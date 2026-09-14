@@ -49,7 +49,7 @@ USB 更新命令不接受任意写地址，只按应用起点加顺序偏移写�
 - `build/klq_bootloader/klq_bootloader.hex`：DAPLink 烧录引导，地址在文件中。
 - `build/klq_bootloader/klq_bootloader.bin`：原始引导镜像，起点 `0x08000000`。
 - `build/klq_bootloader/klq_bootloader.axf`：带调试信息的 ELF。
-- `build/klq_demo_app/klq_demo_app.bin`：链接在 `0x08008000` 的测试应用，供 USB 下载验证。
+- `build/klq_demo_app/klq_demo_app.bin`：链接在 `0x08008000` 的测试应用，包含 SC7A20HTR 角度输出和五路 UART 初始化。
 - 同目录 `.map`：空间占用及符号地址。
 
 本机 Python 工具依赖隔离在 `.venv`。其他环境可用 Python 创建虚拟环境后安装 `pyserial`、`pyocd`；协议工具只需要 `pyserial`。
@@ -85,6 +85,9 @@ USB 更新命令不接受任意写地址，只按应用起点加顺序偏移写�
 # 下载内部 Flash 中的应用固件并启动
 .venv\Scripts\python.exe tools\klq_usb.py flash build\klq_demo_app\klq_demo_app.bin --run
 
+# 监视应用输出；自动识别 KLQ USB 并在拔插后重连
+.venv\Scripts\python.exe tools\serial_monitor.py
+
 # 单独启动有效应用
 .venv\Scripts\python.exe tools\klq_usb.py run
 
@@ -97,7 +100,7 @@ USB 更新命令不接受任意写地址，只按应用起点加顺序偏移写�
 
 修复后的断开流程先关闭 USB 收发器和外设时钟，再把 D+/D− 同时拉低 300 ms；初始化完成后恢复输入模式。延时使用 SysTick，不依赖调试器管理的 DWT/DEMCR，避免 SWD 调试会话结束后计时停住。每次跳转或复位后的枚举需要数秒，立即运行下一条 CLI 命令可能暂时找不到串口。
 
-USB 使用带 CRC 的二进制协议。普通串口终端输入文字不会执行命令；`echo` 是通信诊断。后续应用可复用 USB 串口层增加日志或命令调试。
+USB 使用带 CRC 的二进制协议。普通串口终端输入文字不会执行命令；`echo` 是通信诊断。当前测试应用经同一 USB CDC 约每 100 ms 输出一行 SC7A20HTR 三轴及 Roll/Pitch 信息，串口监视器可直接查看；协议客户端会从文本流中重新同步二进制帧。
 
 **源码断点、单步和寄存器查看仍由 DAPLink/SWD 提供**，本引导没有实现 USB GDB 调试代理。可用 pyOCD 启动 GDB 服务，再用支持 Cortex-M 的 GDB 加载 `.axf` 符号：
 
@@ -135,7 +138,7 @@ GDB 连接 `localhost:3333`。也可在 Keil 中建立 APM32E103RE 工程并选�
 
 状态码：0 成功，1 未知命令，2 长度错误，3 通信 CRC 错误，4 状态错误，5 越界／偏移错误，6 Flash 错误，7 应用镜像无效。
 
-核心源码：`board.c` 为电源／时钟／跳转，`tm1640.c` 为点阵，`usb_serial.c` 为 CDC 适配，`protocol.c` 为下载协议和 Flash 管理。测试应用通过 `KLQ_DEMO_APP` 使用同一组底层驱动，但不包含 Flash 更新命令。
+核心源码：`board.c` 为电源／时钟／跳转，`tm1640.c` 为点阵，`usb_serial.c` 为 CDC 适配，`protocol.c` 为下载协议和 Flash 管理。测试应用通过 `KLQ_DEMO_APP` 使用同一组底层驱动，并增加 `sc7a20.c` 和 `peripherals.c`，但不包含 Flash 更新命令。
 
 USB 当前沿用极海示例的 `VID:PID = 314B:0108` 和演示序列号，仅用于本开发板联调，不代表 KLQ 产品已分配 USB 标识。量产标识及唯一序列号另行设置。
 

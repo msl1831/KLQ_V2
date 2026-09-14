@@ -16,13 +16,18 @@ def build(demo=False, baseline=False):
                lib/'Device/Geehy/APM32E10x/Include', lib/'APM32E10x_StdPeriphDriver/inc',
                lib/'USB_Device_Lib/Core_Device/Standard/inc', lib/'USB_Device_Lib/Driver/inc']
     files = list(board.glob('*.c'))
-    files += [lib/f'APM32E10x_StdPeriphDriver/src/apm32e10x_{n}.c' for n in ['rcm','gpio','fmc']]
+    if not demo and not baseline:
+        files = [source for source in files if source.name not in {'peripherals.c', 'sc7a20.c'}]
+    drivers = ['rcm','gpio','fmc']
+    if demo: drivers += ['usart']
+    files += [lib/f'APM32E10x_StdPeriphDriver/src/apm32e10x_{n}.c' for n in drivers]
     files += list((lib/'USB_Device_Lib/Core_Device/Standard/src').glob('*.c'))
     files += [lib/'USB_Device_Lib/Driver/src/drv_usb_device.c']
     if baseline:
         files = [ROOT/'diagnostics/usb_first_success/usbd_interrupt.c' if f.name == 'usbd_interrupt.c' else f for f in files]
     objects = []
-    common = ['--cpu=Cortex-M3', '--c99', '-O2', '-g', '--split_sections', '-D__MICROLIB', '-DAPM32E10X_HD']
+    common = ['--cpu=Cortex-M3', '--c99', '-O2', '-g', '--split_sections',
+              '-D__MICROLIB', '-DAPM32E10X_HD', '-DHSE_VALUE=16000000']
     if demo: common += ['-DKLQ_DEMO_APP']
     for inc in include: common += ['-I', str(inc)]
     for src in files:
