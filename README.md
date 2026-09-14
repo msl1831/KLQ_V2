@@ -8,6 +8,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 - `bootloader/`：电源保持、7×13 TM1640 点阵、USB CDC 与应用固件更新。
 - `tools/`：构建、烧录和验证脚本。
 - `vendor/APM32E10x_EVAL_SDK-main/Libraries/`：构建所需的 Geehy SDK 库，保留上游声明和许可证。
+- [首次成功版本对照](diagnostics/usb_first_success/README.md)：用于 USB 故障回归，可独立构建；当前板子临时运行此对照镜像，尚未恢复枚举。
 
 **当前状态：引导可通过 DAPLink 烧录，点阵图标和方向已由用户确认；USB 曾完成通信和一次应用下载，但之后无法重新枚举，冷启动也未恢复，尚未验收。** 不应将当前版本视为已验证可用的 USB 下载引导。
 
