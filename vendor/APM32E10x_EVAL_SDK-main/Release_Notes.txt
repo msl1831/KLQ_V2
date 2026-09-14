@@ -1,0 +1,5 @@
+﻿Release Notes for APM32E10x EVAL SDK
+
+Update History
+V1.0 / 30-09-2022
+First Release version of APM32E10x EVAL SDK.

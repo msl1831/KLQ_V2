@@ -1,0 +1,11 @@
+.venv/
+build/
+backups/
+__pycache__/
+*.pyc
+vendor/APM32E10x_SDK/
+vendor/APM32E10x_EVAL_SDK-main/Boards/
+vendor/APM32E10x_EVAL_SDK-main/Documents/
+vendor/APM32E10x_EVAL_SDK-main/Examples/
+vendor/APM32E10x_EVAL_SDK-main/Middlewares/
+vendor/APM32E10x_EVAL_SDK-main/Readme.pdf

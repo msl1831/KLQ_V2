@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/GeehySemi/APM32E10x_EVAL_SDK",
+  "commit": "236fbc3ed9ba4e7a8f2e617dc783fd2bd1b746e1",
+  "retrieved": "2026-09-14",
+  "local_modifications": [
+    "Libraries/USB_Device_Lib/Core_Device/Standard/src/usbd_interrupt.c (non-blocking suspend)"
+  ]
+}
