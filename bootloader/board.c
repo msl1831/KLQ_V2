@@ -42,16 +42,23 @@ void SystemCoreClockUpdate(void) { SystemCoreClock = 72000000u; }
 void SysTick_Handler(void) { ++board_ms; }
 void delay_us(uint32_t us)
 {
-    uint32_t start = DWT->CYCCNT;
-    while ((uint32_t)(DWT->CYCCNT - start) < us * 72u) {}
+    uint32_t remaining = us * (SystemCoreClock / 1000000u);
+    uint32_t period = SysTick->LOAD + 1u;
+    uint32_t previous = SysTick->VAL;
+    /* SysTick keeps timing independent of debugger-owned DEMCR/DWT state.
+     * Poll the downcounter so short delays also work with interrupts masked. */
+    while (remaining) {
+        uint32_t current = SysTick->VAL;
+        uint32_t elapsed = previous >= current ? previous-current : previous+period-current;
+        if (elapsed >= remaining) break;
+        remaining -= elapsed;
+        previous = current;
+    }
 }
 void delay_ms(uint32_t ms) { while (ms--) delay_us(1000); }
 
 void board_init(void)
 {
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    DWT->CYCCNT = 0;
-    DWT->CTRL |= 1;
     SysTick_Config(SystemCoreClock / 1000);
     display_init();
 }
@@ -60,11 +67,17 @@ void usb_disconnect(void)
 {
     GPIO_Config_T io;
     NVIC_DisableIRQ(USBD1_LP_CAN1_RX0_IRQn);
-    /* Keep the USB analog block powered; hold only the digital core in reset. */
-    USBD_SetRegCTRL(1);
+    /* Release USB ownership before driving the bus to SE0 for detach. A core
+     * reset alone leaves the transceiver active and the host can retain its
+     * previous device address when the application starts at address zero. */
+    RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_USB);
+    USBD_PowerOff();
+    USBD_Disable();
+    RCM_DisableAPB1PeriphClock(RCM_APB1_PERIPH_USB);
+    NVIC_ClearPendingIRQ(USBD1_LP_CAN1_RX0_IRQn);
     RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_GPIOA);
-    GPIO_ResetBit(GPIOA, GPIO_PIN_12);
-    io.pin = GPIO_PIN_12;
+    GPIO_ResetBit(GPIOA, GPIO_PIN_11 | GPIO_PIN_12);
+    io.pin = GPIO_PIN_11 | GPIO_PIN_12;
     io.mode = GPIO_MODE_OUT_PP;
     io.speed = GPIO_SPEED_2MHz;
     GPIO_Config(GPIOA, &io);

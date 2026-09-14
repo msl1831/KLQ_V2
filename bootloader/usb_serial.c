@@ -14,17 +14,12 @@ static uint8_t line_coding[8] = {0x00,0xc2,0x01,0,0,0,8,0};
 
 void USBD_HardWareInit(void)
 {
-    GPIO_Config_T io;
     RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_GPIOA);
-    /* D+ remains driven low until the controller and callbacks are ready. */
-    io.pin = GPIO_PIN_11;
-    io.mode = GPIO_MODE_IN_FLOATING;
-    io.speed = GPIO_SPEED_2MHz;
-    GPIO_Config(GPIOA, &io);
-    RCM_EnableAPB1PeriphReset(RCM_APB1_PERIPH_USB);
-    RCM_DisableAPB1PeriphReset(RCM_APB1_PERIPH_USB);
+    /* Both bus pins remain low while the controller is initialized. */
     RCM_ConfigUSBCLK(RCM_USB_DIV_1_5);
     RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_USB);
+    RCM_EnableAPB1PeriphReset(RCM_APB1_PERIPH_USB);
+    RCM_DisableAPB1PeriphReset(RCM_APB1_PERIPH_USB);
     USBD_SetRegCTRL(1); /* Power analog block, retain forced digital reset. */
     delay_ms(2);
     NVIC_SetPriority(USBD1_LP_CAN1_RX0_IRQn, 2);
@@ -116,7 +111,7 @@ void usb_serial_init(void)
     param.pStringDesc = g_stringDescriptor;
     param.pStdReqCallback = &callbacks;
     USBD_Init(&param);
-    io.pin = GPIO_PIN_12;
+    io.pin = GPIO_PIN_11 | GPIO_PIN_12;
     io.mode = GPIO_MODE_IN_FLOATING;
     io.speed = GPIO_SPEED_2MHz;
     GPIO_Config(GPIOA, &io);
