@@ -50,7 +50,7 @@ def main():
         expect_image_error(c)
         print('Whole-image CRC mismatch rejected',flush=True)
         c.flash(args.image,run=True); c.close()
-        c=reconnect('KLQ APP DEMO ')
+        c=reconnect('KLQ ROBOT FW ')
         assert c.command(ECHO,b'Application USB OK',retries=0)==b'Application USB OK'
         c.command(RESET,retries=0); c.close()
         c=reconnect('KLQ USB BOOT ')

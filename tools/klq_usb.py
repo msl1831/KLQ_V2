@@ -11,7 +11,8 @@ from serial.tools import list_ports
 MAGIC = b'KLQ1'
 APP_BASE, META_BASE = 0x08008000, 0x0807F800
 APP_MAX = META_BASE - APP_BASE
-INFO, BEGIN, DATA, END, RUN, ECHO, RESET, DISPLAY = range(1,9)
+INFO, BEGIN, DATA, END, RUN, ECHO, RESET, DISPLAY, STOP, FINISH = range(1,11)
+USER_PROGRAM_MAX = 16384
 ERRORS = ['OK','unknown command','invalid length','CRC mismatch','invalid state',
           'range/offset error','flash write/erase failed','invalid/incomplete image']
 
@@ -94,6 +95,28 @@ class Client:
         print('\nFlash and image CRC verified.')
         if run: self.command(RUN,retries=0)
 
+    def load_program(self, path, run=False):
+        data=Path(path).read_bytes()
+        if not 1 <= len(data) <= USER_PROGRAM_MAX:
+            raise ValueError(f'User program size must be 1..{USER_PROGRAM_MAX} bytes')
+        info=self.info()
+        if not info.startswith('KLQ ROBOT FW '):
+            raise RuntimeError('Robot system firmware is not running; use run first')
+        print(info)
+        self.command(BEGIN,struct.pack('<II',len(data),zlib.crc32(data)))
+        for offset in range(0,len(data),1024):
+            chunk=data[offset:offset+1024]
+            received=self.command(DATA,struct.pack('<I',offset)+chunk)
+            if struct.unpack('<I',received)[0] != offset+len(chunk):
+                raise RuntimeError('Unexpected RAM program offset')
+            print(f'\rDownloaded {offset+len(chunk)}/{len(data)} bytes to RAM',end='',flush=True)
+        self.command(END)
+        print('\nUser program CRC verified; completion icon is being shown.')
+        if run:
+            time.sleep(0.9)
+            self.command(RUN)
+            print('User program run state started (Python VM is not integrated yet).')
+
 def find_port():
     ports=[p.device for p in list_ports.comports() if (p.vid,p.pid)==(0x314B,0x0108)]
     if len(ports)!=1: raise RuntimeError('Specify --port; matching USB ports: '+str(ports))
@@ -103,8 +126,9 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--port',help='COM number; auto-detects the Geehy example VID/PID')
     sub=p.add_subparsers(dest='action',required=True)
-    for name in ['ports','info','run','reset']: sub.add_parser(name)
+    for name in ['ports','info','run','stop','finish','reset']: sub.add_parser(name)
     f=sub.add_parser('flash'); f.add_argument('bin'); f.add_argument('--run',action='store_true')
+    u=sub.add_parser('program'); u.add_argument('python'); u.add_argument('--run',action='store_true')
     e=sub.add_parser('echo'); e.add_argument('text',nargs='?',default='KLQ USB test')
     d=sub.add_parser('display'); d.add_argument('columns',help='13 hex bytes, left to right, bit0=top')
     args=p.parse_args()
@@ -115,7 +139,14 @@ def main():
     try:
         if args.action=='info': print(client.info())
         elif args.action=='flash': client.flash(args.bin,args.run)
-        elif args.action=='run': client.command(RUN,retries=0); print('Application started')
+        elif args.action=='program': client.load_program(args.python,args.run)
+        elif args.action=='run':
+            info=client.info()
+            client.command(RUN,retries=0)
+            print('System firmware started' if info.startswith('KLQ USB BOOT ') else
+                  'User program run state started (Python VM is not integrated yet)')
+        elif args.action=='stop': client.command(STOP); print('User program stopped; standby restored')
+        elif args.action=='finish': client.command(FINISH); print('User program finished; standby restored')
         elif args.action=='reset': client.command(RESET,retries=0); print('Reset to bootloader')
         elif args.action=='echo':
             value=args.text.encode()

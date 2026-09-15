@@ -11,12 +11,22 @@
 #define APP_MAX (META_BASE - APP_BASE)
 #define FLASH_PAGE 2048u
 extern volatile uint32_t board_ms;
+enum {
+    DISPLAY_ICON_DOWNLOAD = 0,
+    DISPLAY_ICON_COMPLETE,
+    DISPLAY_ICON_ERROR,
+    DISPLAY_ICON_STANDBY,
+    DISPLAY_ICON_RUNNING
+};
 void board_init(void);
 void delay_ms(uint32_t ms);
 void delay_us(uint32_t us);
 void display_init(void);
 void display_icon(unsigned icon);
 void display_columns(const uint8_t columns[13]);
+void display_clear(void);
 void usb_disconnect(void);
+void board_request_bootloader(void);
+bool board_consume_bootloader_request(void);
 void board_jump(uint32_t address);
 #endif

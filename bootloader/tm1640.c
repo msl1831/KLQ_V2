@@ -28,20 +28,37 @@ void display_columns(const uint8_t columns[13])
 void display_icon(unsigned icon)
 {
     /* rows top->bottom SEG1..7, chars left->right GRID1..13. */
-    static const char * const rows[3][7] = {
+    static const char * const rows[][7] = {
         {"......#......", "......#......", "....#.#.#....", ".....###.....",
          "......#......", "..#.......#..", "..#########.."},
         {".............", ".........#...", "........#....", "...#...#.....",
          "....#.#......", ".....#.......", "............."},
         {"...#.....#...", "....#...#....", ".....#.#.....", "......#......",
          ".....#.#.....", "....#...#....", "...#.....#..."}
+#ifdef KLQ_DEMO_APP
+        ,
+        {".............", "...##...##...", "...##...##...", ".............",
+         "..#.......#..", "...#.....#...", "....#####...."},
+        {".....#.......", ".....###.....", ".....#####...", ".....#######.",
+         ".....#####...", ".....###.....", ".....#......."}
+#endif
     };
     uint8_t col[13] = {0};
     unsigned x,y;
-    if (icon > 2) icon = 0;
+#ifdef KLQ_DEMO_APP
+    if (icon > DISPLAY_ICON_RUNNING) icon = DISPLAY_ICON_DOWNLOAD;
+#else
+    if (icon > DISPLAY_ICON_ERROR) icon = DISPLAY_ICON_DOWNLOAD;
+#endif
     for (x = 0; x < 13; ++x) for (y = 0; y < 7; ++y)
         if (rows[icon][y][x] == '#') col[x] |= 1u << y;
     display_columns(col);
+}
+
+void display_clear(void)
+{
+    static const uint8_t blank[13] = {0};
+    display_columns(blank);
 }
 
 void display_init(void)
@@ -55,5 +72,5 @@ void display_init(void)
     GPIO_Config(GPIOB, &io);
     delay_ms(5);
     command(0x80);
-    display_icon(0);
+    display_clear();
 }

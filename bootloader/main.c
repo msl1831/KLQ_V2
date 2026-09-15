@@ -3,7 +3,9 @@
 #include "protocol.h"
 #ifdef KLQ_DEMO_APP
 #include "peripherals.h"
+#include "robot_ui.h"
 #include "sc7a20.h"
+#include "user_program.h"
 #include <stdio.h>
 #endif
 
@@ -27,15 +29,18 @@ int main(void)
         uint32_t error_at;
         char line[160];
 
+        user_program_init();
+        robot_ui_init();
+        robot_ui_startup_animation();
         peripherals_uart_init();
         sensor_ready = sc7a20_init();
         sensor_announced = false;
-        display_icon(1);
         usb_serial_init();
         report_at = board_ms + 100u;
         error_at = board_ms;
         for (;;) {
             protocol_poll();
+            robot_ui_poll();
             if (sensor_ready && (int32_t)(board_ms - report_at) >= 0) {
                 sc7a20_sample_t sample;
                 report_at = board_ms + 100u;
@@ -61,8 +66,11 @@ int main(void)
         }
     }
 #else
+    if (!board_consume_bootloader_request() && protocol_system_firmware_valid())
+        board_jump(APP_BASE);
+    display_icon(DISPLAY_ICON_DOWNLOAD);
     usb_serial_init();
-    /* Always enter the loader on reset. Host RUN is explicit; no boot timeout. */
+    /* Stay after an explicit software request, or when system firmware is invalid. */
     for (;;) { protocol_poll(); }
 #endif
 }

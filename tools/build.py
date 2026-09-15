@@ -17,7 +17,8 @@ def build(demo=False, baseline=False):
                lib/'USB_Device_Lib/Core_Device/Standard/inc', lib/'USB_Device_Lib/Driver/inc']
     files = list(board.glob('*.c'))
     if not demo and not baseline:
-        files = [source for source in files if source.name not in {'peripherals.c', 'sc7a20.c'}]
+        demo_only = {'peripherals.c', 'robot_ui.c', 'sc7a20.c', 'user_program.c'}
+        files = [source for source in files if source.name not in demo_only]
     drivers = ['rcm','gpio','fmc']
     if demo: drivers += ['usart']
     files += [lib/f'APM32E10x_StdPeriphDriver/src/apm32e10x_{n}.c' for n in drivers]
@@ -42,7 +43,7 @@ def build(demo=False, baseline=False):
     scatter = out/(name+'.sct')
     scatter.write_text(f'''LR_CODE 0x{base:08X} 0x{size:X} {{
   ER_CODE 0x{base:08X} 0x{size:X} {{ startup.o (RESET, +First) *(InRoot$$Sections) .ANY (+RO) }}
-  RW_RAM 0x20000000 0x20000 {{ .ANY (+RW +ZI) }}
+  RW_RAM 0x20000000 0x1FFF8 {{ .ANY (+RW +ZI) }}
 }}
 ''')
     axf = out/(name+'.axf')

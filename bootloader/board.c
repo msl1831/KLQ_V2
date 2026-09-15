@@ -4,6 +4,9 @@
 uint32_t SystemCoreClock = 72000000u;
 volatile uint32_t board_ms;
 
+#define BOOT_REQUEST_ADDRESS 0x2001FFF8u
+#define BOOT_REQUEST_MAGIC   0x4B4C5142u /* "KLQB" */
+
 /* Called by the reset assembly BEFORE C runtime initialization. No RAM globals. */
 void SystemInit(void)
 {
@@ -82,6 +85,24 @@ void usb_disconnect(void)
     io.speed = GPIO_SPEED_2MHz;
     GPIO_Config(GPIOA, &io);
     delay_ms(300); /* Allow Windows hubs to debounce detach from fixed D+ pull-up. */
+}
+
+void board_request_bootloader(void)
+{
+    volatile uint32_t *request = (volatile uint32_t *)BOOT_REQUEST_ADDRESS;
+    request[0] = BOOT_REQUEST_MAGIC;
+    request[1] = ~BOOT_REQUEST_MAGIC;
+    __DSB();
+}
+
+bool board_consume_bootloader_request(void)
+{
+    volatile uint32_t *request = (volatile uint32_t *)BOOT_REQUEST_ADDRESS;
+    bool requested = request[0] == BOOT_REQUEST_MAGIC && request[1] == ~BOOT_REQUEST_MAGIC;
+    request[0] = 0;
+    request[1] = 0;
+    __DSB();
+    return requested;
 }
 
 __asm void jump_stack(uint32_t stack, uint32_t entry)
