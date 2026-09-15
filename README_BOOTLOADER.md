@@ -49,7 +49,7 @@ USB 系统固件更新命令不接受任意写地址，只按系统固件起点�
 - `build/klq_bootloader/klq_bootloader.hex`：DAPLink 烧录引导，地址在文件中。
 - `build/klq_bootloader/klq_bootloader.bin`：原始引导镜像，起点 `0x08000000`。
 - `build/klq_bootloader/klq_bootloader.axf`：带调试信息的 ELF。
-- `build/klq_demo_app/klq_demo_app.bin`：链接在 `0x08008000` 的系统固件测试镜像，包含 SC7A20HTR 角度输出和五路 UART 初始化。
+- `build/klq_demo_app/klq_demo_app.bin`：链接在 `0x08008000` 的系统固件测试镜像，包含 SC7A20HTR、五路 UART 初始化，以及 UART1～3 外接设备自动发现和 CS100A 服务。
 - 同目录 `.map`：空间占用及符号地址。
 
 本机 Python 工具依赖隔离在 `.venv`。其他环境可用 Python 创建虚拟环境后安装 `pyserial`、`pyocd`；协议工具只需要 `pyserial`。

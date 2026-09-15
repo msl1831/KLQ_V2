@@ -17,7 +17,7 @@ def build(demo=False, baseline=False):
                lib/'USB_Device_Lib/Core_Device/Standard/inc', lib/'USB_Device_Lib/Driver/inc']
     files = list(board.glob('*.c'))
     if not demo and not baseline:
-        demo_only = {'peripherals.c', 'robot_ui.c', 'sc7a20.c', 'user_program.c'}
+        demo_only = {'external_ports.c', 'peripherals.c', 'robot_ui.c', 'sc7a20.c', 'user_program.c'}
         files = [source for source in files if source.name not in demo_only]
     drivers = ['rcm','gpio','fmc']
     if demo: drivers += ['usart']

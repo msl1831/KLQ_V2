@@ -8,12 +8,13 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 - [最终验证记录](docs/verification_20260914.md)：实测结果、固件校验值和测试范围。
 - [SC7A20HTR 与串口验证](docs/verification_20260914_sc7_uart.md)：本次传感器、角度输出及五路串口实测。
 - [显示与 RAM 用户程序验证](docs/verification_20260915_ui_ram.md)：自动启动、显示状态机、RAM 下载和引导升级回归。
+- [外接端口与 CS100A 验证](docs/verification_20260915_external_ports.md)：UART1～3 自动发现、连续测距和掉线重连实测。
 - `bootloader/`：电源保持、7×13 TM1640 点阵、USB CDC 与机器人系统固件更新。
 - `tools/`：构建、烧录和验证脚本。
 - `vendor/APM32E10x_EVAL_SDK-main/Libraries/`：构建所需的 Geehy SDK 库，保留上游声明和许可证。
 - [首次成功版本对照](diagnostics/usb_first_success/README.md)：保留的历史诊断源码，可独立构建；当前板子运行修复后的主线引导。
 
-**当前状态：V0.2 引导和机器人系统固件已烧录，机器人 USB 为 COM123。** 有效系统固件在上电或普通复位后自动启动，播放开机动画并进入待机；显式 USB `reset` 可一次性停留在引导。系统固件已经实现 16 KiB RAM 用户程序下载、CRC 校验、运行状态控制和下载／完成／待机／运行／用户图案显示切换，复位后程序失效且不会写入 Flash。精简 Python 解释器尚未接入，因此当前“运行”命令只验证状态与显示，不执行 Python 代码。完整范围见验证记录。
+**当前状态：V0.2 引导和机器人系统固件已烧录，机器人 USB 为 COM123。** 有效系统固件在上电或普通复位后自动启动，播放开机动画并进入待机；显式 USB `reset` 可一次性停留在引导。系统固件已经实现 16 KiB RAM 用户程序下载、显示状态机，以及 UART1～3 任意端口 KLQ1 自动发现。当前 CS100A 在物理端口 1 完成 INFO、连续 GET_SAMPLE 和掉线重连实测。精简 Python 解释器尚未接入，因此当前“运行”命令只验证状态与显示，不执行 Python 代码。完整范围见验证记录。
 
 构建依赖 Keil ARM Compiler 5；Python 工具依赖见 `tools/requirements.txt`。生成文件、本机虚拟环境及板载固件备份不提交到仓库。完整操作见引导说明。
 
