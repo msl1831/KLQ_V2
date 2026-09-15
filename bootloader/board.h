@@ -16,7 +16,8 @@ enum {
     DISPLAY_ICON_COMPLETE,
     DISPLAY_ICON_ERROR,
     DISPLAY_ICON_STANDBY,
-    DISPLAY_ICON_RUNNING
+    DISPLAY_ICON_RUNNING,
+    DISPLAY_ICON_STANDBY_BLINK
 };
 void board_init(void);
 void delay_ms(uint32_t ms);

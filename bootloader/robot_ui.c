@@ -2,80 +2,93 @@
 #include "board.h"
 
 #define UI_FEEDBACK_MS 800u
+#define IDLE_MIN_MS 4500u
 
 static robot_ui_state_t state;
-static uint32_t feedback_until;
+static uint32_t deadline;
+static uint16_t rnd = 0xace1u;
+static uint8_t blink;
 
-static void show_sweep_frame(unsigned head)
+static void idle_schedule(void)
 {
-    uint8_t columns[13] = {0};
-    if (head < 13u) columns[head] = 0x7fu;
-    if (head > 0u && head - 1u < 13u) columns[head - 1u] = 0x08u;
-    if (head > 1u && head - 2u < 13u) columns[head - 2u] = 0x08u;
-    display_columns(columns);
+    rnd = (uint16_t)((rnd >> 1) ^ ((0u - (rnd & 1u)) & 0xb400u));
+    deadline = board_ms + IDLE_MIN_MS + (rnd & 0xfffu);
+    blink = 0;
 }
 
 void robot_ui_init(void)
 {
     state = ROBOT_UI_BOOTING;
-    feedback_until = 0;
+    deadline = 0;
+    blink = 0;
     display_clear();
 }
 
 void robot_ui_startup_animation(void)
 {
-    unsigned frame;
+    static const uint8_t glow[4][13] = {
+        {0,0,0,0,0,0,0x08,0,0,0,0,0,0},
+        {0,0,0,0,0,0x08,0x1c,0x08,0,0,0,0,0},
+        {0,0,0,0,0x08,0x1c,0x3e,0x1c,0x08,0,0,0,0},
+        {0,0,0x08,0x1c,0x3e,0x3e,0x7f,0x3e,0x3e,0x1c,0x08,0,0}
+    };
+    int frame;
     state = ROBOT_UI_BOOTING;
-    for (frame = 0; frame < 15u; ++frame) {
-        show_sweep_frame(frame);
-        delay_ms(40);
-    }
-    display_icon(DISPLAY_ICON_STANDBY);
-    delay_ms(160);
+    for (frame = 0; frame < 4; ++frame) { display_columns(glow[frame]); delay_ms(70); }
+    for (frame = 2; frame >= 0; --frame) { display_columns(glow[frame]); delay_ms(55); }
     display_clear();
-    delay_ms(80);
+    delay_ms(45);
+    display_icon(DISPLAY_ICON_STANDBY_BLINK);
+    delay_ms(170);
     robot_ui_set_standby();
 }
 
 void robot_ui_poll(void)
 {
-    if ((state == ROBOT_UI_DOWNLOAD_COMPLETE || state == ROBOT_UI_ERROR) &&
-        (int32_t)(board_ms - feedback_until) >= 0)
+    if ((int32_t)(board_ms - deadline) < 0) return;
+    if (state == ROBOT_UI_DOWNLOAD_COMPLETE || state == ROBOT_UI_ERROR) {
         robot_ui_set_standby();
+    } else if (state == ROBOT_UI_STANDBY) {
+        if (++blink == 4u) robot_ui_set_standby();
+        else {
+            display_icon((blink & 1u) ? DISPLAY_ICON_STANDBY_BLINK : DISPLAY_ICON_STANDBY);
+            deadline = board_ms + ((blink & 1u) ? 90u : 120u);
+        }
+    }
 }
 
 void robot_ui_set_standby(void)
 {
     state = ROBOT_UI_STANDBY;
-    feedback_until = 0;
     display_icon(DISPLAY_ICON_STANDBY);
+    idle_schedule();
 }
 
 void robot_ui_set_downloading(void)
 {
     state = ROBOT_UI_DOWNLOADING;
-    feedback_until = 0;
+    deadline = 0;
     display_icon(DISPLAY_ICON_DOWNLOAD);
 }
 
 void robot_ui_set_download_complete(void)
 {
     state = ROBOT_UI_DOWNLOAD_COMPLETE;
-    feedback_until = board_ms + UI_FEEDBACK_MS;
+    deadline = board_ms + UI_FEEDBACK_MS;
     display_icon(DISPLAY_ICON_COMPLETE);
 }
 
 void robot_ui_set_error(void)
 {
     state = ROBOT_UI_ERROR;
-    feedback_until = board_ms + UI_FEEDBACK_MS;
+    deadline = board_ms + UI_FEEDBACK_MS;
     display_icon(DISPLAY_ICON_ERROR);
 }
 
 void robot_ui_set_running(void)
 {
     state = ROBOT_UI_RUNNING;
-    feedback_until = 0;
+    deadline = 0;
     display_icon(DISPLAY_ICON_RUNNING);
 }
 

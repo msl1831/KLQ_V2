@@ -27,32 +27,23 @@ void display_columns(const uint8_t columns[13])
 
 void display_icon(unsigned icon)
 {
-    /* rows top->bottom SEG1..7, chars left->right GRID1..13. */
-    static const char * const rows[][7] = {
-        {"......#......", "......#......", "....#.#.#....", ".....###.....",
-         "......#......", "..#.......#..", "..#########.."},
-        {".............", ".........#...", "........#....", "...#...#.....",
-         "....#.#......", ".....#.......", "............."},
-        {"...#.....#...", "....#...#....", ".....#.#.....", "......#......",
-         ".....#.#.....", "....#...#....", "...#.....#..."}
+    static const uint8_t map[][13] = {
+        {0,0,0x60,0x40,0x44,0x48,0x5f,0x48,0x44,0x40,0x60,0,0},
+        {0,0,0,0x08,0x10,0x20,0x10,0x08,0x04,0x02,0,0,0},
+        {0,0,0,0x41,0x22,0x14,0x08,0x14,0x22,0x41,0,0,0}
 #ifdef KLQ_DEMO_APP
         ,
-        {".............", "...##...##...", "...##...##...", ".............",
-         "..#.......#..", "...#.....#...", "....#####...."},
-        {".....#.......", ".....###.....", ".....#####...", ".....#######.",
-         ".....#####...", ".....###.....", ".....#......."}
+        {0,0,0x10,0x26,0x46,0x40,0x40,0x40,0x46,0x26,0x10,0,0},
+        {0,0,0,0,0,0x7f,0x3e,0x3e,0x1c,0x1c,0x08,0x08,0},
+        {0,0,0x10,0x24,0x44,0x40,0x40,0x40,0x44,0x24,0x10,0,0}
 #endif
     };
-    uint8_t col[13] = {0};
-    unsigned x,y;
 #ifdef KLQ_DEMO_APP
-    if (icon > DISPLAY_ICON_RUNNING) icon = DISPLAY_ICON_DOWNLOAD;
+    if (icon > DISPLAY_ICON_STANDBY_BLINK) icon = DISPLAY_ICON_DOWNLOAD;
 #else
     if (icon > DISPLAY_ICON_ERROR) icon = DISPLAY_ICON_DOWNLOAD;
 #endif
-    for (x = 0; x < 13; ++x) for (y = 0; y < 7; ++y)
-        if (rows[icon][y][x] == '#') col[x] |= 1u << y;
-    display_columns(col);
+    display_columns(map[icon]);
 }
 
 void display_clear(void)
