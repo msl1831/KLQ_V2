@@ -4,6 +4,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 
 - [功能需求 V0.5](KLQ功能需求文档_V0.5.md)：整体功能、显示状态规则、用户程序 RAM 驻留规则及已确认的硬件分配。
 - [当前机器人架构](docs/architecture_current.md)：现有硬件、固件分区、启动流程、通信和下一阶段应用分层。
+- [传感器数据访问决策](docs/decisions/001_sensor_access_strategy.md)：后台采集、静态快照、数据新鲜度和后续 Python API 约束。
 - [USB 引导说明](README_BOOTLOADER.md)：构建、首次 DAPLink 烧录、系统固件下载协议和内部 Flash 分区要求。
 - [最终验证记录](docs/verification_20260914.md)：实测结果、固件校验值和测试范围。
 - [SC7A20HTR 与串口验证](docs/verification_20260914_sc7_uart.md)：本次传感器、角度输出及五路串口实测。
