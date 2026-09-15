@@ -18,4 +18,12 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 
 构建依赖 Keil ARM Compiler 5；Python 工具依赖见 `tools/requirements.txt`。生成文件、本机虚拟环境及板载固件备份不提交到仓库。完整操作见引导说明。
 
+实时观测页面使用机器人 USB CDC 的文本日志和 KLQ1 INFO 响应，同时显示三个外接端口、SC7A20HTR 与系统状态：
+
+```powershell
+python tools/status_dashboard.py --port COM123
+```
+
+启动后访问 `http://127.0.0.1:8765`。页面每 250 ms 刷新，串口断开后自动重连；同一时间不要再运行其他占用 COM123 的串口工具。
+
 第三方 SDK 按其自身许可证使用，本仓库未为整个工程另行指定统一开源许可证。
