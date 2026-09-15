@@ -120,7 +120,9 @@ class Monitor:
                 if match:
                     values = match.groups(); p = self.state["ports"][int(values[0]) - 1]
                     was_online = p["online"]
-                    p.update({"online": False, "timeout": int(values[1]),
+                    p.update({"online": False, "class": 0, "type": 0, "uid": "--",
+                              "distance": 0, "ticks": 0, "sample_status": 0, "sequence": 0,
+                              "timeout": int(values[1]),
                               "frame_error": int(values[2]), "uart_error": int(values[3]),
                               "requests": int(values[4]), "responses": int(values[5]), "updated": now})
                     if was_online:
@@ -215,10 +217,10 @@ HTML = r'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <script>
 const $=id=>document.getElementById(id), esc=v=>String(v??'--').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const ports=$('ports'); ports.innerHTML=[1,2,3].map(i=>`<section class="card"><div class="port-title"><h2>外接端口 ${i}</h2><span id="pb${i}" class="badge">离线</span></div><div id="pd${i}" class="distance">--<small>mm</small></div><div class="kv"><span>设备</span><b id="pt${i}">等待发现</b><span>UID</span><b id="pu${i}" class="mono">--</b><span>回波</span><b id="pk${i}">-- ticks</b><span>样本</span><b id="ps${i}">--</b></div><div class="errors"><div class="err"><b id="pto${i}">0</b>超时</div><div class="err"><b id="pfe${i}">0</b>帧错误</div><div class="err"><b id="pue${i}">0</b>UART</div></div></section>`).join('');
-function device(p){return p.class===1&&p.type===1?'CS100A 超声':p.class||p.type?`类别 ${p.class} / 类型 ${p.type}`:'等待发现'}
+function device(p){return !p.online?'等待发现':p.class===1&&p.type===1?'CS100A 超声':p.class||p.type?`类别 ${p.class} / 类型 ${p.type}`:'未知设备'}
 function age(d,t){return t?Math.max(0,(d.server_time-t)).toFixed(1)+'s 前':'--'}
 function render(d){const c=$('conn');c.classList.toggle('connected',d.connected);c.querySelector('span').textContent=d.connected?`${d.port} 已连接`:`${d.port} 未连接`;
-d.ports.forEach(p=>{const i=p.index,b=$(`pb${i}`);b.classList.toggle('on',p.online);b.textContent=p.online?'在线':'离线';$(`pd${i}`).innerHTML=(p.online?esc(p.distance):'--')+'<small>mm</small>';$(`pt${i}`).textContent=device(p);$(`pu${i}`).textContent=p.uid;$(`pk${i}`).textContent=p.online?`${p.ticks} ticks`:'--';$(`ps${i}`).textContent=p.online?`#${p.sequence} · 状态 ${p.sample_status}`:`REQ ${p.requests} / RESP ${p.responses}`;$(`pto${i}`).textContent=p.timeout;$(`pfe${i}`).textContent=p.frame_error;$(`pue${i}`).textContent=p.uart_error;});
+d.ports.forEach(p=>{const i=p.index,b=$(`pb${i}`);b.classList.toggle('on',p.online);b.textContent=p.online?'在线':'离线';$(`pd${i}`).innerHTML=(p.online?esc(p.distance):'--')+'<small>mm</small>';$(`pt${i}`).textContent=device(p);$(`pu${i}`).textContent=p.online?p.uid:'--';$(`pk${i}`).textContent=p.online?`${p.ticks} ticks`:'--';$(`ps${i}`).textContent=p.online?`#${p.sequence} · 状态 ${p.sample_status}`:`REQ ${p.requests} / RESP ${p.responses}`;$(`pto${i}`).textContent=p.timeout;$(`pfe${i}`).textContent=p.frame_error;$(`pue${i}`).textContent=p.uart_error;});
 const a=d.accelerometer;$('ax').textContent=a.online?a.x:'--';$('ay').textContent=a.online?a.y:'--';$('az').textContent=a.online?a.z:'--';$('roll').textContent=a.online?a.roll.toFixed(2):'--';$('pitch').textContent=a.online?a.pitch.toFixed(2):'--';$('plane').style.transform=`rotate(${a.roll||0}deg) translateY(${Math.max(-35,Math.min(35,a.pitch||0))}px)`;$('scmeta').textContent=a.online?`地址 ${a.address} · ID ${a.identity} · VER ${a.version} · ${age(d,a.updated)}`:'传感器离线';
 const f=d.firmware||{};$('sysname').textContent=f.name||'等待主机 INFO';const keys=['APP','VALID','UI','USER_STATE','USER_VALID','USER_LENGTH','USER_MAX','USB_RESETS'];$('chips').innerHTML=keys.filter(k=>f[k]!==undefined).map(k=>`<div class="chip"><span>${k}</span>${esc(f[k])}</div>`).join('');$('events').innerHTML=d.events.length?d.events.map(e=>`<div class="event"><time>${esc(e.time)}</time><div>${esc(e.message)}</div></div>`).join(''):'<div class="empty">等待数据…</div>'}
 async function update(){try{const r=await fetch('/api/state',{cache:'no-store'});render(await r.json())}catch(e){$('conn').classList.remove('connected');$('conn').querySelector('span').textContent='监控服务断开'}}setInterval(update,250);update();
