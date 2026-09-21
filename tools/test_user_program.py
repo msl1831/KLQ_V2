@@ -44,7 +44,7 @@ def wait_ui(client, expected, timeout=2):
 
 def main():
     client=reconnect('KLQ ROBOT FW ')
-    program=b'from klq import button, port\nwhile button.user_pressed():\n    port.motor_stop(1)\n'
+    program=b'import klq\nwhile True:\n    klq.wait(1)\n'
     try:
         client.command(STOP)
         try: client.command(BEGIN,struct.pack('<II',USER_PROGRAM_MAX+1,0),retries=0)

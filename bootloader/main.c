@@ -3,6 +3,7 @@
 #include "protocol.h"
 #ifdef KLQ_DEMO_APP
 #include "external_ports.h"
+#include "klq_runtime.h"
 #include "peripherals.h"
 #include "robot_ui.h"
 #include "sc7a20.h"
@@ -27,11 +28,15 @@ int main(void)
         bool sensor_ready;
         bool sensor_announced;
         uint32_t report_at;
+        uint32_t sample_at;
         uint32_t error_at;
         uint32_t port_at;
         char line[160];
+        sc7a20_sample_t sample;
+        bool sample_valid;
 
         user_program_init();
+        klq_runtime_init();
         robot_ui_init();
         robot_ui_startup_animation();
         peripherals_uart_init();
@@ -40,21 +45,33 @@ int main(void)
         sensor_announced = false;
         usb_serial_init();
         report_at = board_ms + 100u;
+        sample_at = board_ms + 100u;
         error_at = board_ms;
         port_at = board_ms + 500u;
+        sample_valid = false;
         for (;;) {
             protocol_poll();
+            klq_runtime_poll();
+            user_program_poll();
             robot_ui_poll();
+            external_ports_set_active(user_program_state()==USER_PROGRAM_RUNNING);
             external_ports_poll();
-            if (sensor_ready && (int32_t)(board_ms - report_at) >= 0) {
-                sc7a20_sample_t sample;
-                report_at = board_ms + 100u;
+            if (sensor_ready && (int32_t)(board_ms - sample_at) >= 0) {
+                sample_at = board_ms + (user_program_state()==USER_PROGRAM_RUNNING ? 20u : 100u);
+                sample_valid=sc7a20_read(&sample);
+                klq_runtime_update_imu(&sample,sample_valid);
                 if (!sensor_announced) {
                     int length = sprintf(line, "SC7A20 READY ADDR=0x%02X ID=0x%02X VER=0x%02X\r\n",
                                          sc7a20_address(), sc7a20_identity(), sc7a20_version());
                     sensor_announced = usb_serial_write((const uint8_t *)line, (uint32_t)length);
                 }
-                if (sc7a20_read(&sample)) {
+            } else if (!sensor_ready && (int32_t)(board_ms - error_at) >= 0) {
+                static const char error[] = "SC7A20 ERROR: sensor not detected at 0x19 or 0x18\r\n";
+                error_at += 1000u;
+                usb_serial_write((const uint8_t *)error, sizeof(error) - 1u);
+            }
+            if (sensor_ready && sample_valid && (int32_t)(board_ms - report_at) >= 0) {
+                    report_at = board_ms + 100u;
                     char roll[20], pitch[20];
                     int length;
                     format_angle(roll, sample.roll_cdeg);
@@ -62,11 +79,6 @@ int main(void)
                     length = sprintf(line, "X=%dmg Y=%dmg Z=%dmg ROLL=%sdeg PITCH=%sdeg\r\n",
                                      sample.x_mg, sample.y_mg, sample.z_mg, roll, pitch);
                     usb_serial_write((const uint8_t *)line, (uint32_t)length);
-                }
-            } else if (!sensor_ready && (int32_t)(board_ms - error_at) >= 0) {
-                static const char error[] = "SC7A20 ERROR: sensor not detected at 0x19 or 0x18\r\n";
-                error_at += 1000u;
-                usb_serial_write((const uint8_t *)error, sizeof(error) - 1u);
             }
             if ((int32_t)(board_ms - port_at) >= 0) {
                 unsigned i;

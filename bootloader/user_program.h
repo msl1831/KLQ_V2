@@ -18,6 +18,7 @@ bool user_program_begin(uint32_t length, uint32_t crc);
 bool user_program_write(uint32_t offset, const uint8_t *data, uint32_t length);
 bool user_program_finish_download(void);
 bool user_program_start(void);
+void user_program_poll(void);
 void user_program_stop(void);
 void user_program_finish_execution(void);
 bool user_program_set_display(const uint8_t columns[13]);
@@ -26,5 +27,7 @@ bool user_program_valid(void);
 uint32_t user_program_length(void);
 uint32_t user_program_received(void);
 const uint8_t *user_program_data(void);
+uint8_t user_program_error(void);
+uint16_t user_program_error_line(void);
 
 #endif

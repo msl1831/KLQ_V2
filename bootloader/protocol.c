@@ -101,12 +101,14 @@ static void process(void)
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.2; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
-            "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; USB_RESETS=%lu",
+            "KLQ ROBOT FW 0.3; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; "
+            "PY_ERROR=%u; PY_LINE=%u; USB_RESETS=%lu",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
             (unsigned)user_program_state(),(unsigned)user_program_valid(),
             (unsigned long)user_program_length(),(unsigned long)user_program_received(),
-            (unsigned)USER_PROGRAM_CAPACITY,(unsigned)robot_ui_state(),(unsigned long)usb_reset_count);
+            (unsigned)USER_PROGRAM_CAPACITY,(unsigned)robot_ui_state(),
+            (unsigned)user_program_error(),(unsigned)user_program_error_line(),(unsigned long)usb_reset_count);
 #else
             "KLQ USB BOOT 0.2; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; RECEIVED=%lu; USB_RESETS=%lu",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
@@ -128,6 +130,9 @@ static void process(void)
     case CMD_RESET:
         if (n) status=ERR_LENGTH;
         else {
+#ifdef KLQ_DEMO_APP
+            user_program_stop();
+#endif
             board_request_bootloader();
             action=2;
         }

@@ -115,7 +115,7 @@ class Client:
         if run:
             time.sleep(0.9)
             self.command(RUN)
-            print('User program run state started (Python VM is not integrated yet).')
+            print('User Python program started.')
 
 def find_port():
     ports=[p.device for p in list_ports.comports() if (p.vid,p.pid)==(0x314B,0x0108)]
@@ -144,7 +144,7 @@ def main():
             info=client.info()
             client.command(RUN,retries=0)
             print('System firmware started' if info.startswith('KLQ USB BOOT ') else
-                  'User program run state started (Python VM is not integrated yet)')
+                  'User Python program started')
         elif args.action=='stop': client.command(STOP); print('User program stopped; standby restored')
         elif args.action=='finish': client.command(FINISH); print('User program finished; standby restored')
         elif args.action=='reset': client.command(RESET,retries=0); print('Reset to bootloader')

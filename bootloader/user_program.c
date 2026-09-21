@@ -1,6 +1,8 @@
 #include "user_program.h"
 #include "protocol.h"
 #include "robot_ui.h"
+#include "mini_python.h"
+#include "klq_runtime.h"
 #include <string.h>
 
 static uint8_t program_buffer[USER_PROGRAM_CAPACITY];
@@ -15,11 +17,13 @@ void user_program_init(void)
     expected_length = 0;
     expected_crc = 0;
     received_length = 0;
+    mini_python_init(0,0);
 }
 
 bool user_program_begin(uint32_t length, uint32_t crc)
 {
     if (!length || length > USER_PROGRAM_CAPACITY) return false;
+    if (state==USER_PROGRAM_RUNNING) mini_python_stop();
     state = USER_PROGRAM_DOWNLOADING;
     expected_length = length;
     expected_crc = crc;
@@ -49,6 +53,7 @@ bool user_program_finish_download(void)
         return false;
     }
     state = USER_PROGRAM_READY;
+    mini_python_init(program_buffer,expected_length);
     robot_ui_set_download_complete();
     return true;
 }
@@ -56,15 +61,24 @@ bool user_program_finish_download(void)
 bool user_program_start(void)
 {
     if (state != USER_PROGRAM_READY || robot_ui_state() != ROBOT_UI_STANDBY) return false;
+    if (!mini_python_start()) return false;
     state = USER_PROGRAM_RUNNING;
     robot_ui_set_running();
-    /* The Python VM will consume user_program_data() when it is integrated. */
     return true;
+}
+
+void user_program_poll(void)
+{
+    mini_status_t s;
+    if (state!=USER_PROGRAM_RUNNING) return;
+    s=mini_python_poll();
+    if (s==MINI_DONE) { state=USER_PROGRAM_READY; robot_ui_set_standby(); }
+    else if (s==MINI_ERROR) { state=USER_PROGRAM_READY; robot_ui_set_error(); }
 }
 
 void user_program_stop(void)
 {
-    if (state == USER_PROGRAM_RUNNING) state = USER_PROGRAM_READY;
+    if (state == USER_PROGRAM_RUNNING) { mini_python_stop(); state = USER_PROGRAM_READY; }
     else if (state == USER_PROGRAM_DOWNLOADING) {
         state = USER_PROGRAM_EMPTY;
         expected_length = 0;
@@ -75,7 +89,7 @@ void user_program_stop(void)
 
 void user_program_finish_execution(void)
 {
-    if (state == USER_PROGRAM_RUNNING) state = USER_PROGRAM_READY;
+    if (state == USER_PROGRAM_RUNNING) { mini_python_stop(); state = USER_PROGRAM_READY; }
     robot_ui_set_standby();
 }
 
@@ -89,3 +103,5 @@ bool user_program_valid(void) { return state == USER_PROGRAM_READY || state == U
 uint32_t user_program_length(void) { return user_program_valid() ? expected_length : 0; }
 uint32_t user_program_received(void) { return received_length; }
 const uint8_t *user_program_data(void) { return program_buffer; }
+uint8_t user_program_error(void) { return (uint8_t)mini_python_error(); }
+uint16_t user_program_error_line(void) { return mini_python_error_line(); }

@@ -1,16 +1,16 @@
 # KLQ 机器人当前架构
 
-版本：V0.4
+版本：V0.5
 
-日期：2026-09-15
+日期：2026-09-21
 
-基线：2026-09-15 外接端口自动发现与 CS100A 连机版本
+基线：2026-09-21 精简 Python 与非语音积木接口版本
 
 ## 1. 文档范围
 
 本文描述 KLQ 当前已经形成的硬件连接、固件分区、启动流程、通信链路、驱动组织和开发工具。文中的“当前实现”均可在现有源码中找到；“后续架构”用于指导下一阶段代码拆分，不表示功能已经完成。
 
-当前系统已经具备稳定的 USB 引导、机器人系统固件下载与校验、有效固件自动启动、7×13 LED 点阵显示状态机、16 KiB RAM 用户程序接收、SC7A20HTR 采样，以及 UART1～3 KLQ1 自动发现与 CS100A 超声服务。Python 解释器、电源键业务、用户按键 API、蓝牙应用协议、外接电机服务和音频协议尚未实现；因此当前用户程序“运行”只建立运行状态和显示，不执行 Python 代码。
+当前系统已经具备稳定的 USB 引导、机器人系统固件下载与校验、有效固件自动启动、7×13 LED 点阵显示状态机、16 KiB RAM 用户程序接收与精简 Python 解释执行、PC3 用户键、SC7A20HTR 采样，以及 UART1～3 KLQ1 自动发现与 CS100A 超声服务。电源键业务、蓝牙应用协议、外接电机/红外设备协议和音频协议尚未实现。
 
 本文严格区分两类下载内容：机器人系统固件包含驱动、菜单、通信、解释器和系统服务，保存在 MCU 内部 Flash；上位机生成的 Python 用户程序只在 RAM 中临时驻留，不写入 MCU 内部 Flash。是否将用户程序掉电保存在外部 GD25Q80ESIG 中尚未决定。
 
@@ -39,7 +39,7 @@ flowchart LR
     BLE -->|UART5，应用协议待实现| MCU
     MCU --> BOOT
     MCU --> FW
-    FW -->|当前：接收／CRC／运行状态<br/>后续：解释执行| RAM
+    FW -->|接收／CRC／解释执行| RAM
     MCU --> LED
     ACC -->|PB8/PB9 软件 I²C| MCU
     MCU <--> EXT
@@ -96,9 +96,9 @@ flowchart TB
 | 构建命令 | 宏与链接地址 | 包含内容 |
 | --- | --- | --- |
 | `tools/build.py` | 无 `KLQ_DEMO_APP`；`0x08000000` | 最小引导、USB CDC、TM1640、内部 Flash 更新 |
-| `tools/build.py --demo` | 定义 `KLQ_DEMO_APP`；`0x08008000` | 当前机器人系统固件：USB CDC、显示、RAM 用户程序、五路 UART、外接端口发现／CS100A、SC7A20HTR |
+| `tools/build.py --demo` | 定义 `KLQ_DEMO_APP`；`0x08008000` | 当前机器人系统固件：USB CDC、显示、RAM Python、五路 UART、外接端口发现／CS100A、SC7A20HTR |
 
-引导构建会排除 `external_ports.c`、`peripherals.c`、`sc7a20.c`、`robot_ui.c` 和 `user_program.c`，因此保持“只驱动 USB 与显示”的最小边界。系统固件不是用户程序；它不编译 Flash 擦写路径，在其运行环境中 BEGIN／DATA／END 用于把用户程序放入 RAM。
+引导构建会排除 `external_ports.c`、`peripherals.c`、`sc7a20.c`、`robot_ui.c`、`user_program.c`、`mini_python.c` 和 `klq_runtime.c`，因此保持“只驱动 USB 与显示”的最小边界。系统固件不是用户程序；它不编译 Flash 擦写路径，在其运行环境中 BEGIN／DATA／END 用于把用户程序放入 RAM。
 
 构建统一定义外部晶振为 16 MHz。系统使用 16 MHz HSE，经 PLL 得到 72 MHz 系统时钟；APB1 为 36 MHz，APB2 为 72 MHz，USB 时钟为 48 MHz。
 
@@ -155,7 +155,7 @@ flowchart LR
     PC[上位机生成 Python 用户程序]
     LINK[USB 用户程序下载协议<br/>已实现；蓝牙待接入]
     RAM[MCU RAM<br/>16 KiB 源码缓冲／校验信息／运行状态]
-    VM[系统固件中的 Python 解释器<br/>待接入]
+    VM[系统固件中的精简 Python 解释器<br/>固定状态／无堆分配]
     HWAPI[受控硬件 API<br/>按键／传感器／电机]
     EXT[外部 GD25Q80ESIG<br/>是否持久化待定]
     INTERNAL[MCU 内部 Flash<br/>引导＋系统固件]
@@ -175,7 +175,7 @@ flowchart LR
 | MCU RAM | 当前下载的用户程序、校验状态、解释器运行状态和临时数据 | 本次运行期间有效；复位或断电后视为不存在 |
 | 外部 GD25Q80ESIG | 当前保持备用 | 是否用于用户程序掉电保存后续决定 |
 
-当前系统固件分配 16 KiB 静态 RAM 缓冲。BEGIN 记录长度与 CRC，DATA 只接受连续偏移，END 对整个缓冲执行 CRC-32；成功后才标记为可运行，失败会清除有效状态。替换程序时新 BEGIN 直接进入下载状态。该容量是解释器接入前的暂定值，后续根据 VM 堆栈和脚本规模重新测量。
+当前系统固件分配 16 KiB 静态 RAM 源码缓冲。BEGIN 记录长度与 CRC，DATA 只接受连续偏移，END 对整个缓冲执行 CRC-32；成功后才标记为可运行，失败会清除有效状态。解释器直接扫描该缓冲，不复制源码、不构建语法树、不使用堆；循环栈固定为 8 层。当前系统固件总 RW 为 26,424 字节，在 128 KiB RAM 中保留约 102.2 KiB。
 
 ### 6.2 显示状态机
 
@@ -212,7 +212,7 @@ stateDiagram-v2
 | INFO / ECHO | 支持 | 支持 |
 | DISPLAY | 支持映射调试 | 仅运行中支持用户图案 |
 | BEGIN / DATA / END | 升级内部 Flash 的系统固件 | 下载并校验 RAM 用户程序 |
-| RUN | 跳转有效系统固件 | 进入有效用户程序运行状态 |
+| RUN | 跳转有效系统固件 | 启动精简 Python 解释执行 |
 | STOP / FINISH | 不支持 | 停止／完成用户程序并恢复待机 |
 | RESET | 写一次性请求并复位 | 写一次性请求并复位，返回引导 |
 | 文本日志 | 不输出 | 约 10 Hz 输出三轴和 Roll/Pitch |
@@ -225,7 +225,7 @@ stateDiagram-v2
 
 三个物理端口均为通用设备口，不预设传感器或电机类型。每个未绑定端口每 500 ms 发出无 payload 的 KLQ1 `INFO(0x0001)`；响应通过 CRC、sequence、响应命令和状态校验后，以 `port + device_class + sensor_type + UID` 建立绑定。当前只为 `device_class=1、sensor_type=1` 注册 CS100A 服务，其他合法设备保持已识别状态并继续 INFO 保活，等待对应服务实现。
 
-每个端口各有一个 128 字节中断接收环形缓冲和最多 148 字节的帧解析缓冲，同一时刻只存在一个待响应请求。请求超时为 40 ms，重试两次时复用原 sequence 和完整请求；三次均失败后解绑，500 ms 后恢复发现。连续三个非法帧也会解绑。CS100A 在线后每 100 ms 轮询 `GET_SAMPLE(0x0101)`，保存原始 `sample_sequence`、`capture_time_ms`、`echo_ticks`、`distance_mm`、`sample_status`、质量和驱动状态，并累计请求、响应、超时、帧错误与 UART 错误计数。本阶段没有发送或启用任何传感器 OTA 命令。
+每个端口各有一个 128 字节中断接收环形缓冲和最多 148 字节的帧解析缓冲，同一时刻只存在一个待响应请求。请求超时为 40 ms，重试两次时复用原 sequence 和完整请求；三次均失败后解绑，500 ms 后恢复发现。连续三个非法帧也会解绑。CS100A 在线后待机每 100 ms、用户程序运行时每 40 ms 轮询 `GET_SAMPLE(0x0101)`，保存原始 `sample_sequence`、`capture_time_ms`、`echo_ticks`、`distance_mm`、`sample_status`、质量和驱动状态，并累计请求、响应、超时、帧错误与 UART 错误计数。本阶段没有发送或启用任何传感器 OTA 命令。
 
 ## 8. SC7A20HTR 数据链路
 
@@ -248,6 +248,8 @@ Pitch = atan2(-X, sqrt(Y² + Z²))
 | `bootloader/tm1640.c` | 7×13 点阵映射、亮度命令和系统图标 |
 | `bootloader/robot_ui.c` | 开机动画及待机、下载、完成、错误、运行、用户图案状态机 |
 | `bootloader/user_program.c` | 16 KiB RAM 程序缓冲、顺序接收、CRC 和运行状态 |
+| `bootloader/mini_python.c` | 受限 Python 语法扫描、固定 8 层循环栈、协作等待和错误行号 |
+| `bootloader/klq_runtime.c` | Python API、PC3、SC7/端口快照、点阵渲染和电机安全入口 |
 | `bootloader/usb_serial.c` | Geehy USB Device 库适配、CDC 收发和缓冲 |
 | `bootloader/protocol.c` | KLQ1 帧解析、命令处理、CRC，以及按运行环境分发系统固件或用户程序命令 |
 | `bootloader/peripherals.c` | USART1～3、UART4～5 引脚和 115200、8N1 初始化 |
@@ -261,6 +263,7 @@ Pitch = atan2(-X, sqrt(Y² + Z²))
 | `tools/test_protocol.py` | 帧格式、边界载荷、CRC、重复请求和错误恢复测试 |
 | `tools/test_update.py` | 系统固件分区中断下载、整包 CRC、运行和返回引导测试 |
 | `tools/test_user_program.py` | RAM 程序 CRC、显示状态、运行／停止和复位清空实机测试 |
+| `tools/test_python_runtime.py` | 解释器调用、循环、定时、错误行号、不支持设备和停止响应实机测试 |
 | `tools/test_external_ports.py` | 从主机 USB 日志验证 CS100A 识别、连续采样和错误计数 |
 | `tools/test_external_reconnect.py` | 暂停并复位 PY32 传感器，验证主机解绑和同 UID 重新发现 |
 
@@ -282,9 +285,9 @@ Pitch = atan2(-X, sqrt(Y² + Z²))
 - UART1～3 周期 INFO、CS100A 类型／UID 绑定、连续 GET_SAMPLE 和端口 1 实际收发正常。
 - PY32 传感器暂停 1 秒后，主机状态按 `ON → OFF → ON` 转换并重新识别同一 UID。
 
-除 CS100A 外的外接设备类型、ECB02C 数据传输、音频播放、电池采样、按键交互以及 Python 代码执行不在当前已验证范围内。当前 RUN 只切换系统状态与图标，不能作为解释器完成的证据。
+精简 Python 已完成构建和主机侧协议入口，实板执行结果记录在对应验证文档。除 CS100A 外的外接设备类型、ECB02C 数据传输、音频播放、电池采样、电源键交互仍不在已验证范围内。PC3 用户键驱动与 SC7 倾斜条件已实现，按键有效电平、15° 阈值和前后左右方向仍需实物交互标定。电机和红外仅有稳定 Python API 与底层接入点，取得真实设备协议前会明确返回“不支持”。
 
-## 11. 后续机器人系统固件架构
+## 11. 机器人系统固件分层
 
 在保持引导分区和 KLQ1 更新协议稳定的前提下，下一阶段机器人系统固件继续拆成以下模块：
 
@@ -317,7 +320,7 @@ flowchart TB
 
 Python 层只暴露有限且稳定的 KLQ API，首要范围是用户按键检测、板载或串口传感器数据读取、串口电机控制和 7×13 用户图案显示。用户代码不直接操作 PC5、系统菜单、内部／外部 Flash 或任意 MCU 寄存器。SC7A20HTR、显示和外接端口均通过系统服务访问，以便停止、超时和错误处理保持一致；音频是否开放给用户程序后续再定。
 
-传感器 API 已确定采用后台采集和静态快照。普通 Python 读取只复制最新快照，不同步操作 I²C 或串口；需要新数据时使用带超时并可让出调度的“等待下一帧”接口。当前联调仍保持 10 Hz，用户程序活跃读取时的首轮目标为 SC7A20HTR 50 Hz、CS100A 25 Hz，USB 日志和页面刷新频率不参与业务采集调度。完整约束和验收方法见 [传感器数据访问策略](decisions/001_sensor_access_strategy.md)。
+传感器 API 采用后台采集和静态快照。Python 条件只读最新快照，不同步操作 I²C 或串口。待机时 SC7A20HTR 与 CS100A 保持 10 Hz；用户程序运行时分别提升到 50 Hz 和 25 Hz，USB 日志仍为 10 Hz，页面刷新频率不参与业务采集调度。完整约束和验收方法见 [传感器数据访问策略](decisions/001_sensor_access_strategy.md)。
 
 ## 12. 当前必须保持的约束
 

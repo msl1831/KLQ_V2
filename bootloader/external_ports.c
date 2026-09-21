@@ -13,7 +13,8 @@
 #define FRAME_N 148u
 #define REQ_TIMEOUT 40u
 #define DISCOVER_MS 500u
-#define SAMPLE_MS 100u
+#define SAMPLE_IDLE_MS 100u
+#define SAMPLE_ACTIVE_MS 40u
 #define RETRIES 2u
 
 typedef struct {
@@ -26,6 +27,7 @@ typedef struct {
 } Port;
 
 static Port p[KLQ_EXTERNAL_PORT_COUNT];
+static uint8_t active;
 static USART_T * const uart[KLQ_EXTERNAL_PORT_COUNT] = {USART1, USART2, USART3};
 
 static uint16_t g16(const uint8_t *q) { return q[0] | ((uint16_t)q[1] << 8); }
@@ -87,12 +89,13 @@ static void valid(Port *x)
     } else if (x->command==CMD_SAMPLE) {
         if (n!=20u) goto bad;
         x->s.sample_sequence=g32(d); x->s.capture_time_ms=g32(d+4);
+        x->s.sample_host_ms=board_ms;
         x->s.echo_ticks=g16(d+8); x->s.distance_mm=g16(d+10); x->s.sample_status=d[12];
         x->s.quality_flags=d[13]; x->s.driver_state=d[14];
     } else goto bad;
     x->pending=x->bad=0; ++x->s.response_count;
     x->next_at=board_ms+((x->s.device_class==1u && x->s.sensor_type==1u &&
-                         (x->s.capabilities&1u)) ? SAMPLE_MS : DISCOVER_MS);
+                         (x->s.capabilities&1u)) ? (active?SAMPLE_ACTIVE_MS:SAMPLE_IDLE_MS) : DISCOVER_MS);
     return;
 bad:
     bad_frame(x);
@@ -138,7 +141,7 @@ void USART3_IRQHandler(void) { irq(2); }
 void external_ports_init(void)
 {
     unsigned i;
-    memset(p,0,sizeof(p));
+    memset(p,0,sizeof(p)); active=0;
     for (i=0;i<KLQ_EXTERNAL_PORT_COUNT;i++) {
         p[i].uart=uart[i]; p[i].sequence=i<<24; p[i].next_at=board_ms+50u*i;
         USART_EnableInterrupt(uart[i],USART_INT_RXBNE);
@@ -148,6 +151,8 @@ void external_ports_init(void)
         NVIC_EnableIRQ((IRQn_Type)(USART1_IRQn+i));
     }
 }
+
+void external_ports_set_active(bool value) { active=value; }
 
 void external_ports_poll(void)
 {
@@ -170,4 +175,17 @@ void external_ports_poll(void)
 const klq_port_status_t *external_port_status(unsigned port)
 {
     return port<KLQ_EXTERNAL_PORT_COUNT ? &p[port].s : 0;
+}
+
+/* Motor device class/type and command IDs are intentionally not guessed. */
+bool external_port_motor(unsigned port, int direction, bool run, unsigned power)
+{
+    (void)port; (void)direction; (void)run; (void)power;
+    return false;
+}
+
+void external_ports_motor_stop_all(void)
+{
+    unsigned i;
+    for (i=0;i<KLQ_EXTERNAL_PORT_COUNT;i++) external_port_motor(i,0,false,0);
 }
