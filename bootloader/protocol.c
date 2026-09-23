@@ -5,6 +5,7 @@
 #include <stdio.h>
 #ifdef KLQ_DEMO_APP
 #include "robot_ui.h"
+#include "power_key.h"
 #include "user_program.h"
 #endif
 
@@ -101,14 +102,16 @@ static void process(void)
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.3; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "KLQ ROBOT FW 0.4; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
             "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; "
-            "PY_ERROR=%u; PY_LINE=%u; USB_RESETS=%lu",
+            "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
             (unsigned)user_program_state(),(unsigned)user_program_valid(),
             (unsigned long)user_program_length(),(unsigned long)user_program_received(),
             (unsigned)USER_PROGRAM_CAPACITY,(unsigned)robot_ui_state(),
-            (unsigned)user_program_error(),(unsigned)user_program_error_line(),(unsigned long)usb_reset_count);
+            (unsigned)user_program_error(),(unsigned)user_program_error_line(),
+            (unsigned)power_key_raw_level(),(unsigned)power_key_pressed(),
+            (unsigned)power_key_short_count(),(unsigned long)usb_reset_count);
 #else
             "KLQ USB BOOT 0.2; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; RECEIVED=%lu; USB_RESETS=%lu",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),

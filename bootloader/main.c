@@ -5,6 +5,7 @@
 #include "external_ports.h"
 #include "klq_runtime.h"
 #include "peripherals.h"
+#include "power_key.h"
 #include "robot_ui.h"
 #include "sc7a20.h"
 #include "user_program.h"
@@ -39,6 +40,7 @@ int main(void)
         klq_runtime_init();
         robot_ui_init();
         robot_ui_startup_animation();
+        power_key_init();
         peripherals_uart_init();
         external_ports_init();
         sensor_ready = sc7a20_init();
@@ -51,6 +53,7 @@ int main(void)
         sample_valid = false;
         for (;;) {
             protocol_poll();
+            power_key_poll();
             klq_runtime_poll();
             user_program_poll();
             robot_ui_poll();
