@@ -133,7 +133,7 @@ bool usb_serial_reset_seen(void)
     return value;
 }
 
-bool usb_serial_write(const uint8_t *p, uint32_t n)
+static bool write_limit(const uint8_t *p, uint32_t n, uint32_t limit_ms)
 {
     uint32_t count, begin;
     while (n) {
@@ -147,7 +147,7 @@ bool usb_serial_write(const uint8_t *p, uint32_t n)
         USBD_TxData(USBD_EP_1, tx, count);
         __enable_irq();
         begin = board_ms;
-        while (tx_busy && configured && board_ms - begin < 2000u) {}
+        while (tx_busy && configured && board_ms - begin < limit_ms) {}
         if (tx_busy || !configured) {
             __disable_irq();
             USBD_SetEPTxStatus(USBD_EP_1, USBD_EP_STATUS_NAK);
@@ -159,3 +159,6 @@ bool usb_serial_write(const uint8_t *p, uint32_t n)
     }
     return true;
 }
+
+bool usb_serial_write(const uint8_t *p, uint32_t n) { return write_limit(p,n,2000u); }
+bool usb_serial_log(const uint8_t *p, uint32_t n) { return write_limit(p,n,3u); }

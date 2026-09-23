@@ -22,10 +22,10 @@
 - PC3 暂按上拉低有效，SC7 倾斜阈值 15°，方向需实物确认。
 - 任何程序退出路径调用 `klq_runtime_stop_all()`。
 
-## 当前阻塞
+## 实板状态
 
-机器人 USB CDC 未枚举；DAPLink 的 pyOCD 只读连接卡住，且系统中存在其他项目占用 COM92 的监视进程。未确认 SWD 目标前不要使用 G: DAPLINK 盘烧录。
+2026-09-23 机器人 USB COM123 已恢复，新系统固件 0.3 经 USB 引导写入并通过 CRC，解释器与 RAM 下载回归均通过。调试日志已改成短超时，以免无人读取串口时拖慢用户程序。最终镜像 19,660 字节、SHA-256 `B72BBAD1722E9FA63440E708186C1B352706A91F66CC9FCDECAB40EC3C80F5A9`；详见 `docs/verification_20260921_python_runtime.md`。无外接传感器，CS100A 实测未进行。
 
 ## 继续步骤
 
-先完成 `docs/verification_20260921_python_runtime.md` 的实板步骤并回填结果。实板通过后提交本隔离工作区并推送；原 `F:\work\KLQ_V2\Codex` 有未提交语音改动，不要覆盖或清理，应通过提交/合并处理冲突。
+人工确认点阵图案、PC3 按下/释放和 SC7 四方向；取得电机/红外真实协议后实现 `external_port_motor()` 与红外采集。原 `F:\work\KLQ_V2\Codex` 有未提交语音改动，不要覆盖或清理，应通过提交/合并处理冲突。

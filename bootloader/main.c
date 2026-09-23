@@ -63,12 +63,12 @@ int main(void)
                 if (!sensor_announced) {
                     int length = sprintf(line, "SC7A20 READY ADDR=0x%02X ID=0x%02X VER=0x%02X\r\n",
                                          sc7a20_address(), sc7a20_identity(), sc7a20_version());
-                    sensor_announced = usb_serial_write((const uint8_t *)line, (uint32_t)length);
+                    sensor_announced = usb_serial_log((const uint8_t *)line, (uint32_t)length);
                 }
             } else if (!sensor_ready && (int32_t)(board_ms - error_at) >= 0) {
                 static const char error[] = "SC7A20 ERROR: sensor not detected at 0x19 or 0x18\r\n";
                 error_at += 1000u;
-                usb_serial_write((const uint8_t *)error, sizeof(error) - 1u);
+                usb_serial_log((const uint8_t *)error, sizeof(error) - 1u);
             }
             if (sensor_ready && sample_valid && (int32_t)(board_ms - report_at) >= 0) {
                     report_at = board_ms + 100u;
@@ -78,7 +78,7 @@ int main(void)
                     format_angle(pitch, sample.pitch_cdeg);
                     length = sprintf(line, "X=%dmg Y=%dmg Z=%dmg ROLL=%sdeg PITCH=%sdeg\r\n",
                                      sample.x_mg, sample.y_mg, sample.z_mg, roll, pitch);
-                    usb_serial_write((const uint8_t *)line, (uint32_t)length);
+                    usb_serial_log((const uint8_t *)line, (uint32_t)length);
             }
             if ((int32_t)(board_ms - port_at) >= 0) {
                 unsigned i;
@@ -98,7 +98,7 @@ int main(void)
                             (unsigned long)s->timeout_count,(unsigned long)s->frame_error_count,
                             (unsigned long)s->uart_error_count,(unsigned long)s->request_count,
                             (unsigned long)s->response_count);
-                    usb_serial_write((const uint8_t *)line,(uint32_t)length);
+                    usb_serial_log((const uint8_t *)line,(uint32_t)length);
                 }
             }
         }
