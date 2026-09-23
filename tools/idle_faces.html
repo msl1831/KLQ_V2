@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KLQ 待机表情候选</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Microsoft YaHei",sans-serif;background:#080c14;color:#edf4ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -20%,#183249,transparent 48%),#080c14}main{max-width:1050px;margin:auto;padding:24px}header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}h1{margin:0;font-size:25px}p{color:#a8b8cb;line-height:1.6;margin:8px 0 0}.tag{border:1px solid #2a4155;background:#112333;color:#6be1ff;padding:7px 10px;border-radius:20px;white-space:nowrap;font-size:12px}.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:24px}.choice{display:block;text-align:left;width:100%;background:#111a27;color:inherit;border:2px solid #273749;border-radius:16px;padding:17px;cursor:pointer}.choice:hover{border-color:#4b90b7}.choice.chosen{border-color:#55daef;box-shadow:0 0 0 2px #55daef22}.title{display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:700}.letter{color:#5de1f1;font-family:monospace}.matrix{display:grid;grid-template-columns:repeat(13,14px);grid-template-rows:repeat(7,14px);gap:3px;width:max-content;padding:12px;margin:16px auto;background:#06090d;border:1px solid #253342;border-radius:10px}.led{width:12px;height:12px;border-radius:50%;background:#17212b}.led.on{background:#4ee5fd;box-shadow:0 0 9px #21caffaa}.desc{min-height:44px;color:#a8b8cb;font-size:13px;line-height:1.5}.code{margin-top:10px;font:11px/1.5 Consolas,monospace;color:#7bbacb;word-break:break-all}.picked{margin-top:20px;border:1px solid #31546a;background:#102030;border-radius:12px;padding:14px 17px;line-height:1.6}.picked b{color:#6be1ff}button.copy{margin-top:10px;border:1px solid #408eaa;background:#18455a;color:#edfbff;padding:8px 13px;border-radius:8px;cursor:pointer}small{color:#90a2b6}@media(max-width:560px){main{padding:16px}header{display:block}.tag{display:inline-block;margin-top:12px}}
+</style>
+</head>
+<body><main>
+<header><div><h1>KLQ 待机表情候选</h1><p>均按实际 7 行 × 13 列点阵预览，蓝点代表点亮。点击选一个候选；选中结果只保存在此浏览器，暂不改变机器人固件。</p></div><span class="tag">每约 6 秒眨眼预览</span></header>
+<div id="choices" class="choices"></div>
+<div id="picked" class="picked"></div>
+<p><small>图案数据按 GRID1→GRID13 排列，每列 1 字节；bit0 对应最上面一行。当前固件使用 A 的睁眼图案。</small></p>
+</main>
+<script>
+const faces=[
+  {id:'A',name:'清亮眼 · 当前',desc:'目前主机正在使用的双眼，中心有小瞳孔；保留原有左右看和眨眼。',hex:'00 1c 22 2a 22 1c 00 1c 22 2a 22 1c 00'},
+  {id:'B',name:'豆豆眼',desc:'更简洁的圆点，轻松、亲近；在小尺寸上辨识度高。',hex:'00 00 1c 1c 1c 00 00 00 1c 1c 1c 00 00'},
+  {id:'C',name:'方框眼',desc:'方形轮廓和小瞳孔，偏机器人、科技感。',hex:'00 3e 22 2a 22 3e 00 3e 22 2a 22 3e 00'},
+  {id:'D',name:'星光眼',desc:'两枚小星光，精神、活泼；点亮面积稍大。',hex:'00 08 1c 3e 1c 08 00 08 1c 3e 1c 08 00'},
+  {id:'E',name:'半眯眼',desc:'细长的菱形眼，显得放松、安静。',hex:'00 08 14 14 14 08 00 08 14 14 14 08 00'},
+  {id:'F',name:'笑弯眼',desc:'两只弯眼，不画嘴巴也能表达愉快。',hex:'00 00 20 30 28 10 00 10 28 30 20 00 00'}
+];
+const blink='00 08 10 10 10 08 00 08 10 10 10 08 00'.split(' ').map(x=>parseInt(x,16));
+let selected=localStorage.getItem('klq-idle-face')||'A';
+if(!faces.some(f=>f.id===selected))selected='A';
+let blinking=false;
+const all=document.getElementById('choices'),picked=document.getElementById('picked');
+function matrix(cols){let html='';for(let y=0;y<7;y++)for(let x=0;x<13;x++)html+=`<i class="led${cols[x]&(1<<y)?' on':''}"></i>`;return html}
+function render(){all.innerHTML=faces.map(f=>{const cols=blinking?blink:f.hex.split(' ').map(x=>parseInt(x,16));return `<button class="choice ${selected===f.id?'chosen':''}" data-id="${f.id}"><div class="title"><span>${f.name}</span><span class="letter">${f.id}</span></div><div class="matrix" aria-label="7 行 13 列点阵">${matrix(cols)}</div><div class="desc">${f.desc}</div><div class="code">${f.hex.toUpperCase()}</div></button>`}).join('');const f=faces.find(f=>f.id===selected);picked.innerHTML=`已选择 <b>${f.id} · ${f.name}</b><br>告诉我候选字母，就可以把它做进待机固件。<br><button class="copy" type="button">复制 ${f.id} 的点阵数据</button>`}
+all.addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(!b)return;selected=b.dataset.id;localStorage.setItem('klq-idle-face',selected);render()});
+picked.addEventListener('click',async e=>{if(!e.target.matches('.copy'))return;const f=faces.find(f=>f.id===selected);await navigator.clipboard.writeText(f.hex.replaceAll(' ','').toUpperCase());e.target.textContent='已复制'});
+render();setInterval(()=>{blinking=true;render();setTimeout(()=>{blinking=false;render()},120)},6000);
+</script>
+</body></html>

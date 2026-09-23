@@ -102,7 +102,7 @@ static void process(void)
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.6; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "KLQ ROBOT FW 0.7; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
             "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; "
             "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
@@ -243,6 +243,7 @@ static void process(void)
 void protocol_poll(void)
 {
     int b;
+    unsigned quota=256u;
     if (usb_serial_reset_seen()) {
         used=0; cached=false;
 #ifdef KLQ_DEMO_APP
@@ -252,7 +253,7 @@ void protocol_poll(void)
 #endif
     }
     if (used && board_ms-last_byte>2000u) used=0;
-    while ((b=usb_serial_read()) >= 0) {
+    while (quota-- && (b=usb_serial_read()) >= 0) {
         frame[used++]=(uint8_t)b; last_byte=board_ms;
         if (used==4 && get32(frame)!=FRAME_MAGIC) { memmove(frame,frame+1,3); used=3; }
         if (used==16 && get16(frame+10)>MAX_PAYLOAD) { used=0; continue; }

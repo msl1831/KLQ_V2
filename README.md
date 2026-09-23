@@ -13,6 +13,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 - [精简 Python 首版验证](docs/verification_20260921_python_runtime.md)：固件资源、构建结果、实板验收步骤和当前边界。
 - [PC4 短按实板验证](docs/verification_20260923_power_key.md)：RAM 程序的实体键运行／停止和计数观测。
 - [长按开关机与通信回归](docs/verification_20260923_power_on_off.md)：1.5 秒按键门槛、USB 引导、运行与显示实板验证。
+- [RAM 程序与解释器容错验证](docs/verification_20260923_runtime_faults.md)：错误退出、无延时循环停止、运行中下载替换及固件资源。
 - [显示与 RAM 用户程序验证](docs/verification_20260915_ui_ram.md)：自动启动、显示状态机、RAM 下载和引导升级回归。
 - [外接端口与 CS100A 验证](docs/verification_20260915_external_ports.md)：UART1～3 自动发现、连续测距和掉线重连实测。
 - `bootloader/`：电源保持、7×13 TM1640 点阵、USB CDC 与机器人系统固件更新。
@@ -30,6 +31,6 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 python tools/status_dashboard.py --port COM123
 ```
 
-启动后访问 `http://127.0.0.1:8765`。页面每 250 ms 刷新，串口断开后自动重连；同一时间不要再运行其他占用 COM123 的串口工具。
+启动后访问 `http://127.0.0.1:8765`，待机表情候选在 `http://127.0.0.1:8765/faces`。观测页面每 250 ms 刷新，串口断开后自动重连；同一时间不要再运行其他占用 COM123 的串口工具。
 
 第三方 SDK 按其自身许可证使用，本仓库未为整个工程另行指定统一开源许可证。

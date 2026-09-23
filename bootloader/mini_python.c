@@ -5,6 +5,7 @@
 
 #define LOOP_MAX 8u
 #define ARG_MAX 3u
+#define STEP_BUDGET 32u
 
 typedef struct { const char *s; uint16_t n; int32_t m; uint8_t string; } Arg;
 typedef struct { uint32_t body, remaining; uint16_t indent; uint8_t forever; } Loop;
@@ -239,9 +240,10 @@ bool mini_python_start(void)
 
 mini_status_t mini_python_poll(void)
 {
-    const char *p,*q; uint16_t n,ind,qn,qi; bool tab,qt; uint32_t at,next,look,candidate; int32_t count;
+    const char *p,*q; uint16_t n,ind,qn,qi; bool tab,qt; uint32_t at,next,look,candidate; int32_t count; uint8_t steps=0;
     if (status!=MINI_RUNNING || pending()) return status;
 again:
+    if (++steps>STEP_BUDGET) return status;
     if (pc>=src_n) {
         if (depth) {
             Loop *l=&loop[depth-1u];
