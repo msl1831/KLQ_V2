@@ -7,20 +7,21 @@
 static robot_ui_state_t state;
 static uint32_t deadline;
 static uint16_t rnd = 0xace1u;
-static uint8_t blink;
+static uint8_t phase, gaze;
 
 static void idle_schedule(void)
 {
     rnd = (uint16_t)((rnd >> 1) ^ ((0u - (rnd & 1u)) & 0xb400u));
     deadline = board_ms + IDLE_MIN_MS + (rnd & 0xfffu);
-    blink = 0;
+    phase = 0;
+    gaze = (uint8_t)(rnd & 1u);
 }
 
 void robot_ui_init(void)
 {
     state = ROBOT_UI_BOOTING;
     deadline = 0;
-    blink = 0;
+    phase = gaze = 0;
     display_clear();
 }
 
@@ -49,10 +50,12 @@ void robot_ui_poll(void)
     if (state == ROBOT_UI_DOWNLOAD_COMPLETE || state == ROBOT_UI_ERROR) {
         robot_ui_set_standby();
     } else if (state == ROBOT_UI_STANDBY) {
-        if (++blink == 4u) robot_ui_set_standby();
+        if (++phase == 4u) robot_ui_set_standby();
         else {
-            display_icon((blink & 1u) ? DISPLAY_ICON_STANDBY_BLINK : DISPLAY_ICON_STANDBY);
-            deadline = board_ms + ((blink & 1u) ? 90u : 120u);
+            display_icon(phase==1u ? (gaze ? DISPLAY_ICON_STANDBY_LOOK_RIGHT :
+                                      DISPLAY_ICON_STANDBY_LOOK_LEFT) :
+                         phase==2u ? DISPLAY_ICON_STANDBY : DISPLAY_ICON_STANDBY_BLINK);
+            deadline = board_ms + (phase==1u ? 320u : phase==2u ? 120u : 90u);
         }
     }
 }

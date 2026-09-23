@@ -102,7 +102,7 @@ static void process(void)
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.4; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "KLQ ROBOT FW 0.6; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
             "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; "
             "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
@@ -113,7 +113,7 @@ static void process(void)
             (unsigned)power_key_raw_level(),(unsigned)power_key_pressed(),
             (unsigned)power_key_short_count(),(unsigned long)usb_reset_count);
 #else
-            "KLQ USB BOOT 0.2; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; RECEIVED=%lu; USB_RESETS=%lu",
+            "KLQ USB BOOT 0.3; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; RECEIVED=%lu; USB_RESETS=%lu",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
             (unsigned long)written,(unsigned long)usb_reset_count);
 #endif
@@ -245,7 +245,9 @@ void protocol_poll(void)
     int b;
     if (usb_serial_reset_seen()) {
         used=0; cached=false;
-#ifndef KLQ_DEMO_APP
+#ifdef KLQ_DEMO_APP
+        if (user_program_state()==USER_PROGRAM_DOWNLOADING) user_program_stop();
+#else
         downloading=false;
 #endif
     }

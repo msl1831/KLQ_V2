@@ -66,6 +66,92 @@ void board_init(void)
     display_init();
 }
 
+static uint8_t key_down(void) { return (GPIOC->IDATA & GPIO_PIN_4)==0; }
+
+void board_power_off(bool usb_active)
+{
+    uint8_t raw, stable, released;
+    uint32_t changed, pressed=0, now;
+    if (usb_active) usb_disconnect();
+    display_clear();
+    GPIOC->BC = GPIO_PIN_5;
+    /* USB/SWD may still power the MCU. Require release before a new 1.5 s hold. */
+    raw=stable=key_down();
+    released=(uint8_t)!stable;
+    changed=board_ms;
+    for (;;) {
+        now=board_ms;
+        {
+            uint8_t v=key_down();
+            if (v!=raw) { raw=v; changed=now; }
+            if (v!=stable && now-changed>=POWER_KEY_DEBOUNCE_MS) {
+                stable=v;
+                if (!v) released=1;
+                else if (released) pressed=now;
+            }
+        }
+        if (released && stable && now-pressed>=POWER_KEY_HOLD_MS) {
+            GPIOC->BSC = GPIO_PIN_5;
+            NVIC_SystemReset();
+        }
+    }
+}
+
+void board_power_on_gate(void)
+{
+    uint8_t soft=RCM_ReadStatusFlag(RCM_FLAG_SWRST);
+    uint8_t cold=RCM_ReadStatusFlag(RCM_FLAG_PORRST);
+    uint8_t raw, stable;
+    uint32_t changed, pressed;
+    GPIO_Config_T io;
+    RCM_ClearStatusFlag();
+    io.pin=GPIO_PIN_4;
+    io.mode=GPIO_MODE_IN_PU;
+    io.speed=GPIO_SPEED_2MHz;
+    GPIO_Config(GPIOC,&io);
+    /* USB upgrade and off-state wake use software reset; do not gate them again. */
+    if (soft || (!cold && !key_down())) return;
+    raw=stable=key_down();
+    if (!stable) board_power_off(false);
+    changed=pressed=board_ms;
+    while (board_ms-pressed<POWER_KEY_HOLD_MS) {
+        uint8_t v=key_down();
+        uint32_t now=board_ms;
+        if (v!=raw) { raw=v; changed=now; }
+        if (v!=stable && now-changed>=POWER_KEY_DEBOUNCE_MS) {
+            stable=v;
+            if (!v) board_power_off(false);
+        }
+    }
+}
+
+#ifndef KLQ_DEMO_APP
+static uint32_t boot_changed, boot_pressed;
+static uint8_t boot_raw, boot_stable, boot_armed;
+
+void board_boot_key_init(void)
+{
+    boot_raw=boot_stable=key_down();
+    boot_armed=0;
+    boot_changed=boot_pressed=board_ms;
+}
+
+void board_boot_key_poll(void)
+{
+    uint8_t v=key_down();
+    uint32_t now=board_ms;
+    if (v!=boot_raw) { boot_raw=v; boot_changed=now; }
+    if (v!=boot_stable && now-boot_changed>=POWER_KEY_DEBOUNCE_MS) {
+        boot_stable=v;
+        if (v) boot_pressed=now;
+        else boot_armed=1;
+    }
+    if (!boot_stable && !boot_armed && now-boot_changed>=POWER_KEY_DEBOUNCE_MS) boot_armed=1;
+    if (boot_stable && boot_armed && now-boot_pressed>=POWER_KEY_HOLD_MS)
+        board_power_off(true);
+}
+#endif
+
 void usb_disconnect(void)
 {
     GPIO_Config_T io;

@@ -10,6 +10,8 @@
 #define META_BASE 0x0807F800u
 #define APP_MAX (META_BASE - APP_BASE)
 #define FLASH_PAGE 2048u
+#define POWER_KEY_DEBOUNCE_MS 25u
+#define POWER_KEY_HOLD_MS 1500u
 extern volatile uint32_t board_ms;
 enum {
     DISPLAY_ICON_DOWNLOAD = 0,
@@ -17,9 +19,15 @@ enum {
     DISPLAY_ICON_ERROR,
     DISPLAY_ICON_STANDBY,
     DISPLAY_ICON_RUNNING,
-    DISPLAY_ICON_STANDBY_BLINK
+    DISPLAY_ICON_STANDBY_BLINK,
+    DISPLAY_ICON_STANDBY_LOOK_LEFT,
+    DISPLAY_ICON_STANDBY_LOOK_RIGHT
 };
 void board_init(void);
+void board_power_on_gate(void);
+void board_power_off(bool usb_active);
+void board_boot_key_init(void);
+void board_boot_key_poll(void);
 void delay_ms(uint32_t ms);
 void delay_us(uint32_t us);
 void display_init(void);

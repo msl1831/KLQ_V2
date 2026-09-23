@@ -2,11 +2,9 @@
 #include "board.h"
 #include "user_program.h"
 #include "robot_ui.h"
+#include "klq_runtime.h"
 #include "apm32e10x_gpio.h"
 #include "apm32e10x_rcm.h"
-
-#define DEBOUNCE_MS 25u
-#define LONG_GUARD_MS 1500u
 
 static uint32_t changed_at, pressed_at;
 static uint16_t short_count;
@@ -35,7 +33,7 @@ void power_key_poll(void)
     uint8_t v=(uint8_t)!power_key_raw_level();
     uint32_t now=board_ms;
     if (v!=raw) { raw=v; changed_at=now; }
-    if (v!=stable && now-changed_at>=DEBOUNCE_MS) {
+    if (v!=stable && now-changed_at>=POWER_KEY_DEBOUNCE_MS) {
         stable=v;
         if (v) {
             pressed_at=now;
@@ -45,7 +43,7 @@ void power_key_poll(void)
             else if (user_program_state()==USER_PROGRAM_EMPTY) action=3;
             else action=0;
         } else {
-            if (armed && now-pressed_at<LONG_GUARD_MS) {
+            if (armed && now-pressed_at<POWER_KEY_HOLD_MS) {
                 ++short_count;
                 if (action==2 && user_program_state()==USER_PROGRAM_RUNNING) user_program_stop();
                 else if (action==1 && user_program_state()==USER_PROGRAM_READY) user_program_start();
@@ -55,5 +53,11 @@ void power_key_poll(void)
             action=0;
         }
     }
-    if (!stable && !armed && now-changed_at>=DEBOUNCE_MS) armed=1;
+    if (!stable && !armed && now-changed_at>=POWER_KEY_DEBOUNCE_MS) armed=1;
+    if (stable && armed && now-pressed_at>=POWER_KEY_HOLD_MS) {
+        action=0;
+        user_program_stop();
+        klq_runtime_stop_all();
+        board_power_off(true);
+    }
 }

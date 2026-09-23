@@ -107,11 +107,13 @@ int main(void)
         }
     }
 #else
+    board_power_on_gate();
     if (!board_consume_bootloader_request() && protocol_system_firmware_valid())
         board_jump(APP_BASE);
     display_icon(DISPLAY_ICON_DOWNLOAD);
     usb_serial_init();
+    board_boot_key_init();
     /* Stay after an explicit software request, or when system firmware is invalid. */
-    for (;;) { protocol_poll(); }
+    for (;;) { protocol_poll(); board_boot_key_poll(); }
 #endif
 }
