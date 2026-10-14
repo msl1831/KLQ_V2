@@ -102,7 +102,7 @@ static void process(void)
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.7; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "KLQ ROBOT FW 0.8; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
             "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; "
             "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),

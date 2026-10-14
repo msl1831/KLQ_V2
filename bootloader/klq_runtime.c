@@ -47,7 +47,8 @@ bool klq_runtime_distance(unsigned port, int compare, int32_t cm)
     const klq_port_status_t *s;
     if (port<1u || port>KLQ_EXTERNAL_PORT_COUNT || (compare!=-1 && compare!=1) || cm<0) return false;
     s=external_port_status(port-1u);
-    return s && s->online && s->device_class==1u && s->sensor_type==1u && !s->sample_status &&
+    /* CS100A GET_SAMPLE status 1 is valid; 0 means no sample. */
+    return s && s->online && s->device_class==1u && s->sensor_type==1u && s->sample_status==1u &&
            board_ms-s->sample_host_ms<=80u &&
            cmp(s->distance_mm,compare,cm*10);
 }
