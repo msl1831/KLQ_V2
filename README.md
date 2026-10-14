@@ -4,6 +4,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 
 - [功能需求 V0.8](KLQ功能需求文档_V0.5.md)：整体功能、待机双眼、PC4 长短按、用户程序 RAM 驻留规则及已确认的硬件分配。
 - [当前机器人架构](docs/architecture_current.md)：现有硬件、固件分区、启动流程、通信和下一阶段应用分层。
+- [当前开发交接](docs/handoff_current.md)：主控分支、最新板上版本、测试结果与后续工作。
 - [传感器数据访问决策](docs/decisions/001_sensor_access_strategy.md)：后台采集、静态快照、数据新鲜度和后续 Python API 约束。
 - [精简 Python 与积木接口 V0.1](docs/python_api_v0.1.md)：上位机代码生成规则、26 个非语音积木映射、枚举和错误码。
 - [上位机 USB 通信协议 V0.1](docs/host_usb_protocol_v0.1.md)：KLQ1 帧格式、Python 源码下载、运行控制与状态查询。
@@ -14,6 +15,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 - [PC4 短按实板验证](docs/verification_20260923_power_key.md)：RAM 程序的实体键运行／停止和计数观测。
 - [长按开关机与通信回归](docs/verification_20260923_power_on_off.md)：1.5 秒按键门槛、USB 引导、运行与显示实板验证。
 - [RAM 程序与解释器容错验证](docs/verification_20260923_runtime_faults.md)：错误退出、无延时循环停止、运行中下载替换及固件资源。
+- [26 个非语音积木测试](docs/verification_20261014_blocks.md)：真实 C 模拟、实板接口矩阵、执行命令及物理验收边界。
 - [显示与 RAM 用户程序验证](docs/verification_20260915_ui_ram.md)：自动启动、显示状态机、RAM 下载和引导升级回归。
 - [外接端口与 CS100A 验证](docs/verification_20260915_external_ports.md)：UART1～3 自动发现、连续测距和掉线重连实测。
 - `bootloader/`：电源保持、7×13 TM1640 点阵、USB CDC 与机器人系统固件更新。

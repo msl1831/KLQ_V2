@@ -1,0 +1,494 @@
+{
+  "firmware": "KLQ ROBOT FW 0.8; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2",
+  "cases": [
+    {
+      "name": "entry/import/pass",
+      "blocks": [
+        1
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "decimal delay",
+      "blocks": [
+        2
+      ],
+      "result": "PASS",
+      "seconds": 0.235,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "zero delay",
+      "blocks": [
+        2
+      ],
+      "result": "PASS",
+      "seconds": 0.047,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "finite and nested loops",
+      "blocks": [
+        3
+      ],
+      "result": "PASS",
+      "seconds": 0.281,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "forever with wait",
+      "blocks": [
+        4
+      ],
+      "result": "PASS",
+      "seconds": 0.219,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": 0
+    },
+    {
+      "name": "forever without wait",
+      "blocks": [
+        4
+      ],
+      "result": "PASS",
+      "seconds": 0.235,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": 0.01599999999962165
+    },
+    {
+      "name": "stop skips following action",
+      "blocks": [
+        5
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "single and movement power levels",
+      "blocks": [
+        11,
+        18
+      ],
+      "result": "PASS",
+      "seconds": 0.079,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "all port motor stop and movement stop",
+      "blocks": [
+        10,
+        17
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "motor_for direction 1 unsupported",
+      "blocks": [
+        6
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "motor_run direction 1 unsupported",
+      "blocks": [
+        8
+      ],
+      "result": "PASS",
+      "seconds": 0.047,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "motor_for direction -1 unsupported",
+      "blocks": [
+        7
+      ],
+      "result": "PASS",
+      "seconds": 0.032,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "motor_run direction -1 unsupported",
+      "blocks": [
+        9
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "move_for direction 0 unsupported",
+      "blocks": [
+        12
+      ],
+      "result": "PASS",
+      "seconds": 0.047,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "move direction 0 unsupported",
+      "blocks": [
+        16
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "move_for direction 1 unsupported",
+      "blocks": [
+        13
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "move direction 1 unsupported",
+      "blocks": [
+        16
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "move_for direction 2 unsupported",
+      "blocks": [
+        14
+      ],
+      "result": "PASS",
+      "seconds": 0.047,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "move direction 2 unsupported",
+      "blocks": [
+        16
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "move_for direction 3 unsupported",
+      "blocks": [
+        15
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "move direction 3 unsupported",
+      "blocks": [
+        16
+      ],
+      "result": "PASS",
+      "seconds": 0.032,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "P2 distance greater than zero",
+      "blocks": [
+        19
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "P2 distance below upper limit",
+      "blocks": [
+        19
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "P2 false distance condition",
+      "blocks": [
+        19
+      ],
+      "result": "PASS",
+      "seconds": 0.219,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": 0
+    },
+    {
+      "name": "IR compare -1 unsupported",
+      "blocks": [
+        20
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "IR compare 1 unsupported",
+      "blocks": [
+        20
+      ],
+      "result": "PASS",
+      "seconds": 0.078,
+      "error": 6,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "current tilt direction 0",
+      "blocks": [
+        21
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "opposite tilt direction 1",
+      "blocks": [
+        21
+      ],
+      "result": "PASS",
+      "seconds": 0.218,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": 0
+    },
+    {
+      "name": "current tilt direction 3",
+      "blocks": [
+        21
+      ],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "opposite tilt direction 2",
+      "blocks": [
+        21
+      ],
+      "result": "PASS",
+      "seconds": 0.235,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": 0.01599999999962165
+    },
+    {
+      "name": "button press/release are complementary",
+      "blocks": [
+        22
+      ],
+      "result": "PASS",
+      "completed": [
+        true,
+        false
+      ]
+    },
+    {
+      "name": "ten display faces",
+      "blocks": [
+        23
+      ],
+      "result": "PASS",
+      "seconds": 0.875,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "numeric glyph boundaries",
+      "blocks": [
+        25
+      ],
+      "result": "PASS",
+      "seconds": 0.453,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "custom 13-column pattern",
+      "blocks": [
+        24
+      ],
+      "result": "PASS",
+      "seconds": 0.156,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "user display off",
+      "blocks": [
+        26
+      ],
+      "result": "PASS",
+      "seconds": 0.14,
+      "error": 0,
+      "error_line": 0,
+      "stop_seconds": null
+    },
+    {
+      "name": "invalid face",
+      "blocks": [],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 4,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "invalid number",
+      "blocks": [],
+      "result": "PASS",
+      "seconds": 0.047,
+      "error": 4,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "invalid pattern bit 7",
+      "blocks": [],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 3,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "invalid distance comparison",
+      "blocks": [],
+      "result": "PASS",
+      "seconds": 0.032,
+      "error": 4,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "unknown function",
+      "blocks": [],
+      "result": "PASS",
+      "seconds": 0.031,
+      "error": 2,
+      "error_line": 2,
+      "stop_seconds": null
+    },
+    {
+      "name": "bad indentation",
+      "blocks": [],
+      "result": "PASS",
+      "seconds": 0.046,
+      "error": 1,
+      "error_line": 2,
+      "stop_seconds": null
+    }
+  ],
+  "limits": [
+    "Live tilt tests use current sensor orientation; physical front/back/left/right labels require board positioning.",
+    "Button logic sampled current input; actual PC3 press/release and polarity not physically accepted here."
+  ],
+  "sensors": {
+    "2": {
+      "uid": "4150354A/38343111/0080185B",
+      "mm": 5600,
+      "status": 1
+    }
+  },
+  "tilt": {
+    "roll": 51.18,
+    "pitch": -83.42
+  },
+  "covered_blocks": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26
+  ],
+  "result": "PASS",
+  "usb_transition_warnings": [],
+  "final_port": "COM123",
+  "final_info": "KLQ ROBOT FW 0.8; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2",
+  "cleanup_verification": "USB cleanup helper verified separately after test-script exit-flow repair; 41 functional cases unchanged."
+}
