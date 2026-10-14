@@ -70,7 +70,10 @@ class Monitor:
 
     def set_connection(self, connected: bool, port: str, error: str = "") -> None:
         with self.lock:
+            was_connected = self.state["connected"]
             changed = self.state["connected"] != connected or self.state["port"] != port
+            if not connected and was_connected:
+                self.state = blank_state(port)
             self.state["connected"], self.state["port"], self.state["error"] = connected, port, error
             if connected and changed:
                 self.state["since"] = time.time()
@@ -220,7 +223,7 @@ const $=id=>document.getElementById(id), esc=v=>String(v??'--').replace(/[&<>]/g
 const ports=$('ports'); ports.innerHTML=[1,2,3].map(i=>`<section class="card"><div class="port-title"><h2>外接端口 ${i}</h2><span id="pb${i}" class="badge">离线</span></div><div id="pd${i}" class="distance">--<small>mm</small></div><div class="kv"><span>设备</span><b id="pt${i}">等待发现</b><span>UID</span><b id="pu${i}" class="mono">--</b><span>回波</span><b id="pk${i}">-- ticks</b><span>样本</span><b id="ps${i}">--</b></div><div class="errors"><div class="err"><b id="pto${i}">0</b>超时</div><div class="err"><b id="pfe${i}">0</b>帧错误</div><div class="err"><b id="pue${i}">0</b>UART</div></div></section>`).join('');
 function device(p){return !p.online?'等待发现':p.class===1&&p.type===1?'CS100A 超声':p.class||p.type?`类别 ${p.class} / 类型 ${p.type}`:'未知设备'}
 function age(d,t){return t?Math.max(0,(d.server_time-t)).toFixed(1)+'s 前':'--'}
-function render(d){const c=$('conn');c.classList.toggle('connected',d.connected);c.querySelector('span').textContent=d.connected?`${d.port} 已连接`:`${d.port} 未连接`;
+function render(d){const c=$('conn');c.classList.toggle('connected',d.connected);c.querySelector('span').textContent=d.connected?`${d.port} 已连接`:`${d.port} 未连接${d.error?' · '+d.error:''}`;
 d.ports.forEach(p=>{const i=p.index,b=$(`pb${i}`);b.classList.toggle('on',p.online);b.textContent=p.online?'在线':'离线';$(`pd${i}`).innerHTML=(p.online?esc(p.distance):'--')+'<small>mm</small>';$(`pt${i}`).textContent=device(p);$(`pu${i}`).textContent=p.online?p.uid:'--';$(`pk${i}`).textContent=p.online?`${p.ticks} ticks`:'--';$(`ps${i}`).textContent=p.online?`#${p.sequence} · 状态 ${p.sample_status}`:`REQ ${p.requests} / RESP ${p.responses}`;$(`pto${i}`).textContent=p.timeout;$(`pfe${i}`).textContent=p.frame_error;$(`pue${i}`).textContent=p.uart_error;});
 const a=d.accelerometer;$('ax').textContent=a.online?a.x:'--';$('ay').textContent=a.online?a.y:'--';$('az').textContent=a.online?a.z:'--';$('roll').textContent=a.online?a.roll.toFixed(2):'--';$('pitch').textContent=a.online?a.pitch.toFixed(2):'--';$('plane').style.transform=`rotate(${a.roll||0}deg) translateY(${Math.max(-35,Math.min(35,a.pitch||0))}px)`;$('scmeta').textContent=a.online?`地址 ${a.address} · ID ${a.identity} · VER ${a.version} · ${age(d,a.updated)}`:'传感器离线';
 const f=d.firmware||{};$('sysname').textContent=f.name||'等待主机 INFO';const keys=['APP','VALID','UI','USER_STATE','USER_VALID','USER_LENGTH','USER_RECEIVED','USER_MAX','PY_ERROR','PY_LINE','PK_SHORT','USB_RESETS'];$('chips').innerHTML=keys.filter(k=>f[k]!==undefined).map(k=>`<div class="chip"><span>${k}</span>${esc(f[k])}</div>`).join('');$('events').innerHTML=d.events.length?d.events.map(e=>`<div class="event"><time>${esc(e.time)}</time><div>${esc(e.message)}</div></div>`).join(''):'<div class="empty">等待数据…</div>'}
