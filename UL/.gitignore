@@ -1,0 +1,10 @@
+.venv/
+firmware/vendor/PY32F002B_Firmware/
+tools/node_modules
+tools/__pycache__/
+tests/build/
+firmware/app/build/*.o
+firmware/app/build/*.d
+firmware/app/build/*.axf
+firmware/app/build/*.map
+firmware/app/build/*.htm

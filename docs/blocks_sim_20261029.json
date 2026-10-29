@@ -1,0 +1,40 @@
+{
+  "compiler": "Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 12.00.8168 for 80x86",
+  "command": [
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\VC98\\bin\\cl.EXE",
+    "/nologo",
+    "/TP",
+    "/W3",
+    "/WX",
+    "/O2",
+    "/FIC:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\tools\\block_sim\\klq_mock.h",
+    "/IC:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\tools\\block_sim\\vc98",
+    "/IC:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\tools\\block_sim",
+    "/IC:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\bootloader",
+    "C:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\bootloader\\mini_python.c",
+    "C:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\bootloader\\klq_runtime.c",
+    "C:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\tools\\block_sim\\test_blocks.c",
+    "/FeC:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\klq-block-sim-uxj7hznh\\blocks.exe",
+    "/FoC:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\klq-block-sim-uxj7hznh\\"
+  ],
+  "exit_code": 0,
+  "stdout": "PASS 01 start, import, bare calls, comments and CRLF\nPASS 02 wait decimal, zero, 3600s, exact deadline, uint32 wrap\nPASS 03 finite, nested and zero-count loops\nPASS 04 no-wait forever/pass loops and external stop\nPASS 05 stop block prevents following action and stops motors\nPASS 06/07 motor_for both directions, all ports, exact deadline\nPASS 08/09/10 motor_run positive/negative and motor_stop\nPASS 11 all single-motor power levels and natural safe stop\nPASS 12/13/14/15 timed forward/back/left/right and paired stop\nPASS 16/17 continuous four-direction move and move_stop\nPASS 18 all paired-motion power levels\nPASS motor unsupported, second-port rollback, error/stop safety and zero duration\nPASS 19 distance strict comparisons, all ports, status0..5, stale/offline/type and wrap\nPASS 20 infrared unsupported path and argument contract\nPASS 21 four tilt directions, 14.99/15.00deg, 100/101ms and invalid IMU\nPASS 22 PC3 press/release, 20ms debounce, bounce and uint32 wrap\nPASS 23 all ten face indices with 7-bit columns\nPASS 24 exact custom pattern, single quotes and mixed hex case\nPASS 25 all numbers 0..100 and exact centered 100 bitmap\nPASS 26 display_off clears thirteen columns\nPASS display rejection exits with runtime error\nPASS 44 invalid programs, stack bound, source restart and empty source\nRESULT PASS groups=22 assertions=164175 blocks=26/26\n",
+  "stderr": "",
+  "sha256": {
+    "bootloader\\mini_python.c": "1d5652f9b418835217805aa36a749f0086697b382ac4ee6ce2b48a1416630a51",
+    "bootloader\\klq_runtime.c": "d3e406dc8407a63ec596d242d845eb191193dec4b8834c80b9ffb1d41dd4389a",
+    "tools\\block_sim\\test_blocks.c": "2f8ed0050e98fdbbe48ec3dfaeae700e2df4b59a66ff8718decf97b067ec1fcf",
+    "tools\\block_sim\\apm32e10x_gpio.h": "4321a7ff4260e54880f2aed87928038d683b9d273c22ce7e6d4d3c10ce6949bd",
+    "tools\\block_sim\\apm32e10x_rcm.h": "4321a7ff4260e54880f2aed87928038d683b9d273c22ce7e6d4d3c10ce6949bd",
+    "tools\\block_sim\\klq_mock.h": "fef1ec4e0b90f9542b4fe49c7e458993cabd7de238bf2fb794cc269f7c14a00d",
+    "tools\\block_sim\\vc98\\stdbool.h": "d992a218dc5e8bb42c8ecc2ace9b002bfca98f65ea39c32aa644088e307bbdc9",
+    "tools\\block_sim\\vc98\\stdint.h": "47f6d013e768943ed285409ca4203bbf77aba54ca54c34ee889b7d4f43c2a301"
+  },
+  "boundaries": [
+    "actual mini_python.c and klq_runtime.c unchanged",
+    "GPIO clock/config/input, external ports and robot UI mocked",
+    "motor support success is simulated; current production motor protocol unsupported",
+    "no USB, sensor hardware, physical motors or actual button tested",
+    "VC mode uses C++ parsing; production ARMCC build remains required"
+  ]
+}

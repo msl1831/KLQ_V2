@@ -4,10 +4,15 @@
 #include "usbd_init.h"
 #include "usbd_descriptor.h"
 #include <string.h>
+#ifdef KLQ_DEMO_APP
+#include "external_ports.h"
+#include "power_key.h"
+#endif
 
 #define RX_SIZE 4096u
 static uint8_t rx[RX_SIZE], packet[64], tx[64];
 static volatile uint32_t head, tail;
+static volatile uint32_t usb_epoch;
 static volatile bool configured, tx_busy, reset_seen;
 volatile uint32_t usb_reset_count;
 static uint8_t line_coding[8] = {0x00,0xc2,0x01,0,0,0,8,0};
@@ -29,6 +34,7 @@ void USBD_HardWareInit(void)
 static void reset_callback(void)
 {
     USBD_EPConfig_T ep;
+    ++usb_epoch;
     memset(&ep, 0, sizeof(ep));
     head = tail = 0;
     configured = tx_busy = false;
@@ -51,6 +57,7 @@ static void reset_callback(void)
 
 static void config_callback(void)
 {
+    ++usb_epoch;
     configured = g_usbDev.curConfiguration == 1;
     head = tail = 0;
     tx_busy = false;
@@ -71,7 +78,7 @@ static void out_callback(uint8_t ep)
         for (i = 0; i < n; ++i) rx[(head + i) & (RX_SIZE-1)] = packet[i];
         __DMB();
         head += n;
-    } else { head = tail = 0; reset_seen = true; }
+    } else { ++usb_epoch; head = tail = 0; reset_seen = true; }
     USBD_RxData(USBD_EP_1, packet, sizeof(packet));
 }
 static void in_callback(uint8_t ep) { if (ep == USBD_EP_1) tx_busy = false; }
@@ -121,7 +128,7 @@ int usb_serial_read(void)
 {
     int b = -1;
     __disable_irq();
-    if (tail != head) { b = rx[tail & (RX_SIZE-1)]; ++tail; }
+    if (!reset_seen && tail != head) { b = rx[tail & (RX_SIZE-1)]; ++tail; }
     __enable_irq();
     return b;
 }
@@ -136,18 +143,25 @@ bool usb_serial_reset_seen(void)
 static bool write_limit(const uint8_t *p, uint32_t n, uint32_t limit_ms)
 {
     uint32_t count, begin;
+    uint32_t epoch=usb_epoch;
     while (n) {
-        if (!configured) return false;
+        if (!configured || epoch!=usb_epoch) return false;
         /* Short packets avoid relying on host read length or missing ZLP logic. */
         count = n > 63 ? 63 : n;
         memcpy(tx, p, count);
         __disable_irq();
-        if (!configured) { __enable_irq(); return false; }
+        if (!configured || epoch!=usb_epoch) { __enable_irq(); return false; }
         tx_busy = true;
         USBD_TxData(USBD_EP_1, tx, count);
         __enable_irq();
         begin = board_ms;
-        while (tx_busy && configured && board_ms - begin < limit_ms) {}
+        while (tx_busy && configured && epoch==usb_epoch && board_ms - begin < limit_ms) {
+#ifdef KLQ_DEMO_APP
+            power_key_poll();
+            if (external_upgrade_active()) external_ports_poll();
+#endif
+        }
+        if (epoch!=usb_epoch) return false;
         if (tx_busy || !configured) {
             __disable_irq();
             USBD_SetEPTxStatus(USBD_EP_1, USBD_EP_STATUS_NAK);

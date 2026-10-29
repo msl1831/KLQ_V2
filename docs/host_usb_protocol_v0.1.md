@@ -2,6 +2,8 @@
 
 本文给上位机实现者使用，描述如何把积木生成的 Python 源码下载到机器人并控制运行。积木生成的函数名及参数见 [Python 积木接口](python_api_v0.1.md)。机器人内部的传感器轮询、串口事务和电机驱动不由上位机调用。
 
+系统固件0.9在保留下述Python命令的基础上，增加外接固件升级能力：INFO中的 `EXT_UPGRADE=1; EXT_PORTS=3` 表示支持 OPEN/XFER/RESULT/CLOSE `0x0040..0x0043`。这是电脑专用升级通道，使用 [USB外接升级协议](../sensor_boot/docs/usb_bridge_v1.md) 及 `*_update.klq`，不增加用户积木函数。升级OPEN会停止用户程序；升级期间拒绝Python BEGIN/DATA/END/RUN/DISPLAY/FINISH，允许STOP。实体短按也不能启动旧程序；长按1.5秒会先取消会话再关机。关闭/取消后旧RAM程序可保留，但必须手动重新运行。
+
 ## 连接与运行环境
 
 连接机器人自身的 USB 数据口，打开其 CDC 虚拟串口。开发板当前使用 `VID:PID=314B:0108`、115200 8N1；COM 号会变化，不应固定。一次只能有一个程序占用该串口，串口监视器与下载器不能同时打开。

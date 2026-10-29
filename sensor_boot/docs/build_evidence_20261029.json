@@ -1,0 +1,110 @@
+{
+  "ul": {
+    "target": "PY32F002BF15U6TR",
+    "device": "ul",
+    "board_id": 1,
+    "hw_compat": 1,
+    "device_class": 1,
+    "flash_base": "0x08000000",
+    "flash_bytes": 24576,
+    "boot_bytes": 4464,
+    "app_base": "0x08001800",
+    "app_capacity": 18304,
+    "app_bytes": 5776,
+    "app_crc32": "0x82F15F6F",
+    "metadata_base": "0x08005F80",
+    "page_bytes": 128,
+    "programmed_bytes": 10256,
+    "boot_sha256": "86c032e11e9358570d1f66ad5ff34aee2375a6a81be8b79cc824bed388909f30",
+    "app_sha256": "be330fc900e60e4dac9cfd67aee5372c2246c8b28d0078d2bf1141d2842cfcaa",
+    "sha256": {
+      "ul_factory.bin": "24a6cdd09e3a05774fb30f3c826ba9b9b2e687e56aa0aa568f8647c197edf364",
+      "ul_factory.hex": "a6652f819315e0cea600b7abb55d035f5a66165605eba921a05386243b0d18b1",
+      "ul_update.klq": "67a3fb2122523c3b80e79f51ba78f4048cab77f97fda8e0bc6d7a88e7e7081cb"
+    },
+    "map_sizes": {
+      "boot": {
+        "ro": 4444,
+        "ram": 1600,
+        "rom": 4464
+      },
+      "app": {
+        "ro": 5716,
+        "ram": 2016,
+        "rom": 5776
+      }
+    }
+  },
+  "ir": {
+    "target": "PY32F002BF15U6TR",
+    "device": "ir",
+    "board_id": 3,
+    "hw_compat": 1,
+    "device_class": 1,
+    "flash_base": "0x08000000",
+    "flash_bytes": 24576,
+    "boot_bytes": 4468,
+    "app_base": "0x08001800",
+    "app_capacity": 18304,
+    "app_bytes": 6052,
+    "app_crc32": "0x3CB2BDEC",
+    "metadata_base": "0x08005F80",
+    "page_bytes": 128,
+    "programmed_bytes": 10536,
+    "boot_sha256": "ec24c019152e8166f52c414564820cea05ba723e2aec8ba1f780812c7fe8acd5",
+    "app_sha256": "19b7df54061df7583753b662352a77c93dd4d7bc6c8f0bf53ea2d22a6a653c54",
+    "sha256": {
+      "ir_factory.bin": "e75f389388ad1f7e3950477f944571a2aafd3b9c2c97d7b1a4e06cc8d49c82a1",
+      "ir_factory.hex": "62c9700f3c6e6c90c8efd973a3900798ed6559442a3693849e4ecd378c81744e",
+      "ir_update.klq": "f1d90156e14801f8336de4ae5c7bcd42a042446c8bb3e3e5acbba75f70dcfafb"
+    },
+    "map_sizes": {
+      "boot": {
+        "ro": 4448,
+        "ram": 1600,
+        "rom": 4468
+      },
+      "app": {
+        "ro": 5980,
+        "ram": 2040,
+        "rom": 6052
+      }
+    }
+  },
+  "motor": {
+    "target": "PY32F002BF15U6TR",
+    "device": "motor",
+    "board_id": 2,
+    "hw_compat": 2,
+    "device_class": 2,
+    "flash_base": "0x08000000",
+    "flash_bytes": 24576,
+    "boot_bytes": 4456,
+    "app_base": "0x08001800",
+    "app_capacity": 18304,
+    "app_bytes": 2856,
+    "app_crc32": "0xDFD41AD6",
+    "metadata_base": "0x08005F80",
+    "page_bytes": 128,
+    "programmed_bytes": 7328,
+    "boot_sha256": "182c5c0a752911d177345ef50ed817781e4f178f74e90e2687576c22c42cf058",
+    "app_sha256": "b1fc00c3d17ffd2cfe5f3da059a680bd82270662fe60e7b87f366e7243824169",
+    "sha256": {
+      "motor_factory.bin": "a5ce9ca22c61685198a8b7d187a71589f8aabdccc74bdb228628b16c3db2926a",
+      "motor_factory.hex": "5563c7972b40728a1e70adc235e57fc50e95749a02c60dc7341454eb31d8904f",
+      "motor_update.klq": "68e1390b2c8caebc6d8c8a99a0b3bc548826a31b3d85a120f9da6571b57ef6b2"
+    },
+    "map_sizes": {
+      "boot": {
+        "ro": 4436,
+        "ram": 1600,
+        "rom": 4456
+      },
+      "app": {
+        "ro": 2836,
+        "ram": 1448,
+        "rom": 2856
+      }
+    }
+  }
+}

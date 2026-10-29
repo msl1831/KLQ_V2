@@ -2,9 +2,11 @@
 
 APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/msl1831/KLQ_V2 ，后续源码与文档在此同步。
 
-- [功能需求 V0.8](KLQ功能需求文档_V0.5.md)：整体功能、待机双眼、PC4 长短按、用户程序 RAM 驻留规则及已确认的硬件分配。
+- [功能需求 V0.9](KLQ功能需求文档_V0.5.md)：整体功能、PC4、RAM程序规则及外接固件升级。
 - [当前机器人架构](docs/architecture_current.md)：现有硬件、固件分区、启动流程、通信和下一阶段应用分层。
 - [当前开发交接](docs/handoff_current.md)：主控分支、最新板上版本、测试结果与后续工作。
+- [主控0.9外接升级验证](docs/verification_20261029_host_upgrade.md)：最新Python业务与USB→UART升级的真实合流、资源、工具和交付。
+- [构建环境与依赖](docs/development_setup.md)：主控、三类PY32、固定SDK恢复及重复验证命令。
 - [传感器数据访问决策](docs/decisions/001_sensor_access_strategy.md)：后台采集、静态快照、数据新鲜度和后续 Python API 约束。
 - [精简 Python 与积木接口 V0.1](docs/python_api_v0.1.md)：上位机代码生成规则、26 个非语音积木映射、枚举和错误码。
 - [上位机 USB 通信协议 V0.1](docs/host_usb_protocol_v0.1.md)：KLQ1 帧格式、Python 源码下载、运行控制与状态查询。
@@ -23,7 +25,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 - `vendor/APM32E10x_EVAL_SDK-main/Libraries/`：构建所需的 Geehy SDK 库，保留上游声明和许可证。
 - [首次成功版本对照](diagnostics/usb_first_success/README.md)：保留的历史诊断源码，可独立构建；当前板子运行修复后的主线引导。
 
-**当前状态：系统固件已接入固定内存的精简 Python 子集。** 冷上电长按 PC4 1.5 秒后，引导校验并启动有效系统固件，播放开机动画并进入双眼待机；显式 USB `reset` 可一次性停留在引导。系统固件支持 16 KiB RAM 用户程序下载与解释执行、PC4 短按运行／停止及长按关机、显示状态机、PC3 用户键、SC7 倾斜条件，以及 UART1～3 任意端口 KLQ1 自动发现和 CS100A 距离条件。电机和红外积木的 Python 接口已固定，实际设备协议尚待提供后接入。
+**当前开发固件0.9：保留精简Python业务，合入USB→UART外接固件升级。** PC4长按1.5秒开/关机、短按运行/停止，用户程序只驻留16 KiB RAM；支持显示、PC3、SC7、通用端口发现和CS100A距离等待。新增双路IR端口采样与UL/IR/PY32电机升级桥接，已完成构建和软件回归，本轮未烧录。26积木生成接口保持不变；Python电机控制/IR条件仍待主控驱动接入，不能把模拟成功当成物理动作通过。
 
 构建依赖 Keil ARM Compiler 5；Python 工具依赖见 `tools/requirements.txt`。生成文件、本机虚拟环境及板载固件备份不提交到仓库。完整操作见引导说明。
 

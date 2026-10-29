@@ -59,6 +59,10 @@ int main(void)
             robot_ui_poll();
             external_ports_set_active(user_program_state()==USER_PROGRAM_RUNNING);
             external_ports_poll();
+            if (external_upgrade_active()) {
+                report_at=board_ms+100u; error_at=board_ms+1000u; port_at=board_ms+500u;
+                continue;
+            }
             if (sensor_ready && (int32_t)(board_ms - sample_at) >= 0) {
                 sample_at = board_ms + (user_program_state()==USER_PROGRAM_RUNNING ? 20u : 100u);
                 sample_valid=sc7a20_read(&sample);
@@ -89,7 +93,14 @@ int main(void)
                 for (i=0;i<KLQ_EXTERNAL_PORT_COUNT;i++) {
                     const klq_port_status_t *s=external_port_status(i);
                     int length;
-                    if (s->online)
+                    if (s->online && s->device_class==1u && s->sensor_type==KLQ_SENSOR_IR_DUAL)
+                        length=sprintf(line,"P%u ON C=1 T=2 UID=%08lX/%08lX/%08lX L=%u R=%u ST=%u Q=%u SEQ=%lu TO=%lu FE=%lu UE=%lu\r\n",
+                            i+1u,(unsigned long)s->uid[0],(unsigned long)s->uid[1],
+                            (unsigned long)s->uid[2],s->ir_left,s->ir_right,s->sample_status,
+                            s->quality_flags,(unsigned long)s->sample_sequence,
+                            (unsigned long)s->timeout_count,(unsigned long)s->frame_error_count,
+                            (unsigned long)s->uart_error_count);
+                    else if (s->online)
                         length=sprintf(line,"P%u ON C=%u T=%u UID=%08lX/%08lX/%08lX D=%umm TICKS=%u ST=%u SEQ=%lu TO=%lu FE=%lu UE=%lu\r\n",
                             i+1u,s->device_class,s->sensor_type,(unsigned long)s->uid[0],
                             (unsigned long)s->uid[1],(unsigned long)s->uid[2],s->distance_mm,

@@ -3,6 +3,7 @@
 #include "robot_ui.h"
 #include "mini_python.h"
 #include "klq_runtime.h"
+#include "external_ports.h"
 #include <string.h>
 
 static uint8_t program_buffer[USER_PROGRAM_CAPACITY];
@@ -60,7 +61,7 @@ bool user_program_finish_download(void)
 
 bool user_program_start(void)
 {
-    if (state != USER_PROGRAM_READY || robot_ui_state() != ROBOT_UI_STANDBY) return false;
+    if (external_upgrade_active() || state != USER_PROGRAM_READY || robot_ui_state() != ROBOT_UI_STANDBY) return false;
     if (!mini_python_start()) return false;
     state = USER_PROGRAM_RUNNING;
     robot_ui_set_running();

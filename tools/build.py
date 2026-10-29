@@ -6,10 +6,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SDK = ROOT / 'vendor/APM32E10x_EVAL_SDK-main'
 COMPILER = Path(os.environ.get('KLQ_ARMCC', 'C:/Keil_v5/ARM/ARMCC/bin'))
 
-def build(demo=False, baseline=False):
+def build(demo=False, baseline=False, output_dir=None):
     name = 'klq_usb_baseline' if baseline else ('klq_demo_app' if demo else 'klq_bootloader')
     board = ROOT/'diagnostics/usb_first_success/bootloader' if baseline else ROOT/'bootloader'
-    out = ROOT/'build'/name
+    out = Path(output_dir) if output_dir else ROOT/'build'/name
     out.mkdir(parents=True, exist_ok=True)
     lib = SDK/'Libraries'
     include = [board, lib/'CMSIS/Include',
@@ -17,7 +17,7 @@ def build(demo=False, baseline=False):
                lib/'USB_Device_Lib/Core_Device/Standard/inc', lib/'USB_Device_Lib/Driver/inc']
     files = list(board.glob('*.c'))
     if not demo and not baseline:
-        demo_only = {'external_ports.c', 'peripherals.c', 'robot_ui.c', 'sc7a20.c', 'user_program.c',
+        demo_only = {'audio_link.c', 'external_ports.c', 'peripherals.c', 'robot_ui.c', 'sc7a20.c', 'user_program.c',
                      'klq_runtime.c', 'mini_python.c', 'power_key.c'}
         files = [source for source in files if source.name not in demo_only]
     drivers = ['rcm','gpio','fmc']
@@ -60,5 +60,6 @@ if __name__ == '__main__':
     mode=p.add_mutually_exclusive_group()
     mode.add_argument('--demo', action='store_true')
     mode.add_argument('--usb-baseline', action='store_true', help='Rebuild the first successful USB bring-up sources for comparison only')
+    p.add_argument('--output-dir', type=Path, help='Use a separate output directory without touching earlier build files')
     args=p.parse_args()
-    build(args.demo, args.usb_baseline)
+    build(args.demo, args.usb_baseline, args.output_dir)

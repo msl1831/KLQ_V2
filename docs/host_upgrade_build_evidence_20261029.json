@@ -1,0 +1,224 @@
+{
+  "baseline": "ff33f97438f782a5844bf3ce6e2cd9ed120a402c",
+  "boot_regression": {
+    "base": "0x08000000",
+    "hex": {
+      "bytes": 9944,
+      "first": "0x08000000",
+      "last": "0x080026D7"
+    },
+    "length": 9944,
+    "ram": 8744,
+    "reset": "0x08000169",
+    "ro": 9740,
+    "sha256": "008fc6da22e3e869b7129ae2eab925b44708ea036a3c21520e6b3a9a7fefc4a6",
+    "sp": "0x20002228"
+  },
+  "bundle": {
+    "bytes": 129839,
+    "entries": 23,
+    "path": "build/host_bridge_0_9/release/klq_host_0.9_peripheral_updates.zip",
+    "sha256": "a3a6e9d7a9fb4bb6d9334b050da3c3a221b2ab2949081be6b0190dafa5422237"
+  },
+  "date": "2026-10-29",
+  "files": {
+    "README.txt": "fd81b6d4133af6a3339b0578f05efa115f4bc31ba98ee8c7162e6daf370398b8",
+    "docs/protocol_v1.md": "18e775d88409cf848d1d2f42917882302ee93cf4c10e4cecdcb71a04f80f56f0",
+    "docs/usb_bridge_v1.md": "4301caa78da269010a14e9a4266004fd26eaa4a566ce504e8fb62cb64dee9509",
+    "firmware/klq_robot_0.9.bin": "d255a4135526c10e24b18b01dd2dca1cbba46a5168b601bc348944355085a4b8",
+    "firmware/klq_robot_0.9.hex": "917f7e6056ddec8899d5b93802c30aec04386ad64b4b88411da056cfb8f85dc2",
+    "peripherals/ir/ir_factory.bin": "e75f389388ad1f7e3950477f944571a2aafd3b9c2c97d7b1a4e06cc8d49c82a1",
+    "peripherals/ir/ir_factory.hex": "62c9700f3c6e6c90c8efd973a3900798ed6559442a3693849e4ecd378c81744e",
+    "peripherals/ir/ir_manifest.json": "9fe2e3fcb938eeec4ef5bd74eb11aff1c6e30f14e64fdb5d225b0936bd5160b1",
+    "peripherals/ir/ir_update.klq": "f1d90156e14801f8336de4ae5c7bcd42a042446c8bb3e3e5acbba75f70dcfafb",
+    "peripherals/motor/motor_factory.bin": "31e18df42a3dd56b18ea0588fc3989ee5da02e91b50d8d470ad8c26387898c2a",
+    "peripherals/motor/motor_factory.hex": "ef131d1d59e79a4a476de943923df7c31527cebb805cf8e79c155a48c3282ed3",
+    "peripherals/motor/motor_manifest.json": "a34557b6001a385ff71ec0361a2ba34d85e774ed1be504ba1283cc77e0c53fcf",
+    "peripherals/motor/motor_update.klq": "070f16a977d9ca2fbdbad346c9d259f4bda3d94f82e97c22b30a2ae06df22fbf",
+    "peripherals/ul/ul_factory.bin": "6aedbf653d0cda1de899aa682b319623b2126155e0f79ea9f3a6878bb924e1a0",
+    "peripherals/ul/ul_factory.hex": "d8c496c6b4c203d061c60cce4cca53fc7d669c9270fcbf7539b98bd038892281",
+    "peripherals/ul/ul_manifest.json": "8f68ebf2467ed1ae4230e5e29a7639511a9a201afa42164d4ef5382574348231",
+    "peripherals/ul/ul_update.klq": "0cf7cedb4d8dc572c2b81f51f7ba64469b8d6223f9ec93e1172a85e48e8fc1d3",
+    "requirements.txt": "0b81718d1cbe8a7696e45a9388c9205272b5e345cd79d0cf1ccfb7a9fd1925e9",
+    "tools/host_link.py": "89ec97d3b205fa3c59d17bf40ad6be88831182b7127c59185fa28337429c4b67",
+    "tools/klq_usb.py": "dcf69222904019e204ad20665de14c13099ca87acb19c7a9f211254cd8e321d4",
+    "tools/pack.py": "cb940acc85e099ca5c6b8a5b66ae19ba024948745d651b4ed24cba5e7e2f557b",
+    "tools/update.py": "fdebf2189fca1233530b693c7d32771ceb95af94df1c363a75b24dcce20c9eb6"
+  },
+  "host": {
+    "base": "0x08008000",
+    "hex": {
+      "bytes": 24176,
+      "first": "0x08008000",
+      "last": "0x0800DE6F"
+    },
+    "length": 24176,
+    "ram": 26784,
+    "reset": "0x08008169",
+    "ro": 23884,
+    "sha256": "d255a4135526c10e24b18b01dd2dca1cbba46a5168b601bc348944355085a4b8",
+    "sp": "0x200068A0"
+  },
+  "host_version": "0.9",
+  "peripherals": {
+    "ir": {
+      "app_base": "0x08001800",
+      "app_bytes": 6052,
+      "app_capacity": 18304,
+      "app_crc32": "0x3CB2BDEC",
+      "app_sha256": "19b7df54061df7583753b662352a77c93dd4d7bc6c8f0bf53ea2d22a6a653c54",
+      "board_id": 3,
+      "boot_bytes": 4468,
+      "boot_sha256": "ec24c019152e8166f52c414564820cea05ba723e2aec8ba1f780812c7fe8acd5",
+      "device": "ir",
+      "device_class": 1,
+      "flash_base": "0x08000000",
+      "flash_bytes": 24576,
+      "hw_compat": 1,
+      "metadata_base": "0x08005F80",
+      "page_bytes": 128,
+      "programmed_bytes": 10536,
+      "sha256": {
+        "ir_factory.bin": "e75f389388ad1f7e3950477f944571a2aafd3b9c2c97d7b1a4e06cc8d49c82a1",
+        "ir_factory.hex": "62c9700f3c6e6c90c8efd973a3900798ed6559442a3693849e4ecd378c81744e",
+        "ir_update.klq": "f1d90156e14801f8336de4ae5c7bcd42a042446c8bb3e3e5acbba75f70dcfafb"
+      },
+      "target": "PY32F002BF15U6TR"
+    },
+    "motor": {
+      "app_base": "0x08001800",
+      "app_bytes": 2880,
+      "app_capacity": 18304,
+      "app_crc32": "0x0897C604",
+      "app_sha256": "8272fc74e30b5e2bcbc28a904a5d29b0e43e02ed1663ab5f1e8a1556d4bd9b07",
+      "board_id": 2,
+      "boot_bytes": 4456,
+      "boot_sha256": "182c5c0a752911d177345ef50ed817781e4f178f74e90e2687576c22c42cf058",
+      "device": "motor",
+      "device_class": 2,
+      "flash_base": "0x08000000",
+      "flash_bytes": 24576,
+      "hw_compat": 2,
+      "metadata_base": "0x08005F80",
+      "page_bytes": 128,
+      "programmed_bytes": 7352,
+      "sha256": {
+        "motor_factory.bin": "31e18df42a3dd56b18ea0588fc3989ee5da02e91b50d8d470ad8c26387898c2a",
+        "motor_factory.hex": "ef131d1d59e79a4a476de943923df7c31527cebb805cf8e79c155a48c3282ed3",
+        "motor_update.klq": "070f16a977d9ca2fbdbad346c9d259f4bda3d94f82e97c22b30a2ae06df22fbf"
+      },
+      "target": "PY32F002BF15U6TR"
+    },
+    "ul": {
+      "app_base": "0x08001800",
+      "app_bytes": 5776,
+      "app_capacity": 18304,
+      "app_crc32": "0xCF112888",
+      "app_sha256": "628eab428ed4cf67c77a00eed9375e3c60967f464ca6155f291d26c762d5a4b0",
+      "board_id": 1,
+      "boot_bytes": 4464,
+      "boot_sha256": "86c032e11e9358570d1f66ad5ff34aee2375a6a81be8b79cc824bed388909f30",
+      "device": "ul",
+      "device_class": 1,
+      "flash_base": "0x08000000",
+      "flash_bytes": 24576,
+      "hw_compat": 1,
+      "metadata_base": "0x08005F80",
+      "page_bytes": 128,
+      "programmed_bytes": 10256,
+      "sha256": {
+        "ul_factory.bin": "6aedbf653d0cda1de899aa682b319623b2126155e0f79ea9f3a6878bb924e1a0",
+        "ul_factory.hex": "d8c496c6b4c203d061c60cce4cca53fc7d669c9270fcbf7539b98bd038892281",
+        "ul_update.klq": "0cf7cedb4d8dc572c2b81f51f7ba64469b8d6223f9ec93e1172a85e48e8fc1d3"
+      },
+      "target": "PY32F002BF15U6TR"
+    }
+  },
+  "source_sha256": {
+    "bootloader/board.c": "6f94667697a2c6ee379b4afd8e16b6495e8ad4841a47601392f5be53a79e419a",
+    "bootloader/board.h": "a011a30547bad16a59b1d747c45cd069b93840933a00bf4076999e64f2c88460",
+    "bootloader/external_ports.c": "76b51d8ef1747a9c416c76467e69da15e353ba824aa1dd732094e36167810f7d",
+    "bootloader/external_ports.h": "0656a6e6ca355f85c36d92a3c1f00753a90c931197974fdcb8e5b7b4ec45d841",
+    "bootloader/klq_runtime.c": "d3e406dc8407a63ec596d242d845eb191193dec4b8834c80b9ffb1d41dd4389a",
+    "bootloader/klq_runtime.h": "62fc262f1fefec18978a6da559c65e05076b52e4d750e021aecd7f1124e1dbac",
+    "bootloader/main.c": "fc9a925d2cec2992935275595ec474eb653946e8a58935889f2d9dc462b5d271",
+    "bootloader/mini_python.c": "1d5652f9b418835217805aa36a749f0086697b382ac4ee6ce2b48a1416630a51",
+    "bootloader/mini_python.h": "03e9e289c685879801fe6370e897279b363c2a7a8b5413685c45537b91f5331c",
+    "bootloader/peripherals.c": "2a3a5e8575a2ec46125ae7a3242c48ff01b701140eb043f173eb7fcb1b0990ba",
+    "bootloader/peripherals.h": "0eb0d361ab794db2482c1713b6c0af8dd75c2d042aeb04290e61e8cb76ce702e",
+    "bootloader/power_key.c": "9f1b5f77819cb94b02f2c5f30abd757e276cf59396283abbd4fa4e89843eccc7",
+    "bootloader/power_key.h": "2f1659219f1194e8670a075c9e338c3f4d953cd1867386ef2f1048fe328cbc4b",
+    "bootloader/protocol.c": "13d44b5832d5ceaa2fb28dd46b14de3501eff31d031dad803363d8a5a8a3147c",
+    "bootloader/protocol.h": "28ca739ff2d5e5be5f2358628f0bdda728f2bcca3b295850b26a98e1d70f244a",
+    "bootloader/robot_ui.c": "64afad858434cc54be8c8d5441941562cd8ceaae0d7ecca79b5a3eef4ff57628",
+    "bootloader/robot_ui.h": "124504a94683baaba8b4e5d9103bf88d07553a4758632af0f7e36352128d1f46",
+    "bootloader/sc7a20.c": "4784119bbd7ac2cbf9374d98e9f97a0a43092705842e2c2ef201e9bb42b023aa",
+    "bootloader/sc7a20.h": "61e0fd71105741c0234f9dac264c6a17ca26355b1dbf93a4fc20e4919523f66e",
+    "bootloader/startup.s": "b45d448d627377e5753a776b9f156dc14ee72b896dcf3c110356458abfadcb2c",
+    "bootloader/tm1640.c": "073dadf17b745e5f6db6390a3ea05d7d7632bffc6c2e19e2c066d091cb28f32a",
+    "bootloader/usb_bsp.h": "0a2c4b8898a6aba900b37fe8ef47e0a1c39c927c20e6fe0365fc47b6622dad32",
+    "bootloader/usb_config.h": "796a488a814fa9b39ec6bf486488b4789c1cbffce09716059a5a343dc500d014",
+    "bootloader/usb_serial.c": "ddca465e619cdcb50de3270967e9b00c862c4c2d0352851952bd2ac466d149cf",
+    "bootloader/usb_serial.h": "76fd2e5d262d96b741c5f8674ffcb799798f65d6a73af46c81c1dae607779ab5",
+    "bootloader/usbd_descriptor.c": "2738ace631931d92c0a4f8de473b691144edd04f9f711fa39d2ce02de1115a48",
+    "bootloader/usbd_descriptor.h": "abcbe6ab376a2a08d96ef1e31ee0c49289cb33694a011aad2c860054153813e3",
+    "bootloader/user_program.c": "df305c581cdfa8ae8a8f2bb1f95b31b0552c73a6868833a3c97f9f5989ef7b5a",
+    "bootloader/user_program.h": "8990d668ef69f0d897bcd9c0c342478bc74781d3fb60c03a1efbe570e94b7e9a"
+  },
+  "validation": "build and native simulations; no physical flashing",
+  "tools": {
+    "python": "3.12.3",
+    "pyserial": "3.5",
+    "armcc": "5.06 update 6 build 750",
+    "native": "VC98 12.00.8168"
+  },
+  "baseline_resources": {
+    "app": {
+      "bin": 20412,
+      "ro": 20128,
+      "ram": 26448
+    },
+    "boot": {
+      "bin": 9844,
+      "ro": 9644,
+      "ram": 8736
+    }
+  },
+  "tests": {
+    "port_bridge_assertions": 161,
+    "usb_protocol_assertions": 300,
+    "business_bridge_assertions": 176,
+    "python_tests": 30,
+    "python_skipped": 0,
+    "full_pipeline_tests": 4,
+    "full_image_board_port_combinations": 9,
+    "block_groups": 22,
+    "block_assertions": 164175,
+    "offline_cleanup_cases": 7,
+    "ir_sampling_assertions": 1190,
+    "ir_service_assertions": 107,
+    "ir_host_port_assertions": 104,
+    "usb_format_tests": 2,
+    "ul_pending_reset_regression": "PASS",
+    "motor_safety_update_app": "PASS",
+    "board_native_profiles": [
+      "ul",
+      "ir",
+      "motor"
+    ]
+  },
+  "integration": {
+    "shared_main_preserved": true,
+    "board_firmware_source_files_identical": 44,
+    "rebuilt_manifests_match_latest_shared": true,
+    "source_sdk_dependency": "sensor_boot/dependencies.json",
+    "live_tests_run": false
+  },
+  "unverified": [
+    "Real USB/UART/Flash and automatic HOLD timing",
+    "Power interruption and physical motor stop",
+    "Native end-to-end simulator does not execute ARM APP jumps",
+    "Common peripheral boot RUN may jump after UART/TC timeout; strict response-completion guarantee is not established",
+    "Python physical motor and IR condition drivers remain outside this upgrade integration"
+  ]
+}

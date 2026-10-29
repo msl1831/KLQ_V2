@@ -3,6 +3,7 @@
 #include "user_program.h"
 #include "robot_ui.h"
 #include "klq_runtime.h"
+#include "external_ports.h"
 #include "apm32e10x_gpio.h"
 #include "apm32e10x_rcm.h"
 
@@ -58,6 +59,7 @@ void power_key_poll(void)
         action=0;
         user_program_stop();
         klq_runtime_stop_all();
+        external_upgrade_cancel();
         board_power_off(true);
     }
 }

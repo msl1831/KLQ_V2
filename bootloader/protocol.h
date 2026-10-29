@@ -16,6 +16,7 @@ enum {
     CMD_STOP,
     CMD_FINISH
 };
+enum { CMD_EXT_OPEN=0x0040, CMD_EXT_XFER, CMD_EXT_RESULT, CMD_EXT_CLOSE };
 enum { OK=0, ERR_COMMAND, ERR_LENGTH, ERR_CRC, ERR_STATE, ERR_RANGE, ERR_FLASH, ERR_IMAGE };
 uint32_t crc32_update(uint32_t crc, const void *data, uint32_t n);
 bool protocol_system_firmware_valid(void);

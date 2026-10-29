@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-29",
+  "branch": "main",
+  "head": "63d1ea38f69fbd478f92751855f238340b6fa853",
+  "dirty_workspace": true,
+  "compiler": "ARMCC 5.06 update6 build750",
+  "python": "3.12.14",
+  "host_firmware": "0.3",
+  "images": {
+    "app": {
+      "target": "APM32E103RET6",
+      "base": "0x08008000",
+      "limit": "0x0807F800",
+      "bytes": 19760,
+      "map": {
+        "ro": 19528,
+        "ram": 26720,
+        "rom": 19760
+      },
+      "bin_sha256": "da1c5428fde35a4ffdf9578d05a8504e6b6ac76caa76bd510df4f46a60b1d1d7",
+      "hex_sha256": "bb573e57a3713935fec2adb1c38cc4598006a81605e2de94ad841d103ec744f4",
+      "hex_programmed_bytes": 19760
+    },
+    "boot": {
+      "target": "APM32E103RET6",
+      "base": "0x08000000",
+      "limit": "0x08008000",
+      "bytes": 9388,
+      "map": {
+        "ro": 9196,
+        "ram": 8728,
+        "rom": 9388
+      },
+      "bin_sha256": "2778253c659facc74eb16c842b2adb8525de09060a58ee57451f0c23d0fc7546",
+      "hex_sha256": "5c3abb77ed37419c2ea901f80b3499968dab06898f13a39dd08832ef07a0fb2a",
+      "hex_programmed_bytes": 9388
+    }
+  },
+  "source_sha256": {
+    "bootloader/protocol.c": "a58bd967c7477d5d27351642efdec7856c4a0d9606d992ff0ec742036469ed49",
+    "bootloader/protocol.h": "a1980ce698c9f4b8d414c3bb26ac0d9bd7df327d1a25a2b833f0bfa9a8e0697a",
+    "bootloader/usb_serial.c": "88662e17622c43e61da5b806a22ea91911209a554ac9dff257784431887e6718",
+    "bootloader/main.c": "a9f94e24be5d7982f0b9c38121948dbf91506bac169b60b0ecee4f7b001d9438",
+    "bootloader/external_ports.c": "07a16bd0083ad2428483534b322285d9b4e5561a1e51a461b490c77877c54a43",
+    "bootloader/external_ports.h": "11ea8db940bb154a71e00198118b959e39d6b3ba720caf8a49cdb9e82e7562ae",
+    "sensor_boot/tools/update.py": "fdebf2189fca1233530b693c7d32771ceb95af94df1c363a75b24dcce20c9eb6",
+    "sensor_boot/tools/host_link.py": "89ec97d3b205fa3c59d17bf40ad6be88831182b7127c59185fa28337429c4b67"
+  },
+  "file_sha256": {
+    "controller/klq_demo_app.bin": "da1c5428fde35a4ffdf9578d05a8504e6b6ac76caa76bd510df4f46a60b1d1d7",
+    "controller/klq_demo_app.hex": "bb573e57a3713935fec2adb1c38cc4598006a81605e2de94ad841d103ec744f4",
+    "tools/update.py": "fdebf2189fca1233530b693c7d32771ceb95af94df1c363a75b24dcce20c9eb6",
+    "tools/pack.py": "cb940acc85e099ca5c6b8a5b66ae19ba024948745d651b4ed24cba5e7e2f557b",
+    "tools/host_link.py": "89ec97d3b205fa3c59d17bf40ad6be88831182b7127c59185fa28337429c4b67",
+    "tools/klq_usb.py": "f3102ffc31769acfbb2491a6b66be3fc20f261eb7fa14df7db02bec180562087",
+    "updates/ul_update.klq": "67a3fb2122523c3b80e79f51ba78f4048cab77f97fda8e0bc6d7a88e7e7081cb",
+    "updates/ir_update.klq": "f1d90156e14801f8336de4ae5c7bcd42a042446c8bb3e3e5acbba75f70dcfafb",
+    "updates/motor_update.klq": "68e1390b2c8caebc6d8c8a99a0b3bc548826a31b3d85a120f9da6571b57ef6b2",
+    "requirements.txt": "0b81718d1cbe8a7696e45a9388c9205272b5e345cd79d0cf1ccfb7a9fd1925e9",
+    "README.txt": "e14a01f762266cceb85bb22cb437d24dba443cdb30e1787e5b81df11321d4ab0"
+  },
+  "hardware_validation": "not performed",
+  "release_zip_sha256": "a773168b848d9e8bee6e633faba794732d8089a482ad592374a9dbaf43204a3b",
+  "release_zip_bytes": 61169
+}
