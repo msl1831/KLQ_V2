@@ -1,11 +1,12 @@
-param([string]$Compiler = 'C:\Program Files (x86)\Microsoft Visual Studio\VC98\bin\CL.EXE')
+param([string]$Compiler = 'C:\Program Files (x86)\Microsoft Visual Studio\VC98\bin\CL.EXE', [string]$OutputDir = '')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
-$out=Join-Path $PSScriptRoot 'build'
+$out=if ($OutputDir) { $OutputDir } else { Join-Path $PSScriptRoot 'build' }
 $vc=Split-Path (Split-Path $Compiler -Parent) -Parent
 $oldLib=$env:LIB
 $oldInclude=$env:INCLUDE
 New-Item -ItemType Directory -Path $out -Force | Out-Null
+$out=(Resolve-Path -LiteralPath $out).Path
 Push-Location $out
 try {
     $env:LIB=Join-Path $vc 'Lib'

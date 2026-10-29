@@ -4,5 +4,5 @@
 void sensor_hw_init(void);
 uint8_t sensor_hw_uart_get(uint8_t *byte);
 uint8_t sensor_hw_uart_put(uint8_t byte);
-void sensor_hw_uart_drain(void);
+uint8_t sensor_hw_uart_drain(void);
 #endif

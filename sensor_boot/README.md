@@ -2,7 +2,7 @@
 
 2026-10-29：支持现有 PY32F002BF15U6TR 超声波、双路红外和无码盘电机板。共用一套引导源码，按 `ul`、`ir`、`motor` 生成各自工厂镜像。硬件没有自动板型识别入口，首次 SWD 安装时须选择对应板型。
 
-已完成引导、三种配套应用、打包器，以及 PC 直连 UART 和经科乐机主控 USB 转发的升级工具，编译及完整软件链路验证通过。**尚未烧录或实板验证。** 板端使用 [统一 UART 协议](docs/protocol_v1.md)，经主控升级的用法与外层协议见 [USB 升级说明](docs/usb_bridge_v1.md)。
+当前引导为1.0.2：修正擦写时未启用EOPIE却要求EOP而导致metadata擦除后误报失败的问题，保留1.0.1的RUN发送/TC完成保护。PC工具在BEGIN前要求引导至少1.0.2，拒绝旧1.0.0/1.0.1及未知版本。IR已完成主机USB实板整包升级和采样恢复；UL/MOTOR本轮只做构建/native回归，不能沿用IR实板结论。见 [IR实测与修复](../docs/verification_20261029_ir_via_host.md)。板端使用 [统一 UART 协议](docs/protocol_v1.md)，经主控升级的用法见 [USB 升级说明](docs/usb_bridge_v1.md)。
 
 ## 构建
 
@@ -14,6 +14,8 @@
 & sensor_boot/tools/build.ps1
 # 只构建一个板型：
 & sensor_boot/tools/build.ps1 -Device ir
+# 使用独立输出目录保留旧交付：
+& sensor_boot/tools/build.ps1 -Device ir -OutputDir build/ir_boot102_20261029
 ```
 
 可通过 `-ArmccBin`、`-SdkRoot`、`-Python` 指定依赖路径；也支持 `KLQ_ARMCC`、`KLQ_PY32_SDK`。编译会检查引导 6144 B、应用 18304 B 和 RAM 3072 B 的链接上限。固定栈 1024 B，堆 0 B。

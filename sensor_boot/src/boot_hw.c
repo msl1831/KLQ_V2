@@ -41,6 +41,8 @@ static uint8_t flash_start(void)
     FLASH->SMERTPE=t[3]&0x3FFFFUL; FLASH->PRGTPE=t[4]&0xFFFFU;
     FLASH->PRETPE=(t[4]>>16)&0x3FFFU;
     FLASH->SR=FLASH_SR_EOP|FLASH_SR_WRPERR|FLASH_SR_OPTVERR;
+    /* PY32 EOP only latches with EOPIE; FLASH NVIC remains disabled. */
+    FLASH->CR |= FLASH_CR_EOPIE;
     return 1U;
 }
 static uint8_t erase_page(uint32_t addr)
@@ -52,7 +54,8 @@ static uint8_t erase_page(uint32_t addr)
     FLASH->CR |= FLASH_CR_PER;
     *(__IO uint32_t *)addr=0xFFU;
     ok=flash_wait() && (FLASH->SR & FLASH_SR_EOP);
-    FLASH->CR &= ~FLASH_CR_PER; FLASH->CR |= FLASH_CR_LOCK;
+    FLASH->SR=FLASH_SR_EOP;
+    FLASH->CR &= ~(FLASH_CR_PER|FLASH_CR_EOPIE); FLASH->CR |= FLASH_CR_LOCK;
     for (i=0U; i<SENSOR_FLASH_PAGE_SIZE; ++i)
         if (((const uint8_t *)addr)[i]!=0xFFU) ok=0U;
     return ok;
@@ -71,7 +74,8 @@ static uint8_t program_page(uint32_t addr)
         ((__IO uint32_t *)addr)[i]=page[i];
     }
     ok=flash_wait() && (FLASH->SR & FLASH_SR_EOP);
-    FLASH->CR &= ~FLASH_CR_PG; FLASH->CR |= FLASH_CR_LOCK;
+    FLASH->SR=FLASH_SR_EOP;
+    FLASH->CR &= ~(FLASH_CR_PG|FLASH_CR_EOPIE); FLASH->CR |= FLASH_CR_LOCK;
     __set_PRIMASK(mask);
     for (i=0U; i<32U; ++i) if (((const uint32_t *)addr)[i]!=page[i]) ok=0U;
     return ok;
@@ -127,7 +131,7 @@ uint8_t boot_image_valid(void)
 void boot_hw_init(void) { sensor_hw_init(); }
 uint8_t boot_uart_get(uint8_t *b) { return sensor_hw_uart_get(b); }
 uint8_t boot_uart_put(uint8_t b) { return sensor_hw_uart_put(b); }
-void boot_uart_drain(void) { sensor_hw_uart_drain(); }
+uint8_t boot_uart_drain(void) { return sensor_hw_uart_drain(); }
 __asm static void jump(uint32_t sp,uint32_t pc)
 {
     MSR MSP,r0

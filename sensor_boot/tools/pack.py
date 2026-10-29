@@ -49,8 +49,8 @@ def hex_record(address, kind, data):
     return ':' + body.hex().upper() + f'{(-sum(body)) & 255:02X}'
 
 
-def pack(device):
-    out = ROOT / 'build' / device
+def pack(device, build_dir=None):
+    out = Path(build_dir) if build_dir is not None else ROOT / 'build' / device
     app_name = 'motor_app' if device == 'motor' else f'{device}_sensor_app'
     boot = (out / 'boot/sensor_boot.bin').read_bytes()
     app = (out / 'app' / (app_name + '.bin')).read_bytes()
@@ -92,4 +92,6 @@ def pack(device):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--device', choices=PROFILES, required=True)
-    pack(parser.parse_args().device)
+    parser.add_argument('--build-dir', type=Path, help='Read boot/app and write release under a separate device build directory')
+    args = parser.parse_args()
+    pack(args.device, args.build_dir)

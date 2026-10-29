@@ -1,6 +1,9 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#ifndef BOOT_SIMULATOR
+#include <setjmp.h>
+#endif
 #ifdef BOOT_SIMULATOR
 #include <io.h>
 #include <fcntl.h>
@@ -13,12 +16,42 @@ uint32_t mock_uid[3]={0x12345678UL,0x34567890UL,0x567890ABUL};
 static uint8_t sent[148],flash[0x6000],valid;
 static uint16_t sent_size;
 static unsigned jumps,writes,commits;
+static uint16_t fail_after=0xFFFFU;
+static uint8_t drain_ok=1U;
+static unsigned drains;
+#ifndef BOOT_SIMULATOR
+static jmp_buf poll_escape;
+static uint8_t poll_mode,poll_bytes[16];
+static unsigned poll_pos,poll_idle;
+#endif
 void boot_hw_init(void) {}
-uint8_t boot_uart_get(uint8_t *b) { (void)b; return 0U; }
-uint8_t boot_uart_put(uint8_t b) { assert(sent_size<sizeof(sent)); sent[sent_size++]=b; return 1U; }
-void boot_uart_drain(void) {}
+uint8_t boot_uart_get(uint8_t *b)
+{
+#ifndef BOOT_SIMULATOR
+    if(poll_mode) {
+        ms=600U;
+        if(poll_mode==1U && poll_pos<16U) { *b=poll_bytes[poll_pos++]; return 1U; }
+        if(++poll_idle==4U) longjmp(poll_escape,1);
+    }
+#else
+    (void)b;
+#endif
+    return 0U;
+}
+uint8_t boot_uart_put(uint8_t b)
+{
+    if(sent_size==fail_after) return 0U;
+    assert(sent_size<sizeof(sent)); sent[sent_size++]=b; return 1U;
+}
+uint8_t boot_uart_drain(void) { ++drains; return drain_ok; }
 uint8_t boot_image_valid(void) { return valid; }
-void boot_jump_app(void) { ++jumps; }
+void boot_jump_app(void)
+{
+    ++jumps;
+#ifndef BOOT_SIMULATOR
+    if(poll_mode) longjmp(poll_escape,2);
+#endif
+}
 static int read_flash(uint32_t a,uint8_t *p,uint16_t n)
 { assert(a>=SENSOR_APP_BASE && a+n<=SENSOR_META_BASE); memcpy(p,flash+a-SENSOR_FLASH_BASE,n); return 1; }
 static int invalidate(void) { valid=0; return 1; }
@@ -43,6 +76,35 @@ static void command(uint16_t cmd,const uint8_t *p,uint16_t n,uint32_t status)
     assert(rd32(sent+12U)==frame_crc(sent,sent_size));
 }
 #ifndef BOOT_SIMULATOR
+static void run_tx_boundary(uint16_t limit,uint8_t tc)
+{
+    memcpy(poll_bytes,"KLQ1",4U); wr32(poll_bytes+4U,7U);
+    wr16(poll_bytes+8U,0x0203U); wr16(poll_bytes+10U,0U);
+    wr32(poll_bytes+12U,frame_crc(poll_bytes,16U));
+    valid=1U; hold=image_ok=0U; used=expected=sent_size=0U; ms=0U;
+    jumps=drains=poll_pos=poll_idle=0U; fail_after=limit; drain_ok=tc; poll_mode=1U;
+    if(setjmp(poll_escape)==0) boot_firmware_main();
+    poll_mode=0U;
+    assert(hold && image_ok && valid && ms>=500U);
+    if(limit<20U) {
+        assert(!jumps && !drains && sent_size==limit);
+    } else {
+        assert(sent_size==20U && drains==1U && jumps==(tc?1U:0U));
+    }
+    if(!jumps) {
+        fail_after=0xFFFFU; drain_ok=1U; drains=0U;
+        command(0x0203U,0,0U,0U);
+        assert(jumps==1U && drains==1U);
+    }
+}
+static void default_boot_boundary(uint8_t app_valid)
+{
+    valid=app_valid; hold=image_ok=0U; used=expected=sent_size=0U; ms=0U;
+    jumps=drains=poll_idle=0U; poll_mode=2U;
+    if(setjmp(poll_escape)==0) boot_firmware_main();
+    poll_mode=0U;
+    assert(!hold && jumps==(app_valid?1U:0U) && !sent_size && !drains);
+}
 int main(void)
 {
     uint8_t app[240],p[132],f[16];
@@ -53,6 +115,7 @@ int main(void)
     assert(sent_size==56U && sent[22U]==0U && sent[23U]==SENSOR_DEVICE_CLASS);
     assert(rd16(sent+24U)==SENSOR_BOARD_ID && rd16(sent+26U)==SENSOR_HW_COMPAT);
     assert(rd16(sent+28U)==SENSOR_DEVICE_TYPE && rd32(sent+44U)==mock_uid[0]);
+    assert(rd32(sent+32U)==0x00010002UL);
     command(0x0204U,0,0U,0U);
     assert(sent_size==36U && rd32(sent+20U)==SENSOR_APP_BASE);
     assert(rd16(sent+24U)==SENSOR_APP_CAPACITY && rd16(sent+26U)==128U);
@@ -75,6 +138,11 @@ int main(void)
     sent_size=0; for(i=0U;i<16U;++i) receive(f[i]); assert(!sent_size);
     wr16(f+10U,133U); for(i=0U;i<16U;++i) receive(f[i]); assert(!used && !sent_size);
     command(0x7777U,0,0U,1U); command(1U,p,1U,2U);
+    for(i=0U;i<20U;++i) run_tx_boundary(i,1U);
+    run_tx_boundary(0xFFFFU,0U);
+    run_tx_boundary(0xFFFFU,1U);
+    default_boot_boundary(1U);
+    default_boot_boundary(0U);
     printf("boot parser/protocol PASS, board=%u\n",SENSOR_BOARD_ID);
     return 0;
 }

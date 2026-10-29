@@ -1,6 +1,6 @@
 # 统一 UART 引导协议 v1
 
-2026-10-29，端点为 PY32F002BF15U6TR 的 USART1，PA3 TX / PA4 RX，115200 8N1。引导版本 `0x00010000`。所有数值小端；不使用主控 USB 引导的镜像起点或页长。
+2026-10-29，端点为PY32F002BF15U6TR的USART1，PA3 TX/PA4 RX，115200 8N1。当前引导版本`0x00010002`。1.0.0/1.0.1存在Flash完成标志配置缺陷，PC工具在BEGIN前拒绝这些版本；须先更新常驻引导。所有数值小端，不使用主控USB引导的镜像起点或页长。
 
 ## 身份与内存
 
@@ -32,7 +32,7 @@
 | BEGIN | `0x0200` | board:u16, hw:u16, length:u16, crc32:u32 | next_offset:u16 |
 | DATA | `0x0201` | offset:u16, bytes[2..128] | next_offset:u16 |
 | END | `0x0202` | 空 | 空 |
-| RUN | `0x0203` | 空 | 空，请求发送应答后跳转；发送/TC超时路径的完成保证仍待处理和板测 |
+| RUN | `0x0203` | 空 | 空；完整应答发送及TC排空均成功、镜像有效才跳转，失败保持引导 |
 | GET_LAYOUT | `0x0204` | 空 | app_base:u32, capacity:u16, page:u16, metadata:u32, boot_size:u32，共16 B |
 
 BEGIN 先核对板型、兼容号和长度，成功后先擦有效记录再擦必要应用页。活动升级中的同 length/CRC BEGIN 返回当前 offset，不重新擦除。成功 END 后重新 BEGIN 则开始一次新升级。错误应答不可作为推进 offset 的依据。
@@ -45,7 +45,7 @@ DATA 的 offset 必须页对齐，只允许下一个顺序页或已完成页的�
 
 1. 本地验证升级容器，读取端口 INFO，匹配板型/兼容号/class，记录 UID。
 2. 应用模式发送 ENTER_BOOTLOADER，然后在复位后的 500 ms 窗口内发送 HOLD。进入引导前的 ACK 丢失可容忍，继续尝试 HOLD；窗口错过时重新读 INFO/进入引导。
-3. 再读 INFO，要求 mode=0 且 UID 未变；读 GET_LAYOUT，确认分区。历史电机独立引导没有 GET_LAYOUT，当前工具会在 BEGIN 前停止。
+3. 再读INFO，要求mode=0、UID未变、引导版本至少1.0.2；读GET_LAYOUT确认分区。旧/未知引导在BEGIN前停止，不作擦写。仅在ENTER遇到typed UART错误时，电脑可重新INFO确认同UID引导；其它错误不因此忽略。
 4. BEGIN，按返回的合法页 offset 发 DATA；每页等待 ACK，超时重发同一页。相同上电会话可续传，重启后应接受 offset=0 并从头下载。
 5. END；成功后 RUN，然后等待同 UID、mode=1 的应用 INFO。RUN ACK 丢失时继续查询应用 INFO。
 

@@ -107,6 +107,7 @@ class UpdateTests(unittest.TestCase):
                 if cmd==1:
                     data=bytearray(36)
                     struct.pack_into('<HBBHH',data,0,1,self.mode,1,1,1)
+                    struct.pack_into('<I',data,12,0x10002 if self.mode==0 else 0x10000)
                     data[24:36]=b'123456789abc'
                     return bytes(data)
                 if cmd==0x01F0:
@@ -125,15 +126,36 @@ class UpdateTests(unittest.TestCase):
         self.assertEqual(update.upgrade(link,pack.update_package('ul',image())),('ul',240))
         self.assertEqual(link.commands[:5],[1,0x01F0,9,1,0x0204])
         self.assertEqual(link.commands[-2:],[0x0203,1])
+    def test_direct_old_or_unknown_boot_never_reaches_begin(self):
+        for version in (0,0x10000,0x10001):
+            with self.subTest(version=version):
+                class Device:
+                    def __init__(self):self.commands=[]
+                    def request(self,cmd,payload=b'',**kwargs):
+                        self.commands.append(cmd)
+                        if cmd==1:
+                            data=bytearray(36)
+                            struct.pack_into('<HBBHH',data,0,1,0,1,1,1)
+                            struct.pack_into('<I',data,12,version)
+                            data[24:36]=b'123456789abc'
+                            return bytes(data)
+                        if cmd==9:return b''
+                        raise AssertionError('unsafe command 0x%04X'%cmd)
+                link=Device()
+                with self.assertRaisesRegex(ValueError,r'boot 1\.0\.2 required.*nothing erased'):
+                    update.upgrade(link,pack.update_package('ul',image()))
+                self.assertEqual(link.commands,[1,9,1])
     def test_bad_layout_uid_and_resume_offset_stop_before_data(self):
         for failure in ('uid','layout','offset'):
             class Device:
-                def __init__(self):self.infos,self.data=0,0
+                def __init__(self):self.infos,self.data,self.commands=0,0,[]
                 def request(self,cmd,payload=b'',**kwargs):
+                    self.commands.append(cmd)
                     if cmd==1:
                         self.infos+=1
                         data=bytearray(36)
                         struct.pack_into('<HBBHH',data,0,1,0,1,1,1)
+                        struct.pack_into('<I',data,12,0x10002)
                         data[24:36]=b'123456789abc'
                         if failure=='uid' and self.infos==2:data[24]^=1
                         return bytes(data)
@@ -146,6 +168,7 @@ class UpdateTests(unittest.TestCase):
             link=Device()
             with self.assertRaises(ValueError):update.upgrade(link,pack.update_package('ul',image()))
             self.assertEqual(link.data,0)
+            self.assertEqual(link.commands,[1,9,1]+([] if failure=='uid' else [0x0204])+([0x0200] if failure=='offset' else []))
     def device(self,kind='ul',**kwargs):
         if not (ROOT/'tests/build'/f'sim_{kind}.exe').exists(): self.skipTest('run run_tests.ps1 first')
         port=CDevice(kind,**kwargs);self.addCleanup(port.close);return port

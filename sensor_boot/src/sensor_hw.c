@@ -46,8 +46,9 @@ uint8_t sensor_hw_uart_put(uint8_t byte)
     if (!(USART1->SR & USART_SR_TXE)) return 0U;
     USART1->DR = byte; return 1U;
 }
-void sensor_hw_uart_drain(void)
+uint8_t sensor_hw_uart_drain(void)
 {
     uint32_t n = 100000UL;
     while (!(USART1->SR & USART_SR_TC) && n--) { }
+    return (USART1->SR & USART_SR_TC) != 0U;
 }

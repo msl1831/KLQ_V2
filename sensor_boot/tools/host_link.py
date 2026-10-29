@@ -23,6 +23,12 @@ class USBError(RuntimeError):
         super().__init__(f'controller USB command 0x{command:04X}: status {status}')
 
 
+class BridgeError(ValueError):
+    def __init__(self, reason):
+        self.reason = reason
+        super().__init__('controller bridge: ' + REASONS.get(reason, f'unknown failure {reason}'))
+
+
 class USBLink:
     def __init__(self, port, timeout=0.5):
         self.port, self.timeout = port, timeout
@@ -152,7 +158,7 @@ class HostLink:
                         if attempt + 1 < retries:
                             break
                         raise TimeoutError('controller bridge: ' + REASONS[1])
-                    raise ValueError('controller bridge: ' + REASONS.get(reason, f'unknown failure {reason}'))
+                    raise BridgeError(reason)
                 if not result or result[0] != 1:
                     raise ValueError('malformed controller bridge result state')
                 data = result[1:]

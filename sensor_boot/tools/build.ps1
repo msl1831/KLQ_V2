@@ -2,7 +2,8 @@ param(
     [ValidateSet('all','ul','ir','motor')][string]$Device = 'all',
     [string]$ArmccBin = $(if ($env:KLQ_ARMCC) { $env:KLQ_ARMCC } else { 'C:\Keil_v5\ARM\ARMCC\bin' }),
     [string]$SdkRoot = $(if ($env:KLQ_PY32_SDK) { $env:KLQ_PY32_SDK } else { Join-Path $PSScriptRoot '..\..\UL\firmware\vendor\PY32F002B_Firmware' }),
-    [string]$Python = (Get-Command python -ErrorAction Stop).Source
+    [string]$Python = (Get-Command python -ErrorAction Stop).Source,
+    [string]$OutputDir = ''
 )
 $ErrorActionPreference='Stop'
 $root=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -15,10 +16,13 @@ foreach ($name in @('armcc','armasm','armlink','fromelf')) {
 if (!(Test-Path -LiteralPath $Python)) { throw 'Pass -Python with a Python 3.12 executable.' }
 $devices=if ($Device -eq 'all') { @('ul','ir','motor') } else { @($Device) }
 foreach ($kind in $devices) {
-    $out=Join-Path $root "build\$kind"
+    $out=if ($OutputDir) { if ($Device -eq 'all') { Join-Path $OutputDir $kind } else { $OutputDir } } else { Join-Path $root "build\$kind" }
     $bootOut=Join-Path $out 'boot'
     $appOut=Join-Path $out 'app'
     New-Item -ItemType Directory -Path $bootOut,$appOut -Force | Out-Null
+    $out=(Resolve-Path -LiteralPath $out).Path
+    $bootOut=(Resolve-Path -LiteralPath $bootOut).Path
+    $appOut=(Resolve-Path -LiteralPath $appOut).Path
     $includes=@('-I',(Join-Path $root 'include'),'-I',(Join-Path $cmsis 'Include'),'-I',(Join-Path $cmsis 'Device\PY32F0xx\Include'))
     $sources=@('main','boot_hw','update','sensor_hw') | ForEach-Object { Join-Path $root "src\$_.c" }
     $sources+=Join-Path $sdk 'Templates\PY32F002Bxx_Templates_LL\Src\system_py32f002b.c'
@@ -48,6 +52,6 @@ foreach ($kind in $devices) {
         & (Join-Path $repo 'UL\tools\build_sensor.ps1') -Bootloader -Configuration Release -OutputDir $appOut -ArmccBin $ArmccBin -VendorRoot $sdk
     }
     if (!$?) { throw "$kind app build failed" }
-    & $Python (Join-Path $PSScriptRoot 'pack.py') --device $kind
+    & $Python (Join-Path $PSScriptRoot 'pack.py') --device $kind --build-dir $out
     if ($LASTEXITCODE -ne 0) { throw "$kind packaging failed" }
 }

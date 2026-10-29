@@ -15,7 +15,7 @@
 #define SENSOR_ID_OFFSET        0xC0U
 #define SENSOR_APP_MIN_SIZE     (SENSOR_ID_OFFSET + 16U)
 #include "profile.h"
-#define SENSOR_FIRMWARE_VERSION 0x00010000UL
+#define SENSOR_FIRMWARE_VERSION 0x00010002UL
 
 typedef struct {
     int (*read)(uint32_t address, uint8_t *data, uint16_t length);

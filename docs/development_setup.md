@@ -51,3 +51,18 @@ python tools/package_host_release.py
 先生成三类镜像和native模拟器，再运行Python链路测试，确保无跳过。完整链路保持在模拟引导到END提交，不执行ARM应用跳转；不接真实串口、USB硬件、探针或Flash。包位于 `build/host_bridge_0_9/release/`，build仍不入Git，跨电脑可重建或单独转交ZIP并核对其外部JSON/SHA-256。
 
 实际安装前须另行确认主控COM、目标板型/UID、供电、首次工厂引导及安全输出；本轮授权不包含自动烧录。具体使用见 `sensor_boot/docs/usb_bridge_v1.md`，业务合流证据见 `verification_20261029_host_upgrade.md`。
+
+## IR实板升级修复后的当前基线
+
+同日后续已经用户明确授权完成IR仅引导1.0.2安装，再从主控USB实测两次应用完整升级。当前PC工具在BEGIN前拒绝引导低于1.0.2，不能继续使用早期0.9合集中的factory/PC工具。主控本身仍为0.9。本节覆盖前文合流时“未烧录”的历史边界，具体范围见verification_20261029_ir_via_host.md。
+
+```powershell
+& sensor_boot/tools/build.ps1 -Device ir -OutputDir build/ir_boot102_20261029 -SdkRoot F:/work/KLQ_V2/Codex/UL/firmware/vendor/PY32F002B_Firmware
+& sensor_boot/tests/run_flash_hw.ps1
+& sensor_boot/tests/run_tests.ps1
+python -m unittest discover -s sensor_boot/tests -p 'test_*.py' -v
+```
+
+Flash模型运行实际驱动C，以进程虚拟内存和寄存器代理替代MMIO，只替换未执行的ARM跳转汇编。旧1.0.1源码快照随tests/flash_host入库，不依赖另一分支提交。此模型复现EOPIE契约，仍不替代硅片Flash/中断时序验收。
+
+仅引导安装需特别注意DFP1.2.6声明4096 B擦除扇区，直接给4516 B BIN做sector erase会碰到0x1800应用区。本轮经用户授权使用128 B物理页RAM写入器，并整片比较证明APP/metadata/选项未变；不要在仅引导授权下使用“擦后补回APP”。当前受限RAM helper源码/构建入口为sensor_boot/tools/boot_repair_ram.c、build_ram_repair.ps1；只供明确目标、备份和范围校验后的恢复使用，不能作为普通USB升级流程。

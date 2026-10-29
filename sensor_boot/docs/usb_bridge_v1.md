@@ -4,6 +4,8 @@
 
 主控 USB 应用 INFO 以 `KLQ ROBOT FW 0.9` 开头，声明 `EXT_UPGRADE=1; EXT_PORTS=3`，同时保留PY_ERROR、PY_LINE和PC4状态。主控常驻 USB 引导不提供外接端口升级；PC 需先运行带此能力的系统固件。外接板需已安装对应 sensor_boot 工厂镜像，旧 UL/IR 独立应用无法仅通过 UART 增加常驻引导。主控旧USB引导0.3可以安装0.9应用，无需为本功能更新主控引导。
 
+同日IR实板验证发现旧板端引导Flash完成标志缺陷；当前必须使用板端引导1.0.2及更新后的PC工具。工具在BEGIN前核对引导版本，拒绝1.0.0/1.0.1/未知版本。ENTER期间的typed UART错误只允许通过重新确认同UID引导INFO恢复，再继续布局校验，不会跳过写入门禁。IR两次完整下载/END/RUN及30秒采样恢复已通过，见 [IR实测](../../docs/verification_20261029_ir_via_host.md)。原0.9合集中的旧factory及旧工具不包含本次修复，不能继续用于新安装/升级。
+
 ## 电脑操作
 
 在仓库根目录执行；COM10 为主控的 USB 串口示例，端口号对应实际接线：
@@ -63,4 +65,4 @@ USB响应等待期间仍推进PC4电源键和外接端口状态机。会话活�
 & .venv/Scripts/python.exe -m unittest discover -s sensor_boot/tests -p test_host_tool.py -v
 ```
 
-业务合流证据、资源增量和新交付包哈希见 [主控0.9验证](../../docs/verification_20261029_host_upgrade.md)。[来源验证记录](verification_20261029_usb_bridge.md)保留旧main基线的历史结果。原生模拟覆盖实际USB解析、实际端口桥接和实际板端C更新内核；UART寄存器、USB硬件、Flash驱动及ARM应用跳转仍需实板验收。共用引导RUN的发送/TC超时边界仍按Motor核对记录保留为待处理项，不能声称已保证应答发送完成再跳转。
+业务合流的历史资源及旧包哈希见 [主控0.9验证](../../docs/verification_20261029_host_upgrade.md)。[来源验证记录](verification_20261029_usb_bridge.md)保留旧main软件基线。当前1.0.2已包含RUN应答/TC失败保持引导的修正和对应native边界回归；IR的真实Flash/USB升级正常流程已通过，真实发送故障注入、其它板及断电中断仍需单独验收。

@@ -55,11 +55,11 @@ static uint32_t frame_crc(const uint8_t *p, uint16_t n)
     return ~crc;
 }
 
-static void send_response(uint32_t seq, uint16_t cmd, uint32_t status,
+static uint8_t send_response(uint32_t seq, uint16_t cmd, uint32_t status,
                           const uint8_t *data, uint16_t n)
 {
     uint16_t i, size;
-    if (n > 128U) return;
+    if (n > 128U) return 0U;
     size = (uint16_t)(20U + n);
     tx[0] = 'K'; tx[1] = 'L'; tx[2] = 'Q'; tx[3] = '1';
     wr32(tx + 4U, seq);
@@ -69,7 +69,8 @@ static void send_response(uint32_t seq, uint16_t cmd, uint32_t status,
     for (i = 0U; i < n; ++i) tx[20U + i] = data[i];
     wr32(tx + 12U, frame_crc(tx, size));
     for (i = 0U; i < size; ++i)
-        if (!boot_uart_put(tx[i])) break;
+        if (!boot_uart_put(tx[i])) return 0U;
+    return 1U;
 }
 
 static void process_frame(void)
@@ -120,10 +121,11 @@ static void process_frame(void)
         break;
     case 0x0203U: /* RUN */
         if (n) { status = 2U; break; }
+        hold = 1U; /* A failed RUN must also block the 500 ms automatic start. */
         image_ok = boot_image_valid();
         status = image_ok ? 0U : 6U;
-        send_response(seq, cmd, status, 0, 0U);
-        if (image_ok) { boot_uart_drain(); boot_jump_app(); }
+        if (send_response(seq, cmd, status, 0, 0U) && image_ok && boot_uart_drain())
+            boot_jump_app();
         return;
     default: break;
     }

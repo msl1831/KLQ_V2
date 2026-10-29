@@ -26,6 +26,7 @@ def package(kind='ul', size=272):
 class Controller:
     def __init__(self, kind='ul', mode=0):
         self.kind, self.mode = kind, mode
+        self.boot_version, self.app_version = 0x10002, 0x10000
         self.queue = bytearray()
         self.frames, self.inner, self.data_offsets = [], [], []
         self.capable, self.wrong_token = True, False
@@ -115,7 +116,7 @@ class Controller:
             result = bytearray(36)
             board, hw, cls = pack.PROFILES[self.kind]
             typ = {'ul': 1, 'ir': 2, 'motor': 2}[self.kind]
-            struct.pack_into('<HBBHHHHIIHH', result, 0, 1, self.mode, cls, board, hw, typ, 0, 0x10000, 8, 132, pack.CAPACITY)
+            struct.pack_into('<HBBHHHHIIHH', result, 0, 1, self.mode, cls, board, hw, typ, 0, self.boot_version if self.mode == 0 else self.app_version, 8, 132, pack.CAPACITY)
             result[24:36] = b'123456789ABC'
             reply = bytes(result)
         elif cmd == 0x01F0:
@@ -173,6 +174,56 @@ class HostTests(unittest.TestCase):
             self.assertEqual(controller.data_offsets, [0, 128, 256])
             open_body = next(f[16:] for f in controller.frames if struct.unpack_from('<H', f, 8)[0] == host_link.OPEN)
             self.assertEqual(open_body[0], port - 1)
+
+    def test_old_or_unknown_boot_rejected_before_begin_all_boards(self):
+        for kind in pack.PROFILES:
+            for mode in (0, 1):
+                for version in (0, 0x10000, 0x10001):
+                    with self.subTest(kind=kind, mode=mode, version=version):
+                        controller = Controller(kind, mode)
+                        controller.boot_version = version
+                        with self.assertRaisesRegex(ValueError, r'boot 1\.0\.2 required.*nothing erased'):
+                            with self.link(controller, kind) as link:
+                                update.upgrade(link, package(kind))
+                        commands = [struct.unpack_from('<H', f, 8)[0] for f in controller.inner]
+                        self.assertEqual(commands, [1, 9, 1] if mode == 0 else [1, 0x01F0, 9, 1])
+                        self.assertFalse(controller.app)
+                        self.assertEqual(controller.data_offsets, [])
+                        self.assertIsNone(controller.token)
+
+    def test_current_and_newer_boot_accept_old_application_version(self):
+        for kind in pack.PROFILES:
+            for version in (0x10002, 0x10003):
+                with self.subTest(kind=kind, version=version):
+                    controller = Controller(kind, mode=1)
+                    controller.boot_version = version
+                    self.assertEqual(controller.app_version, 0x10000)
+                    with self.link(controller, kind) as link:
+                        self.assertEqual(update.upgrade(link, package(kind)), (kind, 272))
+                    self.assertEqual(controller.mode, 1)
+                    self.assertEqual(controller.data_offsets, [0, 128, 256])
+                    self.assertIsNone(controller.token)
+
+    def test_fresh_boot_info_after_hold_controls_version_gate(self):
+        class ChangedVersionController(Controller):
+            def device(self, data):
+                if struct.unpack_from('<H', data, 8)[0] == 9:
+                    self.boot_version = 0x10001
+                return super().device(data)
+        for kind in pack.PROFILES:
+            for mode in (0, 1):
+                with self.subTest(kind=kind, mode=mode):
+                    controller = ChangedVersionController(kind, mode)
+                    with self.assertRaisesRegex(ValueError, r'boot 1\.0\.2 required.*nothing erased'):
+                        with self.link(controller, kind) as link:
+                            update.upgrade(link, package(kind))
+                    commands = [struct.unpack_from('<H', f, 8)[0] for f in controller.inner]
+                    self.assertEqual(commands[-2:], [9, 1])
+                    self.assertNotIn(0x0200, commands)
+                    self.assertNotIn(0x0201, commands)
+                    self.assertNotIn(0x0203, commands)
+                    self.assertFalse(controller.app)
+                    self.assertIsNone(controller.token)
 
     def test_controller_capability_checked_before_open(self):
         controller = Controller()

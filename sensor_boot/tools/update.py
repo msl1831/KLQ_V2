@@ -5,6 +5,7 @@ import struct
 import time
 from pathlib import Path
 from pack import APP, META, PAGE, CAPACITY, PROFILES, read_package
+from host_link import BridgeError
 
 
 def encode(seq, cmd, payload=b''):
@@ -75,10 +76,18 @@ def upgrade(link, package, run=True):
             link.request(0x01F0, timeout=0.15, retries=1)
         except TimeoutError:
             pass  # Application may reset after its ACK was lost.
+        except BridgeError as error:
+            if error.reason != 2:
+                raise
+            # Reset-line noise may abort the MCU handshake; only verified boot identity recovers it.
+            check_info(link.request(1, timeout=0.15, retries=1), kind, 0, uid)
     elif info[2] != 0:
         raise ValueError('unknown device mode')
     link.request(9, timeout=0.15, retries=3)
-    check_info(link.request(1), kind, 0, uid)
+    boot_info = link.request(1)
+    check_info(boot_info, kind, 0, uid)
+    if struct.unpack_from('<I', boot_info, 12)[0] < 0x00010002:
+        raise ValueError('boot 1.0.2 required; install the new boot firmware; nothing erased')
     layout = link.request(0x0204)
     if layout != struct.pack('<IHHII', APP, CAPACITY, PAGE, META, APP - 0x08000000):
         raise ValueError('boot layout differs; install the common factory image first')

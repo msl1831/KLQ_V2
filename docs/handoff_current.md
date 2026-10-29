@@ -6,6 +6,8 @@
 
 ## 当前结果
 
+- 同日后续IR经主控USB升级通过，最新板上IR引导1.0.2、APP仍1.0.0（同包重写验证）。曾发现ENTER UART错误容错缺口、旧引导EOPIE缺陷；修复后从引导态及应用态各完整传6052 B/48包、END/CRC/RUN/同UID确认通过。用户明确授权仅SWD更新IR引导；128 B页RAM写入器备份/读回确认APP/metadata/选项未改，APP随后只经USB写入。最终监测PID28828（接力重查），P1/P2有效采样30秒无新增通信错误，主控仍0.9、UI1/PY_ERROR0。见verification_20261029_ir_via_host.md和ir_via_host_20261029.json。
+
 - 同日传感器实测：观测页http://127.0.0.1:8765已恢复，PID30228（接力重查），P1超声/P2双路IR在线，主机接电池、传感器由端口供电。超声移动目标与IR左右独立响应通过；P2在14:48:56非人为掉线、约1秒后同UID恢复并序号重头，TO+3/FE+1，原因未定。恢复后45秒两口无新增通信错误，不能据此关闭间歇故障。见verification_20261029_sensors_live.md及sensor_live_20261029.json。当前0.9桥接不支持IR GET_STATUS，尚未拿到reset_flags/uptime。
 
 - 同日实板新增证据：0.3引导收到24176 B应用，END CRC通过、VALID=1；RUN后INFO为0.9、USER_STATE=0、USER_VALID=0、UI=1、PY_ERROR=0、EXT_UPGRADE=1、EXT_PORTS=3，ECHO通过。仅安装主控应用，没有访问DAPLink或执行外接固件升级；安装后没有下载用户Python程序。
@@ -50,5 +52,5 @@ python tools/status_dashboard.py
 3. 双路IR普通采样已合入；Python wait_ir条件/通道规则尚待实现，目前仍错误6。语音暂不加入26项接口。
    优先跟进实测中P2非人为掉线/序号重头：保留现场，用受限只读STATUS诊断或独立UART读取复位原因，并核对电源/NRST；不得直接归因供电或把短窗口稳定视为问题解决。
 4. 主控0.9自身USB安装/END CRC/应用RUN/USB枚举和ECHO已通过；三类工厂镜像安装/回读、三口外接升级、自动STOP/HOLD时序、各阶段断电、完整业务及真实停车仍待验收。native外接整链路到END，不执行ARM APP跳转。
-5. 共用板端引导RUN的void发送/TC等待超时仍可能跳转；严格“回复发完才跳”未成立，本轮保留并明确记录。电脑容忍丢ACK不能算修复。
+5. 旧引导RUN/TC缺口已合入1.0.1修正，1.0.2保留该保护并修复EOPIE；旧1.0.0/1.0.1工厂文件不再用于升级。IR已实测，UL/MOTOR仅构建及native验证；先核对其它板实际引导再升级，PC在BEGIN前拒绝低于1.0.2。原0.9合集中的旧factory/PC工具仅作历史证据。
 6. 保留共享main的语音及环境材料，下一次合流逐项审查。提交只在本分支选择性暂存，确认无SDK嵌套仓库/生成物，再推送并比较本地HEAD与远端HEAD。不要直接在脏main切分支或git add -A。

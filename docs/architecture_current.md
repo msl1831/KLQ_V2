@@ -352,6 +352,8 @@ Python 层只暴露有限且稳定的 KLQ API，首要范围是用户按键检�
 
 ## 13. 主控USB→外接UART固件升级
 
+2026-10-29同日后续实测：IR端口2已完成应用态自动进引导、6052 B/48包、END/CRC/RUN与有效采样恢复。外接引导最低版本现为1.0.2，修复EOPIE完成标志，包含RUN/TC失败不跳转保护；PC在BEGIN前拒绝旧/未知版本。主控仍0.9且不需重刷；其它板的构建/模拟不能代替其硬件升级验收，见verification_20261029_ir_via_host.md。
+
 PC以OPEN/XFER/RESULT/CLOSE（0x40～0x43）选择端口并逐包发送KLQ1内层请求；详见 [升级协议](../sensor_boot/docs/usb_bridge_v1.md)。主控应用0.9保留所有Python命令，并声明EXT_UPGRADE=1、EXT_PORTS=3。常驻主控引导0.4回归构建不链接UART/解释器，既有引导0.3也能安装0.9应用。
 
 升级锁定token、板型、兼容号和UID；电机先STOP确认再ENTER，主控自动执行HOLD握手。ENTER/RUN或身份错误后必须重新核对同UID引导INFO及GET_LAYOUT，才能BEGIN/DATA/END。固定缓冲只存一帧，不缓存整镜像。目标口暂停普通采样，其它口保持服务；USB等待期间继续推进升级及PC4，接收每轮最多256 B。
