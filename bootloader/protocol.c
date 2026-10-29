@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #ifdef KLQ_DEMO_APP
+#include "external_ports.h"
 #include "robot_ui.h"
 #include "user_program.h"
 #endif
@@ -90,19 +91,25 @@ static void process(void)
     uint16_t cmd=get16(frame+8), n=get16(frame+10);
     const uint8_t *p=frame+16;
     uint8_t *out=response+20;
+    bool bridge_command=cmd>=CMD_EXT_OPEN && cmd<=CMD_EXT_CLOSE;
     calc=crc32_update(crc32_update(0,frame,12),p,n);
-    if (wire_crc == calc && cached && seq==last_seq && wire_crc==last_crc && cmd==last_cmd && n==last_len) {
+    if (!bridge_command && wire_crc == calc && cached && seq==last_seq && wire_crc==last_crc && cmd==last_cmd && n==last_len) {
         usb_serial_write(response,response_len); return;
     }
     cached=false;
     if (wire_crc != calc) status=ERR_CRC;
+#ifdef KLQ_DEMO_APP
+    else if (external_upgrade_active() &&
+             (cmd==CMD_BEGIN || cmd==CMD_DATA || cmd==CMD_END || cmd==CMD_RUN ||
+              cmd==CMD_DISPLAY || cmd==CMD_FINISH)) status=ERR_STATE;
+#endif
     else switch (cmd) {
     case CMD_INFO:
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.2; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
-            "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; USB_RESETS=%lu",
+            "KLQ ROBOT FW 0.3; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; USB_RESETS=%lu; EXT_UPGRADE=1; EXT_PORTS=3",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
             (unsigned)user_program_state(),(unsigned)user_program_valid(),
             (unsigned long)user_program_length(),(unsigned long)user_program_received(),
@@ -128,11 +135,41 @@ static void process(void)
     case CMD_RESET:
         if (n) status=ERR_LENGTH;
         else {
+#ifdef KLQ_DEMO_APP
+            external_upgrade_cancel();
+#endif
             board_request_bootloader();
             action=2;
         }
         break;
 #ifdef KLQ_DEMO_APP
+    case CMD_EXT_OPEN: {
+        uint32_t token;
+        uint8_t active;
+        if (n!=9u) { status=ERR_LENGTH; break; }
+        token=get32(p+1); active=external_upgrade_active();
+        status=external_upgrade_open(p[0],token,get16(p+5),get16(p+7));
+        if (status==OK) {
+            if (!active) user_program_stop();
+            put32(out,token); size=4u;
+        }
+        break;
+    }
+    case CMD_EXT_XFER:
+        if (n<20u || n>152u) status=ERR_LENGTH;
+        else status=external_upgrade_submit(get32(p),p+4,(uint16_t)(n-4u));
+        break;
+    case CMD_EXT_RESULT: {
+        uint16_t count=0u;
+        if (n!=4u) { status=ERR_LENGTH; break; }
+        status=external_upgrade_result(get32(p),out,&count);
+        size=count;
+        break;
+    }
+    case CMD_EXT_CLOSE:
+        if (n!=4u) status=ERR_LENGTH;
+        else status=external_upgrade_close(get32(p));
+        break;
     case CMD_BEGIN: {
         uint32_t requested;
         if (n != 8) { status=ERR_LENGTH; break; }
@@ -224,7 +261,7 @@ static void process(void)
     put32(response+16,status);
     put32(response+12,crc32_update(crc32_update(0,response,12),response+16,size+4));
     response_len=size+20;
-    if (wire_crc==calc) { cached=true; last_seq=seq; last_crc=wire_crc; last_cmd=cmd; last_len=n; }
+    if (!bridge_command && wire_crc==calc) { cached=true; last_seq=seq; last_crc=wire_crc; last_cmd=cmd; last_len=n; }
     if (usb_serial_write(response,response_len) && status==OK && action) {
         delay_ms(30);
         if (action==1) board_jump(APP_BASE);
@@ -232,17 +269,26 @@ static void process(void)
     }
 }
 
+static void reset_received(void)
+{
+    used=0; cached=false;
+#ifdef KLQ_DEMO_APP
+    external_upgrade_cancel();
+#else
+    downloading=false;
+#endif
+}
+
 void protocol_poll(void)
 {
     int b;
-    if (usb_serial_reset_seen()) {
-        used=0; cached=false;
-#ifndef KLQ_DEMO_APP
-        downloading=false;
-#endif
-    }
+    uint16_t budget=256u;
+    if (usb_serial_reset_seen()) reset_received();
     if (used && board_ms-last_byte>2000u) used=0;
-    while ((b=usb_serial_read()) >= 0) {
+    while (budget--) {
+        if (usb_serial_reset_seen()) reset_received();
+        b=usb_serial_read();
+        if (b<0) break;
         frame[used++]=(uint8_t)b; last_byte=board_ms;
         if (used==4 && get32(frame)!=FRAME_MAGIC) { memmove(frame,frame+1,3); used=3; }
         if (used==16 && get16(frame+10)>MAX_PAYLOAD) { used=0; continue; }

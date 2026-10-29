@@ -22,6 +22,10 @@ PORT_ON = re.compile(
     r"P([1-3]) ON C=(\d+) T=(\d+) UID=([0-9A-F/]+) D=(\d+)mm "
     r"TICKS=(\d+) ST=(\d+) SEQ=(\d+) TO=(\d+) FE=(\d+) UE=(\d+)"
 )
+PORT_IR = re.compile(
+    r"P([1-3]) ON C=(\d+) T=(\d+) UID=([0-9A-F/]+) L=(\d+) R=(\d+) "
+    r"ST=(\d+) Q=(\d+) SEQ=(\d+) TO=(\d+) FE=(\d+) UE=(\d+)"
+)
 PORT_OFF = re.compile(r"P([1-3]) OFF TO=(\d+) FE=(\d+) UE=(\d+) REQ=(\d+) RESP=(\d+)")
 SC7 = re.compile(r"X=(-?\d+)mg Y=(-?\d+)mg Z=(-?\d+)mg ROLL=(-?[\d.]+)deg PITCH=(-?[\d.]+)deg")
 SC7_READY = re.compile(r"SC7A20 READY ADDR=(\S+) ID=(\S+) VER=(\S+)")
@@ -37,6 +41,7 @@ def blank_state(port: str | None = None) -> dict:
         "ports": [
             {"index": i, "online": False, "class": 0, "type": 0, "uid": "--",
              "distance": 0, "ticks": 0, "sample_status": 0, "sequence": 0,
+             "left": 0, "right": 0, "quality_flags": 0,
              "timeout": 0, "frame_error": 0, "uart_error": 0,
              "requests": 0, "responses": 0, "updated": 0.0}
             for i in range(1, 4)
@@ -103,6 +108,22 @@ class Monitor:
         if not line:
             return
         now = time.time()
+        match = PORT_IR.search(line)
+        if match:
+            values = match.groups()
+            with self.lock:
+                p = self.state["ports"][int(values[0]) - 1]
+                was_online = p["online"]
+                p.update({"online": True, "class": int(values[1]), "type": int(values[2]),
+                          "uid": values[3], "left": int(values[4]), "right": int(values[5]),
+                          "distance": 0, "ticks": 0, "sample_status": int(values[6]),
+                          "quality_flags": int(values[7]), "sequence": int(values[8]),
+                          "timeout": int(values[9]), "frame_error": int(values[10]),
+                          "uart_error": int(values[11]), "updated": now})
+                if not was_online:
+                    self.event(f"端口 {p['index']} 红外传感器上线：{p['uid']}")
+                self.state["last_update"] = now
+            return
         match = PORT_ON.search(line)
         with self.lock:
             if match:
@@ -110,6 +131,7 @@ class Monitor:
                 was_online = p["online"]
                 p.update({"online": True, "class": int(values[1]), "type": int(values[2]),
                           "uid": values[3], "distance": int(values[4]), "ticks": int(values[5]),
+                          "left": 0, "right": 0, "quality_flags": 0,
                           "sample_status": int(values[6]), "sequence": int(values[7]),
                           "timeout": int(values[8]), "frame_error": int(values[9]),
                           "uart_error": int(values[10]), "updated": now})
@@ -122,6 +144,7 @@ class Monitor:
                     was_online = p["online"]
                     p.update({"online": False, "class": 0, "type": 0, "uid": "--",
                               "distance": 0, "ticks": 0, "sample_status": 0, "sequence": 0,
+                              "left": 0, "right": 0, "quality_flags": 0,
                               "timeout": int(values[1]),
                               "frame_error": int(values[2]), "uart_error": int(values[3]),
                               "requests": int(values[4]), "responses": int(values[5]), "updated": now})
@@ -217,10 +240,10 @@ HTML = r'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <script>
 const $=id=>document.getElementById(id), esc=v=>String(v??'--').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const ports=$('ports'); ports.innerHTML=[1,2,3].map(i=>`<section class="card"><div class="port-title"><h2>外接端口 ${i}</h2><span id="pb${i}" class="badge">离线</span></div><div id="pd${i}" class="distance">--<small>mm</small></div><div class="kv"><span>设备</span><b id="pt${i}">等待发现</b><span>UID</span><b id="pu${i}" class="mono">--</b><span>回波</span><b id="pk${i}">-- ticks</b><span>样本</span><b id="ps${i}">--</b></div><div class="errors"><div class="err"><b id="pto${i}">0</b>超时</div><div class="err"><b id="pfe${i}">0</b>帧错误</div><div class="err"><b id="pue${i}">0</b>UART</div></div></section>`).join('');
-function device(p){return !p.online?'等待发现':p.class===1&&p.type===1?'CS100A 超声':p.class||p.type?`类别 ${p.class} / 类型 ${p.type}`:'未知设备'}
+function device(p){return !p.online?'等待发现':p.class===1&&p.type===1?'CS100A 超声':p.class===1&&p.type===2?'双路红外':p.class||p.type?`类别 ${p.class} / 类型 ${p.type}`:'未知设备'}
 function age(d,t){return t?Math.max(0,(d.server_time-t)).toFixed(1)+'s 前':'--'}
 function render(d){const c=$('conn');c.classList.toggle('connected',d.connected);c.querySelector('span').textContent=d.connected?`${d.port} 已连接`:`${d.port} 未连接`;
-d.ports.forEach(p=>{const i=p.index,b=$(`pb${i}`);b.classList.toggle('on',p.online);b.textContent=p.online?'在线':'离线';$(`pd${i}`).innerHTML=(p.online?esc(p.distance):'--')+'<small>mm</small>';$(`pt${i}`).textContent=device(p);$(`pu${i}`).textContent=p.online?p.uid:'--';$(`pk${i}`).textContent=p.online?`${p.ticks} ticks`:'--';$(`ps${i}`).textContent=p.online?`#${p.sequence} · 状态 ${p.sample_status}`:`REQ ${p.requests} / RESP ${p.responses}`;$(`pto${i}`).textContent=p.timeout;$(`pfe${i}`).textContent=p.frame_error;$(`pue${i}`).textContent=p.uart_error;});
+d.ports.forEach(p=>{const i=p.index,b=$(`pb${i}`),ir=p.class===1&&p.type===2;b.classList.toggle('on',p.online);b.textContent=p.online?'在线':'离线';$(`pd${i}`).innerHTML=!p.online?'--':ir?`左 ${esc(p.left)} / 右 ${esc(p.right)}<small>0～1000</small>`:esc(p.distance)+'<small>mm</small>';$(`pt${i}`).textContent=device(p);$(`pu${i}`).textContent=p.online?p.uid:'--';$(`pk${i}`).previousElementSibling.textContent=ir?'质量标志':'回波';$(`pk${i}`).textContent=p.online?(ir?`${p.quality_flags}`:`${p.ticks} ticks`):'--';$(`ps${i}`).textContent=p.online?`#${p.sequence} · 状态 ${p.sample_status}`:`REQ ${p.requests} / RESP ${p.responses}`;$(`pto${i}`).textContent=p.timeout;$(`pfe${i}`).textContent=p.frame_error;$(`pue${i}`).textContent=p.uart_error;});
 const a=d.accelerometer;$('ax').textContent=a.online?a.x:'--';$('ay').textContent=a.online?a.y:'--';$('az').textContent=a.online?a.z:'--';$('roll').textContent=a.online?a.roll.toFixed(2):'--';$('pitch').textContent=a.online?a.pitch.toFixed(2):'--';$('plane').style.transform=`rotate(${a.roll||0}deg) translateY(${Math.max(-35,Math.min(35,a.pitch||0))}px)`;$('scmeta').textContent=a.online?`地址 ${a.address} · ID ${a.identity} · VER ${a.version} · ${age(d,a.updated)}`:'传感器离线';
 const f=d.firmware||{};$('sysname').textContent=f.name||'等待主机 INFO';const keys=['APP','VALID','UI','USER_STATE','USER_VALID','USER_LENGTH','USER_MAX','USB_RESETS'];$('chips').innerHTML=keys.filter(k=>f[k]!==undefined).map(k=>`<div class="chip"><span>${k}</span>${esc(f[k])}</div>`).join('');$('events').innerHTML=d.events.length?d.events.map(e=>`<div class="event"><time>${esc(e.time)}</time><div>${esc(e.message)}</div></div>`).join(''):'<div class="empty">等待数据…</div>'}
 async function update(){try{const r=await fetch('/api/state',{cache:'no-store'});render(await r.json())}catch(e){$('conn').classList.remove('connected');$('conn').querySelector('span').textContent='监控服务断开'}}setInterval(update,250);update();

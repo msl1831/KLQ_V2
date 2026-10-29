@@ -1,0 +1,47 @@
+{
+  "result": "APPLICATION_RUNNING_SAMPLES_ADVANCE",
+  "snapshots": [
+    {
+      "pc": "0x8002440",
+      "vtor": "0x8001800",
+      "sample": {
+        "sequence": 2611,
+        "capture_time_ms": 26104,
+        "left_delta": 59,
+        "right_delta": 65,
+        "left_value": 14,
+        "right_value": 16,
+        "left_ambient": 4078,
+        "left_active": 4019,
+        "right_ambient": 4080,
+        "right_active": 4015,
+        "status": 1,
+        "quality_flags": 0
+      },
+      "measurement_count": 2611,
+      "fault_count": 0,
+      "adc_ok": 1
+    },
+    {
+      "pc": "0x8002c20",
+      "vtor": "0x8001800",
+      "sample": {
+        "sequence": 2621,
+        "capture_time_ms": 26204,
+        "left_delta": 60,
+        "right_delta": 66,
+        "left_value": 15,
+        "right_value": 16,
+        "left_ambient": 4079,
+        "left_active": 4019,
+        "right_ambient": 4079,
+        "right_active": 4013,
+        "status": 1,
+        "quality_flags": 0
+      },
+      "measurement_count": 2621,
+      "fault_count": 0,
+      "adc_ok": 1
+    }
+  ]
+}

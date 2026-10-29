@@ -1,0 +1,269 @@
+{
+  "date": "2026-10-29",
+  "branch": "main",
+  "head": "63d1ea38f69fbd478f92751855f238340b6fa853",
+  "boot_version": "0x00010001",
+  "hardware_accessed": false,
+  "flashed": false,
+  "changes": [
+    "propagate UART send and TC completion status",
+    "RUN sets hold before ACK so 500 ms auto-start cannot bypass a TX failure"
+  ],
+  "before": {
+    "ul": {
+      "manifest": {
+        "target": "PY32F002BF15U6TR",
+        "device": "ul",
+        "board_id": 1,
+        "hw_compat": 1,
+        "device_class": 1,
+        "flash_base": "0x08000000",
+        "flash_bytes": 24576,
+        "boot_bytes": 4464,
+        "app_base": "0x08001800",
+        "app_capacity": 18304,
+        "app_bytes": 5776,
+        "app_crc32": "0xCF112888",
+        "metadata_base": "0x08005F80",
+        "page_bytes": 128,
+        "programmed_bytes": 10256,
+        "boot_sha256": "86c032e11e9358570d1f66ad5ff34aee2375a6a81be8b79cc824bed388909f30",
+        "app_sha256": "628eab428ed4cf67c77a00eed9375e3c60967f464ca6155f291d26c762d5a4b0",
+        "sha256": {
+          "ul_factory.bin": "6aedbf653d0cda1de899aa682b319623b2126155e0f79ea9f3a6878bb924e1a0",
+          "ul_factory.hex": "d8c496c6b4c203d061c60cce4cca53fc7d669c9270fcbf7539b98bd038892281",
+          "ul_update.klq": "0cf7cedb4d8dc572c2b81f51f7ba64469b8d6223f9ec93e1172a85e48e8fc1d3"
+        }
+      },
+      "boot": {
+        "bin_bytes": 4464
+      },
+      "app": {
+        "bin_bytes": 5776
+      }
+    },
+    "ir": {
+      "manifest": {
+        "target": "PY32F002BF15U6TR",
+        "device": "ir",
+        "board_id": 3,
+        "hw_compat": 1,
+        "device_class": 1,
+        "flash_base": "0x08000000",
+        "flash_bytes": 24576,
+        "boot_bytes": 4468,
+        "app_base": "0x08001800",
+        "app_capacity": 18304,
+        "app_bytes": 6052,
+        "app_crc32": "0x3CB2BDEC",
+        "metadata_base": "0x08005F80",
+        "page_bytes": 128,
+        "programmed_bytes": 10536,
+        "boot_sha256": "ec24c019152e8166f52c414564820cea05ba723e2aec8ba1f780812c7fe8acd5",
+        "app_sha256": "19b7df54061df7583753b662352a77c93dd4d7bc6c8f0bf53ea2d22a6a653c54",
+        "sha256": {
+          "ir_factory.bin": "e75f389388ad1f7e3950477f944571a2aafd3b9c2c97d7b1a4e06cc8d49c82a1",
+          "ir_factory.hex": "62c9700f3c6e6c90c8efd973a3900798ed6559442a3693849e4ecd378c81744e",
+          "ir_update.klq": "f1d90156e14801f8336de4ae5c7bcd42a042446c8bb3e3e5acbba75f70dcfafb"
+        }
+      },
+      "boot": {
+        "bin_bytes": 4468
+      },
+      "app": {
+        "bin_bytes": 6052
+      }
+    },
+    "motor": {
+      "manifest": {
+        "target": "PY32F002BF15U6TR",
+        "device": "motor",
+        "board_id": 2,
+        "hw_compat": 2,
+        "device_class": 2,
+        "flash_base": "0x08000000",
+        "flash_bytes": 24576,
+        "boot_bytes": 4456,
+        "app_base": "0x08001800",
+        "app_capacity": 18304,
+        "app_bytes": 2880,
+        "app_crc32": "0x0897C604",
+        "metadata_base": "0x08005F80",
+        "page_bytes": 128,
+        "programmed_bytes": 7352,
+        "boot_sha256": "182c5c0a752911d177345ef50ed817781e4f178f74e90e2687576c22c42cf058",
+        "app_sha256": "8272fc74e30b5e2bcbc28a904a5d29b0e43e02ed1663ab5f1e8a1556d4bd9b07",
+        "sha256": {
+          "motor_factory.bin": "31e18df42a3dd56b18ea0588fc3989ee5da02e91b50d8d470ad8c26387898c2a",
+          "motor_factory.hex": "ef131d1d59e79a4a476de943923df7c31527cebb805cf8e79c155a48c3282ed3",
+          "motor_update.klq": "070f16a977d9ca2fbdbad346c9d259f4bda3d94f82e97c22b30a2ae06df22fbf"
+        }
+      },
+      "boot": {
+        "bin_bytes": 4456
+      },
+      "app": {
+        "bin_bytes": 2880
+      }
+    }
+  },
+  "after": {
+    "ul": {
+      "manifest": {
+        "target": "PY32F002BF15U6TR",
+        "device": "ul",
+        "board_id": 1,
+        "hw_compat": 1,
+        "device_class": 1,
+        "flash_base": "0x08000000",
+        "flash_bytes": 24576,
+        "boot_bytes": 4492,
+        "app_base": "0x08001800",
+        "app_capacity": 18304,
+        "app_bytes": 5776,
+        "app_crc32": "0xCF112888",
+        "metadata_base": "0x08005F80",
+        "page_bytes": 128,
+        "programmed_bytes": 10284,
+        "boot_sha256": "df4bfb46a590bd7ec456a25bbf1d262565920625d2f30522e12da27e783bbce3",
+        "app_sha256": "628eab428ed4cf67c77a00eed9375e3c60967f464ca6155f291d26c762d5a4b0",
+        "sha256": {
+          "ul_factory.bin": "7b53efcf9a40702ff2681f7e7a25d9803497af849d82f45b1ad2a61ea6011a70",
+          "ul_factory.hex": "70cbf0f9effdeeda2c0452122600dfdedfbcc5b85623b366cf62f60adbd1c397",
+          "ul_update.klq": "0cf7cedb4d8dc572c2b81f51f7ba64469b8d6223f9ec93e1172a85e48e8fc1d3"
+        }
+      },
+      "release_zip_sha256": "58cb1b2188989f9db9b9eed0cd2414875a3fd4d23e32dfa3f91a99d2c8f4e82e",
+      "boot": {
+        "rom_bytes": 4492,
+        "ro_bytes": 4472,
+        "ram_bytes": 1600
+      },
+      "app": {
+        "rom_bytes": 5776,
+        "ro_bytes": 5716,
+        "ram_bytes": 2016
+      },
+      "app_identity": [
+        "KID1",
+        1,
+        1,
+        134223872,
+        1
+      ]
+    },
+    "ir": {
+      "manifest": {
+        "target": "PY32F002BF15U6TR",
+        "device": "ir",
+        "board_id": 3,
+        "hw_compat": 1,
+        "device_class": 1,
+        "flash_base": "0x08000000",
+        "flash_bytes": 24576,
+        "boot_bytes": 4496,
+        "app_base": "0x08001800",
+        "app_capacity": 18304,
+        "app_bytes": 6052,
+        "app_crc32": "0x3CB2BDEC",
+        "metadata_base": "0x08005F80",
+        "page_bytes": 128,
+        "programmed_bytes": 10564,
+        "boot_sha256": "97d78fead1ee8fb274d3700b802969ec559242e483492ce7be835b93e5ac34be",
+        "app_sha256": "19b7df54061df7583753b662352a77c93dd4d7bc6c8f0bf53ea2d22a6a653c54",
+        "sha256": {
+          "ir_factory.bin": "437cdfad4c98e059096191b27f634a2a01c2a60e27e145ddec2eb3c2414200b8",
+          "ir_factory.hex": "3e7534c7e4e4794d237140489b3455f7c650e5a6d6b485cc20aad648ef857c15",
+          "ir_update.klq": "f1d90156e14801f8336de4ae5c7bcd42a042446c8bb3e3e5acbba75f70dcfafb"
+        }
+      },
+      "release_zip_sha256": "690e8d4a1d09445baa3463e47fa24be066bc0d509fc8240665aed0f9127c61cc",
+      "boot": {
+        "rom_bytes": 4496,
+        "ro_bytes": 4476,
+        "ram_bytes": 1600
+      },
+      "app": {
+        "rom_bytes": 6052,
+        "ro_bytes": 5980,
+        "ram_bytes": 2040
+      },
+      "app_identity": [
+        "KID1",
+        3,
+        1,
+        134223872,
+        1
+      ]
+    },
+    "motor": {
+      "manifest": {
+        "target": "PY32F002BF15U6TR",
+        "device": "motor",
+        "board_id": 2,
+        "hw_compat": 2,
+        "device_class": 2,
+        "flash_base": "0x08000000",
+        "flash_bytes": 24576,
+        "boot_bytes": 4488,
+        "app_base": "0x08001800",
+        "app_capacity": 18304,
+        "app_bytes": 2880,
+        "app_crc32": "0x0897C604",
+        "metadata_base": "0x08005F80",
+        "page_bytes": 128,
+        "programmed_bytes": 7384,
+        "boot_sha256": "784043d6ff0edfe3f5bdf30dcd820d77355cd3641989c47af1da153c54bb7545",
+        "app_sha256": "8272fc74e30b5e2bcbc28a904a5d29b0e43e02ed1663ab5f1e8a1556d4bd9b07",
+        "sha256": {
+          "motor_factory.bin": "9a29d4dae518957a9457b3939768f451e7d712ba76673f01b4876e62152bee0b",
+          "motor_factory.hex": "d98ded1908a0971047dc4524c9e1a961d30acca0401a491d15795da55333d230",
+          "motor_update.klq": "070f16a977d9ca2fbdbad346c9d259f4bda3d94f82e97c22b30a2ae06df22fbf"
+        }
+      },
+      "release_zip_sha256": "454e73ac5b6259c394cc7d7977ce571c8c08d1e86a7da402598464fa68ac8133",
+      "boot": {
+        "rom_bytes": 4488,
+        "ro_bytes": 4468,
+        "ram_bytes": 1600
+      },
+      "app": {
+        "rom_bytes": 2880,
+        "ro_bytes": 2860,
+        "ram_bytes": 1448
+      },
+      "app_identity": [
+        "KID1",
+        2,
+        2,
+        134223872,
+        1
+      ]
+    }
+  },
+  "regression": {
+    "native_board_profiles": [
+      "UL",
+      "IR",
+      "MOTOR"
+    ],
+    "run_boundary_cases_per_board": 22,
+    "default_startup_cases_per_board": 2,
+    "common_c_core_and_protocol": "PASS",
+    "ul_app_entry": "PASS in isolated output directory",
+    "ir_sampling_assertions": 1190,
+    "ir_protocol_assertions": 107,
+    "host_ports_assertions": 101,
+    "motor_native_safety_update_app": "PASS",
+    "host_bridge_assertions": 161,
+    "usb_protocol_assertions": 300,
+    "python_tests": 30,
+    "python_failures": 0,
+    "python_skipped": 0
+  },
+  "notes": [
+    "UL default native test output had non-overwritable objects; the same sources and flags passed in build/sensor_boot_run_regression_20261029/ul_entry",
+    "Application binaries and UART update containers have the same SHA-256 as the pre-fix baseline",
+    "The boot fix requires a corresponding factory image installation; UART application update containers exclude boot"
+  ]
+}

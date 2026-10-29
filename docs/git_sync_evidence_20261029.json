@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-29",
+  "branch": "main",
+  "validated_source_tree": "aba517d74eaf011ae126443a34424d28389b68af",
+  "source_method": "git archive of staged tree; later documentation, UL datasheet and isolated Motor flash helper additions do not change tested firmware build inputs",
+  "sdk_commit": "394627d99085c5eae72142503b0405b84428bb20",
+  "sdk_network_clone": "Independent clone from upstream completed, detached at pinned commit, working tree clean. Build used a git archive of the same pinned SDK commit.",
+  "python": "3.12.14",
+  "armcc": "5.06 update 6 build 750",
+  "test_environment": "Snapshot local venv with pyserial 3.5; native VC98 compiler",
+  "builds": {
+    "main_boot": {
+      "bin_bytes": 9388,
+      "sha256": "2778253c659facc74eb16c842b2adb8525de09060a58ee57451f0c23d0fc7546",
+      "map_ro_bytes": 9196,
+      "map_ram_bytes": 8728,
+      "map_rom_bytes": 9388
+    },
+    "main_demo_app": {
+      "bin_bytes": 19760,
+      "sha256": "da1c5428fde35a4ffdf9578d05a8504e6b6ac76caa76bd510df4f46a60b1d1d7",
+      "map_ro_bytes": 19528,
+      "map_ram_bytes": 26720,
+      "map_rom_bytes": 19760
+    },
+    "ul_boot": {
+      "bin_bytes": 4492,
+      "sha256": "df4bfb46a590bd7ec456a25bbf1d262565920625d2f30522e12da27e783bbce3",
+      "map_ro_bytes": 4472,
+      "map_ram_bytes": 1600,
+      "map_rom_bytes": 4492
+    },
+    "ul_app": {
+      "bin_bytes": 5776,
+      "sha256": "628eab428ed4cf67c77a00eed9375e3c60967f464ca6155f291d26c762d5a4b0",
+      "map_ro_bytes": 5716,
+      "map_ram_bytes": 2016,
+      "map_rom_bytes": 5776
+    },
+    "ir_boot": {
+      "bin_bytes": 4496,
+      "sha256": "97d78fead1ee8fb274d3700b802969ec559242e483492ce7be835b93e5ac34be",
+      "map_ro_bytes": 4476,
+      "map_ram_bytes": 1600,
+      "map_rom_bytes": 4496
+    },
+    "ir_app": {
+      "bin_bytes": 6052,
+      "sha256": "19b7df54061df7583753b662352a77c93dd4d7bc6c8f0bf53ea2d22a6a653c54",
+      "map_ro_bytes": 5980,
+      "map_ram_bytes": 2040,
+      "map_rom_bytes": 6052
+    },
+    "motor_boot": {
+      "bin_bytes": 4488,
+      "sha256": "784043d6ff0edfe3f5bdf30dcd820d77355cd3641989c47af1da153c54bb7545",
+      "map_ro_bytes": 4468,
+      "map_ram_bytes": 1600,
+      "map_rom_bytes": 4488
+    },
+    "motor_app": {
+      "bin_bytes": 2880,
+      "sha256": "8272fc74e30b5e2bcbc28a904a5d29b0e43e02ed1663ab5f1e8a1556d4bd9b07",
+      "map_ro_bytes": 2860,
+      "map_ram_bytes": 1448,
+      "map_rom_bytes": 2880
+    }
+  },
+  "tests": {
+    "native_scripts": [
+      "sensor_boot/tests/run_tests.ps1",
+      "sensor_boot/tests/run_host_bridge.ps1",
+      "sensor_boot/tests/usb_host/run_tests.ps1",
+      "IR/tests/run_host_tests.ps1",
+      "MOTOR/tools/test_motor.ps1",
+      "UL/tests/run_boot_entry_tests.ps1"
+    ],
+    "native_all_pass": true,
+    "sensor_boot_python": {
+      "passed": 30,
+      "skipped": 0,
+      "includes_pipeline": 4
+    },
+    "ir_uart_python": {
+      "passed": 10,
+      "skipped": 0
+    }
+  },
+  "environment_check": {
+    "failures": 0,
+    "warnings": 1,
+    "warning_reason": "Python runtime source absent on main; developed on codex/python-runtime"
+  },
+  "hardware_access": false,
+  "voice_firmware_build": false,
+  "python_runtime_remote_commit": "8db761abff784cc3dd023a378b03def718a138c6",
+  "additional_flash_helper": "MOTOR/tools/flash_factory.py: syntax checked only in this sync task; independent hardware evidence recorded in MOTOR/docs/flash_20261029.md"
+}

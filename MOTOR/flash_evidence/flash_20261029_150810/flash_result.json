@@ -1,0 +1,91 @@
+{
+  "probe": "LU_2022_8888",
+  "expected_uid": "4150354C3832360900D86C62",
+  "target": "py32f002bx5",
+  "image": "F:\\work\\KLQ_V2\\Codex\\sensor_boot\\build\\motor\\release\\motor_factory.hex",
+  "image_sha256": "d98ded1908a0971047dc4524c9e1a961d30acca0401a491d15795da55333d230",
+  "manifest": {
+    "target": "PY32F002BF15U6TR",
+    "device": "motor",
+    "board_id": 2,
+    "hw_compat": 2,
+    "device_class": 2,
+    "flash_base": "0x08000000",
+    "flash_bytes": 24576,
+    "boot_bytes": 4488,
+    "app_base": "0x08001800",
+    "app_capacity": 18304,
+    "app_bytes": 2880,
+    "app_crc32": "0x0897C604",
+    "metadata_base": "0x08005F80",
+    "page_bytes": 128,
+    "programmed_bytes": 7384,
+    "boot_sha256": "784043d6ff0edfe3f5bdf30dcd820d77355cd3641989c47af1da153c54bb7545",
+    "app_sha256": "8272fc74e30b5e2bcbc28a904a5d29b0e43e02ed1663ab5f1e8a1556d4bd9b07",
+    "sha256": {
+      "motor_factory.bin": "9a29d4dae518957a9457b3939768f451e7d712ba76673f01b4876e62152bee0b",
+      "motor_factory.hex": "d98ded1908a0971047dc4524c9e1a961d30acca0401a491d15795da55333d230",
+      "motor_update.klq": "070f16a977d9ca2fbdbad346c9d259f4bda3d94f82e97c22b30a2ae06df22fbf"
+    }
+  },
+  "status": "passed_running",
+  "original_flash_backed_up": false,
+  "option_bytes_changed": false,
+  "uid": "4150354C3832360900D86C62",
+  "options_before": "aab0554f0700f8ff0000ffff3f00c0ff",
+  "readback": {
+    "boot": {
+      "address": "0x08000000",
+      "bytes": 4488,
+      "sha256": "784043d6ff0edfe3f5bdf30dcd820d77355cd3641989c47af1da153c54bb7545",
+      "matches": true
+    },
+    "app": {
+      "address": "0x08001800",
+      "bytes": 2880,
+      "sha256": "8272fc74e30b5e2bcbc28a904a5d29b0e43e02ed1663ab5f1e8a1556d4bd9b07",
+      "matches": true
+    },
+    "metadata_page": {
+      "address": "0x08005F80",
+      "bytes": 128,
+      "sha256": "5ceb5e82210f8a3eec0e5ed8d113a672d5194c75744cb572609219eebcd445f2",
+      "matches": true
+    }
+  },
+  "full_flash_sha256": "9a29d4dae518957a9457b3939768f451e7d712ba76673f01b4876e62152bee0b",
+  "full_flash_matches_factory": true,
+  "options_after": "aab0554f0700f8ff0000ffff3f00c0ff",
+  "runtime": {
+    "pc": "0x08001CFC",
+    "vtor": "0x08001800",
+    "gpioa_moder": "0x0000FEAA",
+    "gpioa_odr": 0,
+    "gpioa_idr": 28,
+    "tim1_arr": 1199,
+    "tim1_ccr1": 0,
+    "tim1_ccr2": 0
+  },
+  "runtime_retry_without_reprogramming": "type object 'ResetType' has no attribute 'SW_SYSRESETREQ'",
+  "runtime_samples": [
+    {
+      "pc": "0x8001d16",
+      "vtor": "0x8001800",
+      "tick_ms": 61143,
+      "requested_pwm": 0,
+      "motor_active": 0,
+      "ccr1": 0,
+      "ccr2": 0
+    },
+    {
+      "pc": "0x8001cfc",
+      "vtor": "0x8001800",
+      "tick_ms": 61266,
+      "requested_pwm": 0,
+      "motor_active": 0,
+      "ccr1": 0,
+      "ccr2": 0
+    }
+  ],
+  "running_after_check": true
+}

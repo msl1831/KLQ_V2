@@ -9,3 +9,27 @@ vendor/APM32E10x_EVAL_SDK-main/Documents/
 vendor/APM32E10x_EVAL_SDK-main/Examples/
 vendor/APM32E10x_EVAL_SDK-main/Middlewares/
 vendor/APM32E10x_EVAL_SDK-main/Readme.pdf
+
+# Keil/MDK and compiler intermediates. Keep projects, libraries and flash assets.
+Objects/
+Listings/
+*.o
+*.obj
+*.d
+*.dep
+*.axf
+*.map
+*.crf
+*.lst
+*.build_log.htm
+*.build_log.txt
+*.uvguix.*
+*.uvgui.*
+
+# The bundled voice toolchain ships object files needed by its runtime.
+!VOICE/toolchains/**/*.o
+
+# Local installations, temporary analysis files and reproducible release outputs.
+/VOICE/toolchains/
+/tmp/
+/outputs/

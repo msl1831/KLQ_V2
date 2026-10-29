@@ -1,0 +1,33 @@
+{
+  "probe": "LU_2022_8888",
+  "target": "PY32F002Bx5",
+  "uid": [
+    "0x4150354c",
+    "0x38323609",
+    "0xdb8962"
+  ],
+  "image": "F:\\work\\KLQ_V2\\Codex\\sensor_boot\\build\\ir\\release\\ir_factory.hex",
+  "image_sha256": "62c9700f3c6e6c90c8efd973a3900798ed6559442a3693849e4ecd378c81744e",
+  "before_blank": true,
+  "before_sha256": "1df8949b2e345ab8c00cb81fb6b83686e20a4080f969e5cd8b8d520a07cdaba2",
+  "segments": [
+    {
+      "base": "0x8000000",
+      "bytes": 4468,
+      "sha256": "ec24c019152e8166f52c414564820cea05ba723e2aec8ba1f780812c7fe8acd5"
+    },
+    {
+      "base": "0x8001800",
+      "bytes": 6052,
+      "sha256": "19b7df54061df7583753b662352a77c93dd4d7bc6c8f0bf53ea2d22a6a653c54"
+    },
+    {
+      "base": "0x8005f80",
+      "bytes": 16,
+      "sha256": "b4baf87eaa8e9b1f7a422865dbb95f66cb9b68749262353b3d5ff90abc885af7"
+    }
+  ],
+  "verified_bytes": 10536,
+  "option_bytes_unchanged": true,
+  "result": "FLASH_READBACK_PASS"
+}

@@ -1,0 +1,10 @@
+LR_IROM1 0x08000000 0x00004F80  {
+  ER_IROM1 0x08000000 0x00004F80  {
+    *.o (RESET, +First)
+    *(InRoot$$Sections)
+    .ANY (+RO)
+  }
+  RW_IRAM1 0x20000000 0x00000C00  {
+    .ANY (+RW +ZI)
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "recorded": "2026-09-24",
+  "python": "3.12.14",
+  "armcc": "ARM Compiler 5.06 update 6 (build 750)",
+  "keil_mdk": "5.38",
+  "git_observed": "2.39.1.windows.1",
+  "powershell_observed": "7.6.5",
+  "geehy_sdk": {
+    "path": "vendor/APM32E10x_EVAL_SDK-main",
+    "repository": "https://github.com/GeehySemi/APM32E10x_EVAL_SDK",
+    "commit": "236fbc3ed9ba4e7a8f2e617dc783fd2bd1b746e1",
+    "note": "Use the repository copy, including the USB suspend modification."
+  },
+  "geehy_pack": {
+    "name": "Geehy.APM32E1xx_DFP.1.0.3.pack",
+    "version": "1.0.3",
+    "sha256": "0ec35b01f62f75f8012493c1e6e5ae02e6da4b88235afa8b7af1aeaa35d9559b"
+  },
+  "ul_sdk": {
+    "path": "UL/firmware/vendor/PY32F002B_Firmware",
+    "repository": "https://github.com/OpenPuya/PY32F002B_Firmware.git",
+    "commit": "394627d99085c5eae72142503b0405b84428bb20"
+  },
+  "puya_pack": {
+    "path": "UL/firmware/vendor/PY32F002B_Firmware/Packs/MDK/Puya.PY32F0xx_DFP.1.2.6.pack",
+    "version": "1.2.6",
+    "sha256": "de7d4665cdf295fe8a03109432d2b7b075ca68e6980b283d3ec037b6c74b20f3"
+  },
+  "voice": {
+    "sdk_path": "VOICE/CI13XX_SDK_ASR_ALG_V2.7.12",
+    "sdk_version": "2.7.12",
+    "gcc_path": "VOICE/toolchains/gcc_fix_raissrc/bin/riscv-nuclei-elf-gcc.exe",
+    "gcc_version": "9.2.0",
+    "make_version": "4.2.1",
+    "lua_version": "5.4.3",
+    "ci_tool_kit_version": "1.25",
+    "pack_update_tool_version": "4.0.5.000",
+    "ci_tool_kit_sha256": "f10cbf3c262af9375251db48a1941d79b14ff9aeb3d2b0be12041b25b7ee095e",
+    "pack_update_tool_sha256": "ea5f7720b101b9153135d70573701fb924a674ff7e786c3fe7515241146ad5be",
+    "archives": [
+      {
+        "name": "CI13XX_SDK_ASR_ALG_V2.7.12.zip",
+        "bytes": 123605094,
+        "sha256": "8a14400c741ced9587f1e49c2b40370164d8dfe2e194c8d37574b26e177b80f6"
+      },
+      {
+        "name": "riscv-nuclei-elf-gcc-9.2.0.rar",
+        "bytes": 96134818,
+        "sha256": "12c0eedc8b828e9a063eb84e629ff964b1f83eff45936e8381c60cf0bdcaf45e"
+      }
+    ]
+  },
+  "last_verified": "2026-10-29"
+}

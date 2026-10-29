@@ -1,0 +1,7 @@
+firmware/boot/build/
+firmware/app/build/
+firmware/factory/build/
+tools/__pycache__/
+tests/build/
+legacy/**/build/
+legacy/**/__pycache__/

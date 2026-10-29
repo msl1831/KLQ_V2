@@ -1,0 +1,21 @@
+# Preserve binary build inputs, vendor libraries and evidence byte-for-byte.
+*.a -text
+*.lib -text
+*.bin -text
+*.dat -text
+*.fefixbin458 -text
+*.pack -text
+*.FLM -text
+*.exe -text
+*.dll -text
+*.wav -text
+*.mp3 -text
+*.png -text
+*.jpg -text
+*.pdf -text
+*.xls -text
+*.xlsx -text
+*.doc -text
+*.docx -text
+*.zip -text
+*.rar -text

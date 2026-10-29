@@ -1,0 +1,15 @@
+LR_IROM1 0x08001800 0x00004780 {
+  ER_VECTORS 0x08001800 0x000000C0 {
+    *.o (RESET, +First)
+  }
+  ER_IDENTITY 0x080018C0 FIXED 0x10 {
+    app_identity.o (.sensor_identity)
+  }
+  ER_IROM1 0x080018D0 FIXED 0x000046B0 {
+    *(InRoot$$Sections)
+    *(+RO)
+  }
+  RW_IRAM1 0x20000000 0x00000C00 {
+    *(+RW +ZI)
+  }
+}
