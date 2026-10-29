@@ -1,0 +1,721 @@
+{
+  "date": "2026-10-29",
+  "result": "PASS",
+  "scope": "Normal APP1.0.2 -> boot1.0.2 -> full same-version APP1.0.2 rewrite via KLQ USB -> UART2",
+  "controller_firmware": "0.9",
+  "target": {
+    "port": 2,
+    "uid": "4150354C/3832360B/0064B862",
+    "board": 1,
+    "hw": 1,
+    "class": 1,
+    "sensor_type": 1,
+    "boot_version": "1.0.2",
+    "app_version_before": "1.0.2",
+    "app_version_after": "1.0.2"
+  },
+  "production_tool_commit": "60a5f0462490046bf9d1e2f9148e91f8cdca41ad",
+  "tool_sha256_live_bytes": {
+    "host_link.py": "125aecbd133ca3564a49418c869b9d160cd73ecc88bd4c152895b11e5676f8b4",
+    "update.py": "5afa9df383230a67b8ca7483589f6cef2f63eb93d51c7cb3fba62376640e2998",
+    "pack.py": "77a99f46a92c2a933504506f21574e72da6d3592336f2b71689f672bec42bf7f"
+  },
+  "line_ending_note": "Windows working-tree CRLF may differ from Git LF; normalized content matches stated commit.",
+  "ul_source_base": "72e2ac44278fe3240fad1366654b7c7ee2030083 with uncommitted RCWL9610A app1.0.2 fixes snapshotted",
+  "ul_source_sha256": {
+    "UL/firmware/app/Inc/cs100a.h": "dbd865866220fee5217bd7db0e2df95b48e1fdda694ca0bb68c1e189f7156509",
+    "UL/firmware/app/Src/cs100a.c": "7dec4615bde18ee6d0d441ff4d786e427f579454226cfe0b13aa5ec618745444",
+    "UL/firmware/app/Src/main.c": "32d8d6996f61ec66027cc123ad78bff6e9b2c38123eebb132891d86b86fb4cbe",
+    "UL/firmware/boards/ul_v1/board.c": "cdb9a85231714dac71df6fb1ac9a9db0dd9c9efa2015659f2557d10a42499dd6",
+    "UL/firmware/boards/ul_v1/board.h": "c5bbb82f6f83274fd1f9cde18400c4b1d84befd4934b3a684e5cfecd846b175d",
+    "sensor_boot/include/update.h": "88be2b99e0a76a12455bc005657b8aec59bda64b0fce24e401dcf94015b14f98",
+    "sensor_boot/src/boot_hw.c": "862f745c2c4f316ed5547fa6611cb1b479f6bdbd47ed757da5929beec2f92514"
+  },
+  "manifest": {
+    "target": "PY32F002BF15U6TR",
+    "device": "ul",
+    "board_id": 1,
+    "hw_compat": 1,
+    "device_class": 1,
+    "flash_base": "0x08000000",
+    "flash_bytes": 24576,
+    "boot_bytes": 4512,
+    "app_base": "0x08001800",
+    "app_capacity": 18304,
+    "app_bytes": 5832,
+    "app_crc32": "0xA20B01FE",
+    "metadata_base": "0x08005F80",
+    "page_bytes": 128,
+    "programmed_bytes": 10360,
+    "boot_sha256": "9a5e708944947d750006a6dd4c0cc85fc016153299ccae7b603fd43d13526e30",
+    "app_sha256": "b793f3cc998b1cb6372656be677ab5a588ab43691115486fb32acd8afa3e60bb",
+    "sha256": {
+      "ul_factory.bin": "76cd29617430ba7b9239e3092771deb611288256f5c2d9dcdee0b0d8b2a7d505",
+      "ul_factory.hex": "bcc7a65fe1db7ca5f16fc871ecdb41d96a0a9181704131c24e67c3177a78e85b",
+      "ul_update.klq": "b71dec0d545f65b833bacee5f3472e4072bfcf9cf3425e1b196c2eca70fb1d88"
+    }
+  },
+  "transfer": {
+    "date": "2026-10-29",
+    "method": "PC USB -> APM32 FW0.9 -> external port2 UART -> UL common boot",
+    "target_uid": "4150354C/3832360B/0064B862",
+    "image": "build\\ul_via_host_20261029\\ul_update.klq",
+    "firmware_code_commit": "ce714f7f19a0e23156f4d92e5ea2c3a82c73ee4a",
+    "ul_source_base_commit": "72e2ac44278fe3240fad1366654b7c7ee2030083 with uncommitted RCWL9610A app1.0.2 fixes snapshotted",
+    "host_worktree_commit": "60a5f0462490046bf9d1e2f9148e91f8cdca41ad",
+    "events": [
+      {
+        "cmd": "0x0001",
+        "request_hex": "",
+        "response_hex": "010001010100010001000000020001000f000000840080474c3550410b36323862b86400",
+        "ok": true,
+        "info": {
+          "protocol": 1,
+          "mode": 1,
+          "class": 1,
+          "board": 1,
+          "hw": 1,
+          "type": 1,
+          "version": "0x00010002",
+          "capabilities": 15,
+          "max_image": 18304,
+          "uid": "4150354C/3832360B/0064B862"
+        },
+        "seconds": 0.094
+      },
+      {
+        "cmd": "0x0001",
+        "request_hex": "",
+        "response_hex": "010001010100010001000000020001000f000000840080474c3550410b36323862b86400",
+        "ok": true,
+        "info": {
+          "protocol": 1,
+          "mode": 1,
+          "class": 1,
+          "board": 1,
+          "hw": 1,
+          "type": 1,
+          "version": "0x00010002",
+          "capabilities": 15,
+          "max_image": 18304,
+          "uid": "4150354C/3832360B/0064B862"
+        },
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x01F0",
+        "request_hex": "",
+        "response_hex": "",
+        "ok": true,
+        "seconds": 0.157
+      },
+      {
+        "cmd": "0x0009",
+        "request_hex": "",
+        "response_hex": "",
+        "ok": true,
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0001",
+        "request_hex": "",
+        "response_hex": "0100000101000100010000000200010008000000840080474c3550410b36323862b86400",
+        "ok": true,
+        "info": {
+          "protocol": 1,
+          "mode": 0,
+          "class": 1,
+          "board": 1,
+          "hw": 1,
+          "type": 1,
+          "version": "0x00010002",
+          "capabilities": 8,
+          "max_image": 18304,
+          "uid": "4150354C/3832360B/0064B862"
+        },
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0204",
+        "request_hex": "",
+        "response_hex": "0018000880478000805f000800180000",
+        "ok": true,
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0200",
+        "request_hex": "01000100c816fe010ba2",
+        "response_hex": "0000",
+        "ok": true,
+        "offset": 0,
+        "seconds": 0.219
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "0000e807002075190008f11e0008cf1b000800000000000000000000000000000000000000000000000000000000c51f00080000000000000000391f0008c71f000800000000000000000000000087190008871900088719000887190008871900080000000000000000000000000000000087190008871900081920000800000000",
+        "response_hex": "8000",
+        "ok": true,
+        "offset": 128,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8000000000008719000800000000112000080000000000000000000000008719000800000000871900080000000021200008000000000000000000000000000000004b49443101000100001800080100000000f002f800f03ef80ca030c8083824182d18a246671eab4654465d46ac4201d100f030f87e460f3e0fccb64601263342",
+        "response_hex": "0001",
+        "ok": true,
+        "offset": 256,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "000100d0fb1aa246ab46334318475c1500007c150000103a02d378c878c1fad8520701d330c830c101d504680c60704700000023002400250026103a01d378c1fbd8520700d330c100d50b6070471fb51fbd10b510bd00f009f91146fff7f7ff00f0e1ff00f021f903b4fff7f2ff03bc00f027f900000748804707480047fee7fee7",
+        "response_hex": "8001",
+        "ok": true,
+        "offset": 384,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8001fee7fee7fee7fee704480549034a054b70470000d11f0008d1180008e8030020e8070020e803002001e004c0091f0429fbd28b0701d50280801cc90700d00270704700290bd0c30702d00270401c491e022904d3830702d50280801c891ee3e70022eee70022dfe70378c2781946437812061b0219438378c0781b0419431143",
+        "response_hex": "0002",
+        "ok": true,
+        "offset": 512,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "00020902090a000608437047002203098b422cd3030a8b4211d300239c464ee003460b433cd4002243088b4231d303098b421cd3030a8b4201d394463fe0c3098b4201d3cb01c01a524183098b4201d38b01c01a524143098b4201d34b01c01a524103098b4201d30b01c01a5241c3088b4201d3cb00c01a524183088b4201d38b00",
+        "response_hex": "8002",
+        "ok": true,
+        "offset": 640,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8002c01a524143088b4201d34b00c01a5241411a00d201465241104670475de0ca0f00d04942031000d34042534000229c4603098b422dd3030a8b4212d3fc22890112ba030a8b420cd3890192118b4208d3890192118b4204d389013ad0921100e08909c3098b4201d3cb01c01a524183098b4201d38b01c01a524143098b4201d3",
+        "response_hex": "0003",
+        "ok": true,
+        "offset": 768,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "00034b01c01a524103098b4201d30b01c01a5241c3088b4201d3cb00c01a524183088b4201d38b00c01a5241d9d243088b4201d34b00c01a5241411a00d20146634652415b10104601d34042002b00d54942704763465b1000d3404201b50020c046c04602bd704770477047754600f024f8ae46050069465346c008c000854618b0",
+        "response_hex": "8003",
+        "ok": true,
+        "offset": 896,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800320b5fff701ff60bc00274908b6460026c0c5c0c5c0c5c0c5c0c5c0c5c0c5c0c5403d49008d46704710b50446c046c0462046fff7d8fe10bd004870478403002001491820abbefee7260002007047fee708b504490a6802430a6009680140009108bd000040100240f0b500233ce001249c40224037d04f680668144654436500",
+        "response_hex": "0004",
+        "ok": true,
+        "offset": 1024,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "00046519ae4367433e4306604e68012e01d0022e05d18f6886686743ae433e4386600f69c668ae4325467d432e43c6604d68022d18d14d69ff2a09d8066a54435443e200121b96436c43264306620be0140a2246624362436243d400a61a446a6a43b443144344625b1c0a681446dc40bed14a68012a01d0022a06d10a68c9684368",
+        "response_hex": "8004",
+        "ok": true,
+        "offset": 1152,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800493434a43134343600020f0bd08b504494a6b02434a63496b0140009108bd00000010024010b57d21c900fff7aefe0449401e4861002088610520086110bd000000e000e010b5044600f058f9206000f035f9606000f042f9a06010bd01490860704700003c00002070b501230024012921d0ff252d02102937d0ff39491e48d0",
+        "response_hex": "0005",
+        "ok": true,
+        "offset": 1280,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "00050f263602b1422ed1016a1b0399430162d6685168314396683143c669090aae433143c161016a5d001268a943120311431943016216e0016a490849000162d36851681943936819438369090c1b0a1b02194381611268016a0a239943012319430a4302622346184670bd016a102399430162d66851683143966831438669090a",
+        "response_hex": "8005",
+        "ok": true,
+        "offset": 1408,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8005ae4331438161016aa0251268a9431201cde7016aff23013399430162d5685168294395682943c569090c2d0a2d022943c161016a05256d021268a9431202b6e710b502680f4b984203d17024a2434c682243984202d00c4ca04204d103242402a243cc68224302608a68c2620a888262984201d1097c01634169012211434161",
+        "response_hex": "0006",
+        "ok": true,
+        "offset": 1536,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "0006002010bd002c014000200040feb50446c0680d4601268004c00f2ad1e9686868e26808432969144b1a4011430843e0606069f1028843a96908436061a8682169720391430143216168696169032212029143014361616846fff734ff0299002907d02b68002b04d000262046aa6900f005f83046febd0000f3e9ffff70b50546",
+        "response_hex": "8006",
+        "ok": true,
+        "offset": 1664,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800601201924c0026143824217d15a0008461146fff7bafd04466421fff7b6fd060164214843201ac0003230fff7aefdf8210140490071184007400f15e09a0008461146fff7a2fd04466421fff79efd060164214843201a00013230fff796fdf021014071180007000f081880b2a86070bd704700008307ff22db0e9a408907090e",
+        "response_hex": "0007",
+        "ok": true,
+        "offset": 1792,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "0007994000280bda0007000f0838830808489b001818c36993430b43c3617047830804489b001818036893430b430360704700ed00e000e400e070470000054989683c22890911401140034a515cc906c90ec840704700100240e82d000805498968054a4904490f8900515cc906c90ec8407047000000100240482e000810b50e4a",
+        "response_hex": "8007",
+        "ok": true,
+        "offset": 1920,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8007916838200140082913d00120c00318290ed020290cd0106801218004400f814050681c22c00a1040044a1058fff72dfd10bd034810bd000000100240282e000800366e01704710b500f0c2f810bd00000b4841680b4a090c1288090492b2114341604168084a1140064a40329288d205d209114341600549c003886070470000",
+        "response_hex": "0008",
+        "ok": true,
+        "offset": 2048,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "0008001002400001ff1fffff00fe00ed00e010b500f0a5f810bd10b500f0b7f810bd10b500f033fe10bd0148406a80b27047002c01400120052109070969884301d0002070470120704702210548c9430161891e0161034901610349016170470000002c0140fffdfffffffbffff7047000010b523480022234902700b6a9b00db0f",
+        "response_hex": "8008",
+        "ok": true,
+        "offset": 2176,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800801d0012303700b6adb00db0f03d003780224234303700b6a5b01db0f03d003780424234303700b6a1b01db0f03d003780824234303700b6a0124e40523430b6242600120fff7e2fd402105200007816242688a43426082688b01032109038a438260c2688a43c26002688a431a43026000f0f4f800f092f800f012fd10bd0000",
+        "response_hex": "0009",
+        "ok": true,
+        "offset": 2304,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "0009280000204010024005210907002802d0402088617047402088627047014840687047000028000020014800787047000028000020bff34f8f04490348c860bff34f8f00bffde700000400fa0500ed00e002484168491c4160704700002800002010b509480169c907c90f0cd0c168c907c90f08d00121c9430161052120200907",
+        "response_hex": "8009",
+        "ok": true,
+        "offset": 2432,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8009886200f0a3f910bd0020004010b5164c20698007c00f0ad0e0688007c00f06d00220c0432061606b80b200f0ebf820694007c00f0ad0e0684007c00f06d00420c0432061a06b80b200f0b8f820698005c00f01d00548206120694005c00f01d00348206110bd0000002c0140fffdfffffffbffff084801684908490001600021",
+        "response_hex": "000a",
+        "ok": true,
+        "offset": 2560,
+        "seconds": 0.046
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "000a4162891e016120210522120791610168012211430160704700200040f0b58fb0182109a8fff7defb0024059406940794142168460894fff7d5fb0120fff726fd0120c002fff7c4fc02260127052009970a960b960d9609a900070e960c94fff7c3fcf00306904001194d08900794059405aa01212846fff737fd3004069005aa",
+        "response_hex": "800a",
+        "ok": true,
+        "offset": 2688,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800a102105962846fff72ffd2f206946088010480290019403940c742846fff790fde8683043e860e86804210843e860296a11200143296200210e20fff71bfe0649700308602868384328600fb0f0bd0000002c0140ffff000000e100e010b51448016882151143016001684905c90ffbd081680f221202914381608168c908c900",
+        "response_hex": "000b",
+        "ok": true,
+        "offset": 2816,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "000b8160382281681142fcd181680722120391438160074c2046fff7c4fc06490a69022002430a612046fff7d8fc10bd00000010024000366e0100e000e070b50f490a78032a19d18988401a85b22220684364213230fff759fb094980b20124884201d9032402e0142800d20224fff7d6fe02462146284600f04ffb70bd08000020",
+        "response_hex": "800b",
+        "ok": true,
+        "offset": 2944,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800b581b000003490a78022a02d1888003200870704708000020eff3108272b608490b6803604b6843600b8903814b8943810b7b0373497b4173002a00d162b67047e000002070b50c4d00242c70ac80fff7a5fea860a868e8606c70fff72bfea87006480460446004814481047344732c61ec80fff729fe70bd08000020e0000020",
+        "response_hex": "000c",
+        "ok": true,
+        "offset": 3072,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "000c01480069704700000800002070b5eff3108672b6fff7bafefff780fe244d04462878022818d02878032815d0fff702fea978884201d0a870ac600028a86820d0201a462830d3e888401ce88022460521002000f0e1fa27e0e868201a462823d3e888401ce8802878032802d022460421eee7fff7d9fda9882246401a80b20321",
+        "response_hex": "800c",
+        "ok": true,
+        "offset": 3200,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800ce7e7201a02280fd36878002803d0e868201a3c2808d3fff7d7fd0120ec60687002202870fff7a6fe002e00d162b670bd080000200148007870470000080000200148c088704700000800002070470000f0b5424d0446287889b0002829d1a088062806d0e188002903d000231a4602216fe0ff220232811a00270126904220d0",
+        "response_hex": "000d",
+        "ok": true,
+        "offset": 3328,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "000d08dc012812d0062815d0072851d0092808d15be0012959d0022938d003293ad0ef2946d000231a46012152e0204600f07df909b0f0bde388402bd6d8a268002147e005a8fff728ff01a8059900f08cfa02a8069900f088fa6946898b03a800f07ffa694603a8c98b023000f079fa08a908786946087408a9487869464874fff7",
+        "response_hex": "800d",
+        "ok": true,
+        "offset": 3456,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800d99ff69468874cf74102301aad7e7204600f094f9cde7684606704670fff730ff002800d0012069468870cf7004236a46c5e700231a461946204600f067fa0028b7d02e70fff7aafda860b2e700231a460521204600f05afaabe700001c0000200249486000200870886070471c00002070b5084d04462878002809d000f0aefb",
+        "response_hex": "000e",
+        "ok": true,
+        "offset": 3584,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "000e002805d0a868201a022801d3fff792fd70bd00001c00002070b50022d24300240a4d0ee0035d5a4000235608d207d20f52422a405b1c7240dbb2082bf5d3641ca4b28c42eed3d04370bd00002083b8edffb581b00c9e0446301d87b23846103085b2842f01d88d4202d9002005b0f0bd4b2020704c2060705120a0703120e070",
+        "response_hex": "800e",
+        "ok": true,
+        "offset": 3712,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800e1146201d00f0a4fb01200499c00301432046083000f098fb204639460a3000f093fb20460c300021074600f091fb204610300a9900f08cfb002005e00b992218095c401c117580b2b042f7d30c212046fff7a2ffc14310220c4b0ee0a05c414000204e08c907c90f49421940401c7140c0b20828f5d3521c92b2aa42eed3c943",
+        "response_hex": "000f",
+        "ok": true,
+        "offset": 3840,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "000f384600f065fb2846b0e700002083b8ed002180308182c1828161818370478030828a002a09d08269891a142905d9818b491c818300218182c1827047ffb5044685b080340546a261a08a0e46942805d3a08b401ca083284600f026f9a08a411ca1822e54a08a04280ad8691e425c2d49405c824202d0284600f016f909b0f0bd",
+        "response_hex": "800f",
+        "ok": true,
+        "offset": 3968,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "800f10280bd1e97aaa7a09021143842903d9a08b401ca083eee71031e182e18a0029ecd08842ead328460c3000f065f903900c212846fff730ffe78a102f15d9c1431022194e0ee0a85c414000204b08c907c90f49423140401c5940c0b20828f5d3521c92b29742eed8c84303998142cfd1281d00f041f90090687a297a00020843",
+        "response_hex": "0010",
+        "ok": true,
+        "offset": 4096,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "001069468880e87aa97a000208436946c880103508996846029588470020a082e082ace70000e32d00082083b8ed30b589b005460121684600f013f9012069468870c87001466c4601a800f00af90121a01d00f006f9012102a800f002f902a80021023000f0fdf8134903a800f0fdf80f2104a800f0f9f8842105a800f0f1f88f21",
+        "response_hex": "8010",
+        "ok": true,
+        "offset": 4224,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "801005a8c901023000f0ebf80b4c06a8216800f0eaf807a8616800f0e6f808a8a16800f0e2f824236a460021284600f0eef809b030bd020001000000ff1f7fb50446fff72cfc0146684600f0cef800f06cf901466d4601a800f0c3f8114840688030818ba81d00f0bcf8fff78afd014602a800f0baf8fff7e4fd014603a800f0b0f8",
+        "response_hex": "0011",
+        "ok": true,
+        "offset": 4352,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "0011fff7d8fd69468873fff70efc6946c87310236a460021204600f0b8f87fbd00001c00002008b572b61b481c498860bff34f8fbff36f8f62b6fff79afb00f03af9fff740fd1648fff7e3fe1548fff748fefff7e4fb044606e068460178114b22460f48fff7ebfe684600f0e4f90028f3d1fff7d4fb044601460948fff7d0fe2046",
+        "response_hex": "8011",
+        "ok": true,
+        "offset": 4480,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8011fff744fd2046fff733fe204600f090f8fff76cfbdce700000018000800ed00e040000020d1240008f0b500230122014680318e46898a8c4624e0891a8cb2042c01d2254600e00425002107e05618875d104e765cb74203d1491c89b2a942f5d3a9420dd12346032c00d90323002104e05418045d4454491c89b29942f8d304e0",
+        "response_hex": "0012",
+        "ok": true,
+        "offset": 4608,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "0012521c92b261469445d7d8704683820021c182f0bde02d000870b50e46044622214843154664213230fef7efff0a4b1968491c19605d601c8158811e7300205873064c2069401c2061a560fff7f3faa0700420207070bd0000e0000020080000200170090a4170704701700a0a42700a0c8270090ec170704710b50446fef7b4ff",
+        "response_hex": "8012",
+        "ok": true,
+        "offset": 4736,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "80120002e178000a0906084310bd0eb50091029301928388026894210448fff7d8fd011e02d0014800f06bf90ebdf00000207fb51a4c6168411a64292bd360606846fff76afc6846007b0025042807d0052805d0fff723fb0199401ac82805d36078052803d2401c607000e0657060780528207803d3c007c017401c02e000280ad0",
+        "response_hex": "0013",
+        "ok": true,
+        "offset": 4864,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "00130020fff701fb2078401cc0b220700a2800d125707fbd0120f3e7000000000020f0b58bb018216846fef75cff142106a8fef758ff0120fff7a9f80120c003fff747f80220052720260125002402903f07049069460096019503943846fff744f8be62172069460883312008a9079411c10c700b4c06a92046fff722f921680820",
+        "response_hex": "8013",
+        "ok": true,
+        "offset": 4992,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8013814301432160e0682843e06000211320fff7b0f90349a00108600bb0f0bd00000020004000e100e001480089704700003000002030b58fb0182107a8fef712ff1c216846fef70eff2b480024c480848044800480048129480121426b0a434263406b08400d9025488903403002680a4302600068012508400d90182007900220",
+        "response_hex": "0014",
+        "ok": true,
+        "offset": 5120,
+        "seconds": 0.063
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "00140890032009a931c1052007a900070c95fef7eaffe12040020090019402940394059406940c20164c049069462046fff7edf82069e114884320616069082188436061104801680902090aaa07114301600d49d0100860e06820210843e060606928436061e068c9000843e060e06849010843e0600fb030bd3000002000100240",
+        "response_hex": "8014",
+        "ok": true,
+        "offset": 5248,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "80140038014018e400e000e100e038b525490868254ac007c00f0bd108688007c00f07d108684007c00f03d108680007c00f06d008680090486800901089401c108108688006c00f13d0c8688006c00f0fd04868c3b210885488401cc0b2a04203d11089401c108103e0104c15886355108008680006c00f0bd0c8680006c00f07d0",
+        "response_hex": "0015",
+        "ok": true,
+        "offset": 5376,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "0015d0889388984204d1c86880229043c86038bd0748d388c05c4860d088401cc0b2d08038bd00380140300000208401002084020020074a51881388994201d100207047054b5b5c0370491cc8b25080012070470000300000208401002006488188c088814206d1054800684006c00f01d001207047002070473000002000380140",
+        "response_hex": "8015",
+        "ok": true,
+        "offset": 5504,
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "801570b50e4dab88ea88d21a521ed2b2914201d9002070bd0022094c05e0865ce6545b1c521cdbb292b28a42f7d3ab800548c16880221143c160012070bd3000002084020020003801400170090a4170704701700a0a42700a0c8270090ec17070474b4c51314b4c5131000000000000000000000000000000000000000000000000",
+        "response_hex": "0016",
+        "ok": true,
+        "offset": 5632,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "00160000000000000000010000000200000003000000040000000600000007000000080000000900000000093d0000127a00000000000000000000366e01006cdc0200000000000000000000000000000000000000000000000001000000020000000300000004000000882e0008000000204000000014190008c82e000840000020",
+        "response_hex": "8016",
+        "ok": true,
+        "offset": 5760,
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0201",
+        "request_hex": "8016a80700003019000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000366e01",
+        "response_hex": "c816",
+        "ok": true,
+        "offset": 5832,
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0202",
+        "request_hex": "",
+        "response_hex": "",
+        "ok": true,
+        "seconds": 0.094
+      },
+      {
+        "cmd": "0x0203",
+        "request_hex": "",
+        "response_hex": "",
+        "ok": true,
+        "seconds": 0.062
+      },
+      {
+        "cmd": "0x0001",
+        "request_hex": "",
+        "response_hex": "010001010100010001000000020001000f000000840080474c3550410b36323862b86400",
+        "ok": true,
+        "info": {
+          "protocol": 1,
+          "mode": 1,
+          "class": 1,
+          "board": 1,
+          "hw": 1,
+          "type": 1,
+          "version": "0x00010002",
+          "capabilities": 15,
+          "max_image": 18304,
+          "uid": "4150354C/3832360B/0064B862"
+        },
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0001",
+        "request_hex": "",
+        "response_hex": "010001010100010001000000020001000f000000840080474c3550410b36323862b86400",
+        "ok": true,
+        "info": {
+          "protocol": 1,
+          "mode": 1,
+          "class": 1,
+          "board": 1,
+          "hw": 1,
+          "type": 1,
+          "version": "0x00010002",
+          "capabilities": 15,
+          "max_image": 18304,
+          "uid": "4150354C/3832360B/0064B862"
+        },
+        "seconds": 0.032
+      }
+    ],
+    "tool_sha256": {
+      "host_link.py": "125aecbd133ca3564a49418c869b9d160cd73ecc88bd4c152895b11e5676f8b4",
+      "update.py": "5afa9df383230a67b8ca7483589f6cef2f63eb93d51c7cb3fba62376640e2998",
+      "pack.py": "77a99f46a92c2a933504506f21574e72da6d3592336f2b71689f672bec42bf7f"
+    },
+    "package_bytes": 5852,
+    "app_bytes": 5832,
+    "app_crc32": "A20B01FE",
+    "package_sha256": "b71dec0d545f65b833bacee5f3472e4072bfcf9cf3425e1b196c2eca70fb1d88",
+    "app_sha256": "b793f3cc998b1cb6372656be677ab5a588ab43691115486fb32acd8afa3e60bb",
+    "started_at": "2026-10-29T17:28:45.282594+08:00",
+    "usb": "COM123",
+    "host_before": "KLQ ROBOT FW 0.9; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3",
+    "device_before": {
+      "protocol": 1,
+      "mode": 1,
+      "class": 1,
+      "board": 1,
+      "hw": 1,
+      "type": 1,
+      "version": "0x00010002",
+      "capabilities": 15,
+      "max_image": 18304,
+      "uid": "4150354C/3832360B/0064B862"
+    },
+    "upgrade_seconds": 3.328,
+    "device_after": {
+      "protocol": 1,
+      "mode": 1,
+      "class": 1,
+      "board": 1,
+      "hw": 1,
+      "type": 1,
+      "version": "0x00010002",
+      "capabilities": 15,
+      "max_image": 18304,
+      "uid": "4150354C/3832360B/0064B862"
+    },
+    "close_acknowledged": true,
+    "host_after": "KLQ ROBOT FW 0.9; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3",
+    "host_echo": true,
+    "result": "PASS",
+    "data_transactions": 46,
+    "data_bytes": 5832,
+    "boot_info": [
+      {
+        "protocol": 1,
+        "mode": 0,
+        "class": 1,
+        "board": 1,
+        "hw": 1,
+        "type": 1,
+        "version": "0x00010002",
+        "capabilities": 8,
+        "max_image": 18304,
+        "uid": "4150354C/3832360B/0064B862"
+      }
+    ]
+  },
+  "post_upgrade": {
+    "duration_seconds": 30.047,
+    "http_observations": 134,
+    "http_errors": [],
+    "ports": [
+      {
+        "index": 1,
+        "uid": "4150354C/38323609/00DB8962",
+        "type": 2,
+        "all_online": true,
+        "unique_port_logs": 61,
+        "status_counts": {
+          "1": 61
+        },
+        "sequence_first": 57730,
+        "sequence_last": 60723,
+        "sequence_reset_observed": false,
+        "error_delta": {
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0
+        },
+        "distance_valid_min": 0,
+        "distance_valid_max": 0
+      },
+      {
+        "index": 2,
+        "uid": "4150354C/3832360B/0064B862",
+        "type": 1,
+        "all_online": true,
+        "unique_port_logs": 61,
+        "status_counts": {
+          "1": 61
+        },
+        "sequence_first": 1149,
+        "sequence_last": 1649,
+        "sequence_reset_observed": false,
+        "error_delta": {
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0
+        },
+        "distance_valid_min": 23,
+        "distance_valid_max": 23
+      }
+    ],
+    "host": {
+      "name": "KLQ ROBOT FW 0.9",
+      "APP": "0x08008000",
+      "MAX": "489472",
+      "PAGE": "2048",
+      "VALID": "1",
+      "USER_STATE": "0",
+      "USER_VALID": "0",
+      "USER_LENGTH": "0",
+      "USER_RECEIVED": "0",
+      "USER_MAX": "16384",
+      "UI": "1",
+      "PY_ERROR": "0",
+      "PY_LINE": "0",
+      "PK_RAW": "1",
+      "PK_DOWN": "0",
+      "PK_SHORT": "0",
+      "USB_RESETS": "2",
+      "EXT_UPGRADE": "1",
+      "EXT_PORTS": "3"
+    },
+    "pass": true
+  },
+  "dashboard_pid": 27832,
+  "reconstructed_data_matches_package_app": true,
+  "app_base": "0x08001800",
+  "app_last_byte": "0x08002EC7",
+  "metadata_base": "0x08005F80",
+  "flash_changes": "Only P2 application and metadata via USB protocol; no SWD used.",
+  "resource_bytes": {
+    "boot_rom": 4512,
+    "boot_ram": 1600,
+    "app_rom": 5832,
+    "app_ram": 2024
+  },
+  "not_tested": [
+    "power interruption",
+    "USB interruption or fault injection",
+    "long-duration stability",
+    "distance accuracy or range",
+    "post-update SWD readback"
+  ]
+}
