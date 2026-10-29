@@ -7,6 +7,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 - [当前开发交接](docs/handoff_current.md)：主控分支、最新板上版本、测试结果与后续工作。
 - [主控0.9外接升级验证](docs/verification_20261029_host_upgrade.md)：最新Python业务与USB→UART升级的真实合流、资源、工具和交付。
 - [主控0.9 USB安装](docs/verification_20261029_usb_install.md)：通过主机自身USB完成安装、CRC提交、启动及版本/回显回读，原引导0.3保留。
+- [红外与超声实测](docs/verification_20261029_sensors_live.md)：P1测距/P2左右响应、错误增量，以及一次非人为IR掉线/重启迹象的待定位记录。
 - [构建环境与依赖](docs/development_setup.md)：主控、三类PY32、固定SDK恢复及重复验证命令。
 - [传感器数据访问决策](docs/decisions/001_sensor_access_strategy.md)：后台采集、静态快照、数据新鲜度和后续 Python API 约束。
 - [精简 Python 与积木接口 V0.1](docs/python_api_v0.1.md)：上位机代码生成规则、26 个非语音积木映射、枚举和错误码。

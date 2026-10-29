@@ -1,0 +1,675 @@
+{
+  "date": "2026-10-29",
+  "source_commit": "7dc1663babea257d9bfb711238201c34bc43bacd",
+  "firmware_code_commit": "ce714f7f19a0e23156f4d92e5ea2c3a82c73ee4a",
+  "dashboard": "http://127.0.0.1:8765/",
+  "dashboard_pid": 30228,
+  "usb": "COM123",
+  "initial": {
+    "connected": true,
+    "port": "COM123",
+    "since": 1793256313.3523514,
+    "last_update": 1793256321.641706,
+    "error": "",
+    "firmware": {
+      "name": "KLQ ROBOT FW 0.9",
+      "APP": "0x08008000",
+      "MAX": "489472",
+      "PAGE": "2048",
+      "VALID": "1",
+      "USER_STATE": "0",
+      "USER_VALID": "0",
+      "USER_LENGTH": "0",
+      "USER_RECEIVED": "0",
+      "USER_MAX": "16384",
+      "UI": "1",
+      "PY_ERROR": "0",
+      "PY_LINE": "0",
+      "PK_RAW": "1",
+      "PK_DOWN": "0",
+      "PK_SHORT": "0",
+      "USB_RESETS": "2",
+      "EXT_UPGRADE": "1",
+      "EXT_PORTS": "3"
+    },
+    "accelerometer": {
+      "online": true,
+      "x": -1015,
+      "y": 93,
+      "z": 65,
+      "roll": 55.04,
+      "pitch": 83.62,
+      "address": "--",
+      "identity": "--",
+      "version": "--",
+      "updated": 1793256321.641706
+    },
+    "ports": [
+      {
+        "index": 1,
+        "online": true,
+        "class": 1,
+        "type": 1,
+        "uid": "4150354C/3832360B/0064B862",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 4,
+        "sequence": 13062,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 4600,
+        "frame_error": 5,
+        "uart_error": 61,
+        "requests": 0,
+        "responses": 0,
+        "updated": 1793256321.400542
+      },
+      {
+        "index": 2,
+        "online": true,
+        "class": 1,
+        "type": 2,
+        "uid": "4150354C/38323609/00DB8962",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 1,
+        "sequence": 48203,
+        "left": 34,
+        "right": 35,
+        "quality_flags": 0,
+        "timeout": 4620,
+        "frame_error": 27,
+        "uart_error": 39,
+        "requests": 0,
+        "responses": 0,
+        "updated": 1793256321.4025402
+      },
+      {
+        "index": 3,
+        "online": false,
+        "class": 0,
+        "type": 0,
+        "uid": "--",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 0,
+        "sequence": 0,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 6948,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 6948,
+        "responses": 0,
+        "updated": 1793256321.4025402
+      }
+    ],
+    "events": [
+      {
+        "time": "14:45:13",
+        "message": "端口 2 红外传感器上线：4150354C/38323609/00DB8962"
+      },
+      {
+        "time": "14:45:13",
+        "message": "端口 1 设备上线：4150354C/3832360B/0064B862"
+      },
+      {
+        "time": "14:45:13",
+        "message": "主机状态已更新"
+      },
+      {
+        "time": "14:45:13",
+        "message": "已连接 COM123"
+      }
+    ],
+    "server_time": 1793256321.6910121
+  },
+  "windows": [
+    {
+      "source": "build\\sensor_live_20261029\\ul_response.json",
+      "start_time": 1793256373.5300686,
+      "end_time": 1793256403.2703896,
+      "http_errors": [],
+      "ports": [
+        {
+          "port": 1,
+          "logs": 57,
+          "online_logs": 57,
+          "status_counts": {
+            "1": 52,
+            "4": 5
+          },
+          "quality_counts": {
+            "0": 57
+          },
+          "valid_distance_range_mm": [
+            26,
+            1707
+          ],
+          "left_range": null,
+          "right_range": null,
+          "counters_before": {
+            "timeout": 4600,
+            "frame_error": 5,
+            "uart_error": 61
+          },
+          "counters_after": {
+            "timeout": 4600,
+            "frame_error": 5,
+            "uart_error": 61
+          },
+          "counter_delta": {
+            "timeout": 0,
+            "frame_error": 0,
+            "uart_error": 0
+          },
+          "sequence_before_after": [
+            14447,
+            15228
+          ]
+        },
+        {
+          "port": 2,
+          "logs": 57,
+          "online_logs": 57,
+          "status_counts": {
+            "1": 57
+          },
+          "quality_counts": {
+            "0": 57
+          },
+          "valid_distance_range_mm": null,
+          "left_range": [
+            2,
+            47
+          ],
+          "right_range": [
+            3,
+            58
+          ],
+          "counters_before": {
+            "timeout": 4620,
+            "frame_error": 27,
+            "uart_error": 39
+          },
+          "counters_after": {
+            "timeout": 4620,
+            "frame_error": 27,
+            "uart_error": 39
+          },
+          "counter_delta": {
+            "timeout": 0,
+            "frame_error": 0,
+            "uart_error": 0
+          },
+          "sequence_before_after": [
+            53394,
+            56338
+          ]
+        }
+      ]
+    },
+    {
+      "source": "build\\sensor_live_20261029\\ir_response_retry.json",
+      "start_time": 1793256548.2339442,
+      "end_time": 1793256568.1406796,
+      "http_errors": [],
+      "ports": [
+        {
+          "port": 1,
+          "logs": 37,
+          "online_logs": 37,
+          "status_counts": {
+            "1": 36,
+            "4": 1
+          },
+          "quality_counts": {
+            "0": 37
+          },
+          "valid_distance_range_mm": [
+            156,
+            160
+          ],
+          "left_range": null,
+          "right_range": null,
+          "counters_before": {
+            "timeout": 4600,
+            "frame_error": 5,
+            "uart_error": 61
+          },
+          "counters_after": {
+            "timeout": 4600,
+            "frame_error": 5,
+            "uart_error": 61
+          },
+          "counter_delta": {
+            "timeout": 0,
+            "frame_error": 0,
+            "uart_error": 0
+          },
+          "sequence_before_after": [
+            19113,
+            19645
+          ]
+        },
+        {
+          "port": 2,
+          "logs": 37,
+          "online_logs": 37,
+          "status_counts": {
+            "1": 37
+          },
+          "quality_counts": {
+            "0": 37
+          },
+          "valid_distance_range_mm": null,
+          "left_range": [
+            144,
+            148
+          ],
+          "right_range": [
+            134,
+            137
+          ],
+          "counters_before": {
+            "timeout": 4623,
+            "frame_error": 28,
+            "uart_error": 39
+          },
+          "counters_after": {
+            "timeout": 4623,
+            "frame_error": 28,
+            "uart_error": 39
+          },
+          "counter_delta": {
+            "timeout": 0,
+            "frame_error": 0,
+            "uart_error": 0
+          },
+          "sequence_before_after": [
+            1060,
+            3056
+          ]
+        }
+      ]
+    },
+    {
+      "source": "build\\sensor_live_20261029\\stability.json",
+      "start_time": 1793256661.1037033,
+      "end_time": 1793256705.7160008,
+      "http_errors": [],
+      "ports": [
+        {
+          "port": 1,
+          "logs": 90,
+          "online_logs": 90,
+          "status_counts": {
+            "1": 81,
+            "4": 9
+          },
+          "quality_counts": {
+            "0": 90
+          },
+          "valid_distance_range_mm": [
+            23,
+            8047
+          ],
+          "left_range": null,
+          "right_range": null,
+          "counters_before": {
+            "timeout": 4600,
+            "frame_error": 5,
+            "uart_error": 61
+          },
+          "counters_after": {
+            "timeout": 4600,
+            "frame_error": 5,
+            "uart_error": 61
+          },
+          "counter_delta": {
+            "timeout": 0,
+            "frame_error": 0,
+            "uart_error": 0
+          },
+          "sequence_before_after": [
+            22061,
+            23185
+          ]
+        },
+        {
+          "port": 2,
+          "logs": 90,
+          "online_logs": 90,
+          "status_counts": {
+            "1": 90
+          },
+          "quality_counts": {
+            "0": 90
+          },
+          "valid_distance_range_mm": null,
+          "left_range": [
+            44,
+            137
+          ],
+          "right_range": [
+            26,
+            111
+          ],
+          "counters_before": {
+            "timeout": 4623,
+            "frame_error": 28,
+            "uart_error": 39
+          },
+          "counters_after": {
+            "timeout": 4623,
+            "frame_error": 28,
+            "uart_error": 39
+          },
+          "counter_delta": {
+            "timeout": 0,
+            "frame_error": 0,
+            "uart_error": 0
+          },
+          "sequence_before_after": [
+            12340,
+            16783
+          ]
+        }
+      ]
+    }
+  ],
+  "final": {
+    "connected": true,
+    "port": "COM123",
+    "since": 1793256313.3523514,
+    "last_update": 1793256878.2883248,
+    "error": "",
+    "firmware": {
+      "name": "KLQ ROBOT FW 0.9",
+      "APP": "0x08008000",
+      "MAX": "489472",
+      "PAGE": "2048",
+      "VALID": "1",
+      "USER_STATE": "0",
+      "USER_VALID": "0",
+      "USER_LENGTH": "0",
+      "USER_RECEIVED": "0",
+      "USER_MAX": "16384",
+      "UI": "1",
+      "PY_ERROR": "0",
+      "PY_LINE": "0",
+      "PK_RAW": "1",
+      "PK_DOWN": "0",
+      "PK_SHORT": "0",
+      "USB_RESETS": "2",
+      "EXT_UPGRADE": "1",
+      "EXT_PORTS": "3"
+    },
+    "accelerometer": {
+      "online": true,
+      "x": -998,
+      "y": 115,
+      "z": -123,
+      "roll": 136.92,
+      "pitch": 80.42,
+      "address": "--",
+      "identity": "--",
+      "version": "--",
+      "updated": 1793256878.2883248
+    },
+    "ports": [
+      {
+        "index": 1,
+        "online": true,
+        "class": 1,
+        "type": 1,
+        "uid": "4150354C/3832360B/0064B862",
+        "distance": 215,
+        "ticks": 631,
+        "sample_status": 1,
+        "sequence": 27779,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 4600,
+        "frame_error": 5,
+        "uart_error": 61,
+        "requests": 0,
+        "responses": 0,
+        "updated": 1793256877.8964806
+      },
+      {
+        "index": 2,
+        "online": true,
+        "class": 1,
+        "type": 2,
+        "uid": "4150354C/38323609/00DB8962",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 1,
+        "sequence": 34004,
+        "left": 109,
+        "right": 23,
+        "quality_flags": 0,
+        "timeout": 4623,
+        "frame_error": 28,
+        "uart_error": 39,
+        "requests": 32353,
+        "responses": 27721,
+        "updated": 1793256877.8974812
+      },
+      {
+        "index": 3,
+        "online": false,
+        "class": 0,
+        "type": 0,
+        "uid": "--",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 0,
+        "sequence": 0,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 9618,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 9618,
+        "responses": 0,
+        "updated": 1793256877.8984807
+      }
+    ],
+    "events": [
+      {
+        "time": "14:48:57",
+        "message": "端口 2 红外传感器上线：4150354C/38323609/00DB8962"
+      },
+      {
+        "time": "14:48:56",
+        "message": "端口 2 设备离线"
+      },
+      {
+        "time": "14:45:13",
+        "message": "端口 2 红外传感器上线：4150354C/38323609/00DB8962"
+      },
+      {
+        "time": "14:45:13",
+        "message": "端口 1 设备上线：4150354C/3832360B/0064B862"
+      },
+      {
+        "time": "14:45:13",
+        "message": "主机状态已更新"
+      },
+      {
+        "time": "14:45:13",
+        "message": "已连接 COM123"
+      }
+    ],
+    "server_time": 1793256878.3274345
+  },
+  "user_confirmations": {
+    "ul_target_moved": "Completed approximately 20-30cm then 40-60cm; no precision reference supplied",
+    "ir_channels": "Left and right both changed independently",
+    "ir_disconnect_was_manual": false,
+    "supply": "Both sensors powered by host ports; host has a battery"
+  },
+  "findings": {
+    "ul": "Detection, valid echo distance changes and no-echo reporting passed; accuracy not calibrated",
+    "ir_response": "Independent optical response confirmed by user; ST=1/Q=0 in saved windows",
+    "ir_stability": "Not fully passed: unexpected offline at 14:48:56, recovered same UID at 14:48:57 with sequence restart, timeout +3/frame_error +1",
+    "last_45s": "Both online across 90 port logs each; zero additional timeout/frame/UART errors",
+    "cause": "Undetermined. Restart or sensor-state reset suspected; reset_flags/uptime not read",
+    "web_collector": "One initial 40s attempt ended on HTTP timeout; retried with per-poll persistence. This is separate from UART statistics"
+  },
+  "not_tested": [
+    "Physical supply/NRST waveform",
+    "IR GET_STATUS reset flags and uptime",
+    "Precision distance and black-white calibration",
+    "Hot plug deliberately controlled",
+    "Peripheral firmware upgrades",
+    "Exact UART successful sample rate"
+  ],
+  "closing_snapshot": {
+    "connected": true,
+    "port": "COM123",
+    "since": 1793256313.3523514,
+    "last_update": 1793257004.345033,
+    "error": "",
+    "firmware": {
+      "name": "KLQ ROBOT FW 0.9",
+      "APP": "0x08008000",
+      "MAX": "489472",
+      "PAGE": "2048",
+      "VALID": "1",
+      "USER_STATE": "0",
+      "USER_VALID": "0",
+      "USER_LENGTH": "0",
+      "USER_RECEIVED": "0",
+      "USER_MAX": "16384",
+      "UI": "1",
+      "PY_ERROR": "0",
+      "PY_LINE": "0",
+      "PK_RAW": "1",
+      "PK_DOWN": "0",
+      "PK_SHORT": "0",
+      "USB_RESETS": "2",
+      "EXT_UPGRADE": "1",
+      "EXT_PORTS": "3"
+    },
+    "accelerometer": {
+      "online": true,
+      "x": -1011,
+      "y": 111,
+      "z": -57,
+      "roll": 117.18,
+      "pitch": 82.96,
+      "address": "--",
+      "identity": "--",
+      "version": "--",
+      "updated": 1793257004.345033
+    },
+    "ports": [
+      {
+        "index": 1,
+        "online": true,
+        "class": 1,
+        "type": 1,
+        "uid": "4150354C/3832360B/0064B862",
+        "distance": 208,
+        "ticks": 611,
+        "sample_status": 1,
+        "sequence": 31135,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 4600,
+        "frame_error": 5,
+        "uart_error": 61,
+        "requests": 0,
+        "responses": 0,
+        "updated": 1793257003.895638
+      },
+      {
+        "index": 2,
+        "online": true,
+        "class": 1,
+        "type": 2,
+        "uid": "4150354C/38323609/00DB8962",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 1,
+        "sequence": 46582,
+        "left": 53,
+        "right": 15,
+        "quality_flags": 0,
+        "timeout": 4623,
+        "frame_error": 28,
+        "uart_error": 39,
+        "requests": 32353,
+        "responses": 27721,
+        "updated": 1793257003.8972743
+      },
+      {
+        "index": 3,
+        "online": false,
+        "class": 0,
+        "type": 0,
+        "uid": "--",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 0,
+        "sequence": 0,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 10224,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 10224,
+        "responses": 0,
+        "updated": 1793257003.8972743
+      }
+    ],
+    "events": [
+      {
+        "time": "14:48:57",
+        "message": "端口 2 红外传感器上线：4150354C/38323609/00DB8962"
+      },
+      {
+        "time": "14:48:56",
+        "message": "端口 2 设备离线"
+      },
+      {
+        "time": "14:45:13",
+        "message": "端口 2 红外传感器上线：4150354C/38323609/00DB8962"
+      },
+      {
+        "time": "14:45:13",
+        "message": "端口 1 设备上线：4150354C/3832360B/0064B862"
+      },
+      {
+        "time": "14:45:13",
+        "message": "主机状态已更新"
+      },
+      {
+        "time": "14:45:13",
+        "message": "已连接 COM123"
+      }
+    ],
+    "server_time": 1793257004.3761172
+  },
+  "total_counter_delta": [
+    {
+      "timeout": 0,
+      "frame_error": 0,
+      "uart_error": 0
+    },
+    {
+      "timeout": 3,
+      "frame_error": 1,
+      "uart_error": 0
+    }
+  ]
+}
