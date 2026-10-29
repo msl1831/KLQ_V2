@@ -46,7 +46,9 @@ void power_key_poll(void)
         } else {
             if (armed && now-pressed_at<POWER_KEY_HOLD_MS) {
                 ++short_count;
-                if (action==2 && user_program_state()==USER_PROGRAM_RUNNING) user_program_stop();
+                if (external_motor_control_active()) {
+                    external_upgrade_cancel(); robot_ui_set_standby();
+                } else if (action==2 && user_program_state()==USER_PROGRAM_RUNNING) user_program_stop();
                 else if (action==1 && user_program_state()==USER_PROGRAM_READY) user_program_start();
                 else if (action==3 && user_program_state()==USER_PROGRAM_EMPTY) robot_ui_set_error();
             }

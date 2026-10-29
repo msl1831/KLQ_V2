@@ -109,9 +109,9 @@ static void process(void)
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.9; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "KLQ ROBOT FW 0.10; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
             "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; "
-            "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu; EXT_UPGRADE=1; EXT_PORTS=3",
+            "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
             (unsigned)user_program_state(),(unsigned)user_program_valid(),
             (unsigned long)user_program_length(),(unsigned long)user_program_received(),
@@ -205,7 +205,10 @@ static void process(void)
         break;
     case CMD_STOP:
         if (n) status=ERR_LENGTH;
-        else user_program_stop();
+        else {
+            if (external_motor_control_active()) external_upgrade_cancel();
+            user_program_stop();
+        }
         break;
     case CMD_FINISH:
         if (n) status=ERR_LENGTH;

@@ -1,0 +1,1418 @@
+{
+  "date": "2026-10-29",
+  "result": "PASS_PHYSICAL_ROTATION_AND_STOP_AT_80_PERCENT",
+  "controller_firmware": "0.10",
+  "motor_app": "2.0.0",
+  "motor_uid": "4150354C/38323609/00D86C62",
+  "port": 3,
+  "motor_type_user_reported": "N20",
+  "user_preparation": "User confirmed motor/wheels raised and unloaded.",
+  "physical_confirmation": "有转动，并已停止",
+  "host_install": {
+    "date": "2026-10-29",
+    "method": "main native USB system APP only",
+    "events": [
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "4b4c5120524f424f5420465720302e393b204150503d307830383030383030303b204d41583d3438393437323b20504147453d323034383b2056414c49443d313b20555345525f53544154453d303b20555345525f56414c49443d303b20555345525f4c454e4754483d303b20555345525f52454345495645443d303b20555345525f4d41583d31363338343b2055493d313b2050595f4552524f523d303b2050595f4c494e453d303b20504b5f5241573d313b20504b5f444f574e3d303b20504b5f53484f52543d303b205553425f5245534554533d323b204558545f555047524144453d313b204558545f504f5254533d33",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 7,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.0
+      },
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "4b4c512055534220424f4f5420302e333b204150503d307830383030383030303b204d41583d3438393437323b20504147453d323034383b2056414c49443d313b2052454345495645443d303b205553425f5245534554533d32",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 2,
+        "request_bytes": 8,
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.094
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 0,
+        "ok": true,
+        "response_hex": "00040000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 1024,
+        "ok": true,
+        "response_hex": "00080000",
+        "seconds": 0.016
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 2048,
+        "ok": true,
+        "response_hex": "000c0000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 3072,
+        "ok": true,
+        "response_hex": "00100000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 4096,
+        "ok": true,
+        "response_hex": "00140000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 5120,
+        "ok": true,
+        "response_hex": "00180000",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 6144,
+        "ok": true,
+        "response_hex": "001c0000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 7168,
+        "ok": true,
+        "response_hex": "00200000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 8192,
+        "ok": true,
+        "response_hex": "00240000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 9216,
+        "ok": true,
+        "response_hex": "00280000",
+        "seconds": 0.016
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 10240,
+        "ok": true,
+        "response_hex": "002c0000",
+        "seconds": 0.015
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 11264,
+        "ok": true,
+        "response_hex": "00300000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 12288,
+        "ok": true,
+        "response_hex": "00340000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 13312,
+        "ok": true,
+        "response_hex": "00380000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 14336,
+        "ok": true,
+        "response_hex": "003c0000",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 15360,
+        "ok": true,
+        "response_hex": "00400000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 16384,
+        "ok": true,
+        "response_hex": "00440000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 17408,
+        "ok": true,
+        "response_hex": "00480000",
+        "seconds": 0.016
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 18432,
+        "ok": true,
+        "response_hex": "004c0000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 19456,
+        "ok": true,
+        "response_hex": "00500000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 20480,
+        "ok": true,
+        "response_hex": "00540000",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 21504,
+        "ok": true,
+        "response_hex": "00580000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 22528,
+        "ok": true,
+        "response_hex": "005c0000",
+        "seconds": 0.015
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 856,
+        "offset": 23552,
+        "ok": true,
+        "response_hex": "545f0000",
+        "seconds": 0.016
+      },
+      {
+        "cmd": 4,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.062
+      },
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "4b4c512055534220424f4f5420302e333b204150503d307830383030383030303b204d41583d3438393437323b20504147453d323034383b2056414c49443d313b2052454345495645443d32343430343b205553425f5245534554533d32",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 5,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "4b4c5120524f424f5420465720302e31303b204150503d307830383030383030303b204d41583d3438393437323b20504147453d323034383b2056414c49443d313b20555345525f53544154453d303b20555345525f56414c49443d303b20555345525f4c454e4754483d303b20555345525f52454345495645443d303b20555345525f4d41583d31363338343b2055493d313b2050595f4552524f523d303b2050595f4c494e453d303b20504b5f5241573d313b20504b5f444f574e3d303b20504b5f53484f52543d303b205553425f5245534554533d323b204558545f555047524144453d313b204558545f504f5254533d333b204558545f4d4f544f523d31",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 6,
+        "request_bytes": 16,
+        "ok": true,
+        "response_hex": "4d4f544f525f46575f302e31305f4f4b",
+        "seconds": 0.016
+      }
+    ],
+    "result": "PASS",
+    "main_boot_written": false,
+    "motor_firmware_written": false,
+    "bytes": 24404,
+    "sha256": "aa4910441f03f222b52723ee8360600f742a754f4eaabc6a4ea4c07723c233a4",
+    "crc32": "853666A3",
+    "host_before": "KLQ ROBOT FW 0.9; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3",
+    "motor_stop_before_install": true,
+    "motor_info_before": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+    "boot_info": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=0; USB_RESETS=2",
+    "image_committed_crc_verified": true,
+    "boot_after_end": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=24404; USB_RESETS=2",
+    "host_after": "KLQ ROBOT FW 0.10; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1",
+    "host_echo": true
+  },
+  "build": {
+    "version": "0.10",
+    "base": "0x08008000",
+    "last": "0x0800DF53",
+    "bytes": 24404,
+    "sha256": "aa4910441f03f222b52723ee8360600f742a754f4eaabc6a4ea4c07723c233a4",
+    "crc32": 2234934947,
+    "vector": [
+      536897696,
+      134250857
+    ],
+    "map": [
+      "Total RO  Size (Code + RO Data)                24112 (  23.55kB)",
+      "Total RW  Size (RW Data + ZI Data)             26784 (  26.16kB)",
+      "Total ROM Size (Code + RO Data + RW Data)      24404 (  23.83kB)"
+    ],
+    "source_sha256": {
+      "bootloader/external_ports.c": "04953d4fc534fe84efc0057829fee4ce077203178fc76dad1284a4c3b2e1762d",
+      "bootloader/external_ports.h": "9669b29c47027507c4d57f8a5ab59104cbfc9bf8b49b162e0a2f6a176435c2d8",
+      "bootloader/power_key.c": "b69676f04186af0de7108868feefb85299b908cc489a73a2e17f7649eaca6815",
+      "bootloader/protocol.c": "61af2f2e4fbb3435fdcb11d140724f1e2276e67bd24962de22cfedd4be917f5a",
+      "sensor_boot/tools/host_link.py": "594051de11f8112ed960f9e8583a0482f937cbf2daf9c895e9f02d8d441bc082",
+      "tools/test_motor_live.py": "7252266fedfa0932f96d5d31064ae23b2be37e0d5ee51e74f64be0e43e32961b"
+    },
+    "previous_bytes": 24176,
+    "flash_delta_bytes": 228,
+    "rollback_sha256": "d255a4135526c10e24b18b01dd2dca1cbba46a5168b601bc348944355085a4b8"
+  },
+  "runs": [
+    {
+      "started_at": "2026-10-29T17:55:55.032236+08:00",
+      "method": "KLQ native USB -> selected UART -> motor APP; no Flash commands",
+      "sensor_port": 3,
+      "uid": "4150354C/38323609/00D86C62",
+      "pwm": 200,
+      "seconds_requested": 1.0,
+      "events": [
+        {
+          "cmd": "0x0001",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+          "seconds": 0.172
+        },
+        {
+          "cmd": "0x0302",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "",
+          "seconds": 0.11
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "2e2e0c0000000000",
+          "seconds": 0.078
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.093
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "d22e0c00c8000001",
+          "seconds": 0.047
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.047
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "442f0c00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.063
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "a52f0c00c8000001",
+          "seconds": 0.046
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.25
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "05310c00c8000001",
+          "seconds": 0.078
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.062
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "20320c00c8000001",
+          "seconds": 0.047
+        },
+        {
+          "cmd": "0x0302",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "",
+          "seconds": 0.062
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "9e320c0000000000",
+          "seconds": 0.063
+        }
+      ],
+      "result": "PASS",
+      "identity_verified": true,
+      "stop_confirmed": true,
+      "close_confirmed": true,
+      "host_before": "KLQ ROBOT FW 0.10; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1",
+      "motor_info_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+      "status_before": {
+        "uptime_ms": 798254,
+        "pwm": 0,
+        "active": 0
+      },
+      "status_running": {
+        "uptime_ms": 799264,
+        "pwm": 200,
+        "active": 1
+      },
+      "run_seconds": 1.0,
+      "stop_acknowledged": true,
+      "status_after": {
+        "uptime_ms": 799390,
+        "pwm": 0,
+        "active": 0
+      },
+      "cleanup_errors": [],
+      "record_file": "forward.json",
+      "physical_observation": "First20percent1second: user did not observe."
+    },
+    {
+      "started_at": "2026-10-29T17:57:17.254471+08:00",
+      "method": "KLQ native USB -> selected UART -> motor APP; no Flash commands",
+      "sensor_port": 3,
+      "uid": "4150354C/38323609/00D86C62",
+      "pwm": 200,
+      "seconds_requested": 2.0,
+      "events": [
+        {
+          "cmd": "0x0001",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+          "seconds": 0.062
+        },
+        {
+          "cmd": "0x0302",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "d36d0d0000000000",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "116e0d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "516e0d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "8e6e0d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "cd6e0d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "0a6f0d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "486f0d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "876f0d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "c96f0d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "05700d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "42700d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "81700d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "bf700d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "fd700d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "3b710d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "7a710d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "ba710d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "f8710d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "36720d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "76720d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "b3720d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "f3720d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "31730d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "72730d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "ae730d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "eb730d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "2a740d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "67740d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "a4740d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "e4740d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "21750d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "5d750d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "c800",
+          "ok": true,
+          "response_hex": "c800",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "9d750d00c8000001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0302",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "dc750d0000000000",
+          "seconds": 0.031
+        }
+      ],
+      "result": "PASS",
+      "identity_verified": true,
+      "stop_confirmed": true,
+      "close_confirmed": true,
+      "host_before": "KLQ ROBOT FW 0.10; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1",
+      "motor_info_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+      "status_before": {
+        "uptime_ms": 880083,
+        "pwm": 0,
+        "active": 0
+      },
+      "status_running": {
+        "uptime_ms": 882077,
+        "pwm": 200,
+        "active": 1
+      },
+      "run_seconds": 2.0,
+      "stop_acknowledged": true,
+      "status_after": {
+        "uptime_ms": 882140,
+        "pwm": 0,
+        "active": 0
+      },
+      "cleanup_errors": [],
+      "record_file": "forward_repeat.json",
+      "physical_observation": "20percent2seconds: user confirmed no rotation."
+    },
+    {
+      "started_at": "2026-10-29T18:06:30.622575+08:00",
+      "method": "KLQ native USB -> selected UART -> motor APP; no Flash commands",
+      "sensor_port": 3,
+      "uid": "4150354C/38323609/00D86C62",
+      "pwm": 800,
+      "allow_high_pwm": true,
+      "seconds_requested": 1.0,
+      "events": [
+        {
+          "cmd": "0x0001",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+          "seconds": 0.078
+        },
+        {
+          "cmd": "0x0302",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "60df150000000000",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "9fdf150020030001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "dedf150020030001",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "1ce0150020030001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "59e0150020030001",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "98e0150020030001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "d8e0150020030001",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "16e1150020030001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "54e1150020030001",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "94e1150020030001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "d4e1150020030001",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "14e2150020030001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "53e2150020030001",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "93e2150020030001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "d1e2150020030001",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "10e3150020030001",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0300",
+          "request_hex": "2003",
+          "ok": true,
+          "response_hex": "2003",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "4fe3150020030001",
+          "seconds": 0.032
+        },
+        {
+          "cmd": "0x0302",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "",
+          "seconds": 0.031
+        },
+        {
+          "cmd": "0x0301",
+          "request_hex": "",
+          "ok": true,
+          "response_hex": "90e3150000000000",
+          "seconds": 0.047
+        }
+      ],
+      "result": "PASS",
+      "identity_verified": true,
+      "stop_confirmed": true,
+      "close_confirmed": true,
+      "host_before": "KLQ ROBOT FW 0.10; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1",
+      "motor_info_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+      "status_before": {
+        "uptime_ms": 1433440,
+        "pwm": 0,
+        "active": 0
+      },
+      "status_running": {
+        "uptime_ms": 1434447,
+        "pwm": 800,
+        "active": 1
+      },
+      "run_seconds": 1.0,
+      "stop_acknowledged": true,
+      "status_after": {
+        "uptime_ms": 1434512,
+        "pwm": 0,
+        "active": 0
+      },
+      "cleanup_errors": [],
+      "record_file": "forward80.json",
+      "physical_observation": "User requested80percent1second: confirmed rotation then stopped."
+    }
+  ],
+  "software_checks": {
+    "port_bridge_assertions": 303,
+    "business_coexistence_assertions": 239,
+    "usb_protocol_assertions": 322,
+    "python_upgrade_tests": 41,
+    "motor_tool_cleanup_tests": 12,
+    "blocks": 26,
+    "block_groups": 22,
+    "block_assertions": 164175
+  },
+  "monitor_pid": 31352,
+  "final_monitor": {
+    "connected": true,
+    "port": "COM123",
+    "since": 1793268392.3433018,
+    "last_update": 1793268461.9813201,
+    "error": "",
+    "firmware": {
+      "name": "KLQ ROBOT FW 0.10",
+      "APP": "0x08008000",
+      "MAX": "489472",
+      "PAGE": "2048",
+      "VALID": "1",
+      "USER_STATE": "0",
+      "USER_VALID": "0",
+      "USER_LENGTH": "0",
+      "USER_RECEIVED": "0",
+      "USER_MAX": "16384",
+      "UI": "1",
+      "PY_ERROR": "0",
+      "PY_LINE": "0",
+      "PK_RAW": "1",
+      "PK_DOWN": "0",
+      "PK_SHORT": "0",
+      "USB_RESETS": "2",
+      "EXT_UPGRADE": "1",
+      "EXT_PORTS": "3",
+      "EXT_MOTOR": "1"
+    },
+    "accelerometer": {
+      "online": true,
+      "x": -720,
+      "y": 135,
+      "z": -713,
+      "roll": 169.27,
+      "pitch": 44.77,
+      "address": "--",
+      "identity": "--",
+      "version": "--",
+      "updated": 1793268461.9813201
+    },
+    "ports": [
+      {
+        "index": 1,
+        "online": true,
+        "class": 1,
+        "type": 2,
+        "uid": "4150354C/38323609/00DB8962",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 1,
+        "sequence": 283765,
+        "left": 1,
+        "right": 1,
+        "quality_flags": 0,
+        "timeout": 0,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 0,
+        "responses": 0,
+        "updated": 1793268461.9520154
+      },
+      {
+        "index": 2,
+        "online": true,
+        "class": 1,
+        "type": 1,
+        "uid": "4150354C/3832360B/0064B862",
+        "distance": 160,
+        "ticks": 470,
+        "sample_status": 1,
+        "sequence": 38819,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 0,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 0,
+        "responses": 0,
+        "updated": 1793268461.953046
+      },
+      {
+        "index": 3,
+        "online": true,
+        "class": 2,
+        "type": 2,
+        "uid": "4150354C/38323609/00D86C62",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 0,
+        "sequence": 0,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 0,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 0,
+        "responses": 0,
+        "updated": 1793268461.9540453
+      }
+    ],
+    "events": [
+      {
+        "time": "18:06:32",
+        "message": "端口 3 设备上线：4150354C/38323609/00D86C62"
+      },
+      {
+        "time": "18:06:32",
+        "message": "端口 2 设备上线：4150354C/3832360B/0064B862"
+      },
+      {
+        "time": "18:06:32",
+        "message": "端口 1 红外传感器上线：4150354C/38323609/00DB8962"
+      },
+      {
+        "time": "18:06:32",
+        "message": "主机状态已更新"
+      },
+      {
+        "time": "18:06:32",
+        "message": "已连接 COM123"
+      }
+    ],
+    "server_time": 1793268461.9885056
+  },
+  "scope": "Only main APP updated via USB; motor/boot and sensor firmware not rewritten; Python motor API remains unsupported.",
+  "limits": [
+    "No encoder/RPM feedback",
+    "20percent did not rotate; startup threshold unmeasured",
+    "First20percent STATUS gap352ms may cross receiver250ms deadman",
+    "Second20percent maxSTATUSgap66ms; 80percent max65ms; not waveform proof",
+    "250ms deadman not a separate physical fault-injection test",
+    "Reverse/load/longrun/powerUSBfailure/electricalwaveforms not tested"
+  ]
+}

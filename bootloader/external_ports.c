@@ -36,7 +36,7 @@ typedef struct {
     uint32_t token, activity, deadline, drain_at, uid[3], uart_errors;
     uint16_t board, hw, raw_n, reply_n, pos, image_n;
     uint8_t active, port, result, reason, stage, waiting, retry;
-    uint8_t pinned, boot_id, layout, mode, hold_for, draining;
+    uint8_t pinned, boot_id, layout, mode, hold_for, draining, motor_control;
     uint8_t raw[FRAME_N], reply[56], internal[16];
 } Upgrade;
 static Upgrade up;
@@ -151,6 +151,11 @@ static void up_valid(Port *x)
             uint16_t size=cmd==0x0200u ? g16(up.raw+20u) : up.image_n;
             if (n!=6u || g16(d)>size || (g16(d)!=size && (g16(d)&127u))) { up_fail(4u); return; }
             if (cmd==0x0200u) up.image_n=size;
+        } else if (cmd==0x0300u) {
+            if (n!=6u || g16(d)!=g16(up.raw+16u)) { up_fail(4u); return; }
+        } else if (cmd==0x0301u) {
+            if (n!=12u || (int16_t)g16(d+4u)<-1000 || (int16_t)g16(d+4u)>1000 ||
+                d[6] || d[7]>1u) { up_fail(4u); return; }
         } else if (n!=4u) { up_fail(4u); return; }
     }
     memcpy(up.reply,f,total); up.reply_n=total;
@@ -193,7 +198,7 @@ static void up_poll(void)
             x->uart->DATA=f[up.pos++];
             if (up.pos==n) {
                 up.waiting=1u;
-                timeout=cmd==0x0200u ? 10000u : (cmd==0x01f0u ? 150u : (cmd==9u ? 100u : 500u));
+                timeout=cmd==0x0300u ? 100u : (cmd==0x0200u ? 10000u : (cmd==0x01f0u ? 150u : (cmd==9u ? 100u : 500u)));
                 up.deadline=board_ms+timeout; ++x->s.request_count;
             }
         } else if ((int32_t)(board_ms-up.deadline)>=0) { ++x->s.uart_error_count; up.uart_errors=x->s.uart_error_count; up_fail(2u); }
@@ -203,17 +208,22 @@ static void up_poll(void)
     ++x->s.timeout_count; x->used=x->expected=0u;
     if (up.stage==UP_RAW && cmd==0x01f0u) {
         up.hold_for=2u; up.mode=2u; up.boot_id=up.layout=0u; up.image_n=0u; up_start(UP_HOLD);
+    } else if (up.stage==UP_RAW && cmd==0x0300u) {
+        /* A late SET retry could restart a motor already stopped by its 250 ms deadman. */
+        up_fail(1u);
     } else if (up.retry<2u) {
         ++up.retry; up.pos=0u; up.waiting=0u; up.deadline=board_ms+250u;
     } else up_fail(1u);
 }
 
 uint8_t external_upgrade_active(void) { return up.active; }
+uint8_t external_motor_control_active(void) { return up.active && up.motor_control; }
 
 void external_upgrade_cancel(void)
 {
     Port *x;
     if (!up.active) return;
+    /* Discard queued control; never replay SET_PWM. Receiver's 250 ms deadman remains the fallback. */
     x=&p[up.port]; closed_token=up.token;
     x->pending=x->retry=x->bad=x->used=x->expected=0u; x->rt=x->rh;
     unbind(x); x->next_at=board_ms+50u;
@@ -251,8 +261,12 @@ uint32_t external_upgrade_submit(uint32_t token,const uint8_t *f,uint16_t length
     if (up.raw_n==length && !memcmp(up.raw,f,length)) return 0u;
     if ((up.raw_n && !up.result) || (up.raw_n && g32(up.raw+4u)==g32(f+4u))) return 4u;
     switch (cmd) {
-    case 1u: case 9u: case 0x01f0u: case 0x0302u: case 0x0202u: case 0x0203u: case 0x0204u:
+    case 1u: case 9u: case 0x01f0u: case 0x0301u: case 0x0302u: case 0x0202u: case 0x0203u: case 0x0204u:
         if (n) return 2u;
+        break;
+    case 0x0300u:
+        if (n!=2u) return 2u;
+        if ((int16_t)g16(f+16u)<-1000 || (int16_t)g16(f+16u)>1000) return 5u;
         break;
     case 0x0200u:
         if (n!=10u) return 2u;
@@ -272,7 +286,9 @@ uint32_t external_upgrade_submit(uint32_t token,const uint8_t *f,uint16_t length
     if (cmd==0x0204u && !up.boot_id) return 4u;
     if (cmd==0x01f0u && up.mode>1u) return 4u;
     if ((cmd==9u || cmd==0x0204u || cmd==0x0203u) && up.mode!=0u) return 4u;
-    if (cmd==0x0302u && (up.board!=2u || up.mode!=1u)) return 5u;
+    if ((cmd==0x0300u || cmd==0x0301u || cmd==0x0302u) &&
+        (up.board!=2u || up.hw!=2u || up.mode!=1u)) return 5u;
+    if (cmd==0x0300u || cmd==0x0301u) up.motor_control=1u;
     if (cmd==0x0200u) up.image_n=0u;
     memcpy(up.raw,f,length); up.raw_n=length; up.reply_n=0u; up.result=up.reason=0u;
     up.uart_errors=p[up.port].s.uart_error_count;

@@ -6,6 +6,8 @@
 
 ## 当前结果
 
+- 同日后续电机实物通过：主机经USB从0.9到0.10应用，24404 B（Flash+228/RAM仍26784 B），新增EXT_MOTOR及选定口0x0300/0301诊断，SET超时不重发，PC4/USBSTOP取消控制。P1 IR/P2 UL/P3 N20；motor UID4150354C/38323609/00D86C62/APP2.0.0。20%/2秒未转；用户要求80%后，+800/1秒实物转动并停止，STOP/STATUS0/CLOSE通过。电机固件未改，Python电机接口仍未接通；启动阈值和取消时延待测。观测PID31352（重查），三口在线。原生303/239/322、Python41、工具12、26积木164175断言通过。见verification_20261029_motor.md、motor_live_20261029.json；日志/0.9恢复镜像在build/motor_live_20261029。
+
 - 同日后续UL经主控USB正常升级流程通过：当前接线P1 IR/P2 UL/P3空；UID4150354C/3832360B/0064B862，实际APP1.0.2→boot1.0.2→APP1.0.2。用共享main尚未提交的最新RCWL9610A修复包完整重写5832 B/46包，3.328秒，END/CRC/RUN/同UID及主机ECHO通过；不使用本分支旧UL5776 B应用。本轮无SWD、无固件源码变更。之后30秒两口有效采样，无新增TO/FE/UE或序号重头，UL报告23 mm（未独立校准）。观测PID27832（接力重查）。见verification_20261029_ul_via_host.md、ul_via_host_20261029.json；冻结包/源快照及原始日志在build/ul_via_host_20261029。
 
 - 同日后续IR经主控USB升级通过，最新板上IR引导1.0.2、APP仍1.0.0（同包重写验证）。曾发现ENTER UART错误容错缺口、旧引导EOPIE缺陷；修复后从引导态及应用态各完整传6052 B/48包、END/CRC/RUN/同UID确认通过。用户明确授权仅SWD更新IR引导；128 B页RAM写入器备份/读回确认APP/metadata/选项未改，APP随后只经USB写入。最终监测PID28828（接力重查），P1/P2有效采样30秒无新增通信错误，主控仍0.9、UI1/PY_ERROR0。见verification_20261029_ir_via_host.md和ir_via_host_20261029.json。
@@ -50,7 +52,7 @@ python tools/status_dashboard.py
 ## 后续工作
 
 1. 实物确认 PC3 按下/释放极性、SC7 安装前后左右、10 种表情与数字图案；本轮模拟和当前输入检查不替代这些验收。
-2. 按已归档电机协议落实主控驱动、周期控制/保活，再测250 ms子板失联停机、motor_for、持续动作、双端口回滚及实际停车。当前成功动作只有mock证据。
+2. 按已归档电机协议落实主控驱动、周期控制/保活，再测250 ms子板失联停机、motor_for、持续动作、双端口回滚及实际停车。0.10诊断已有N20正值80%/1秒转动和停止实物证据；Python动作仍仅mock。
 3. 双路IR普通采样已合入；Python wait_ir条件/通道规则尚待实现，目前仍错误6。语音暂不加入26项接口。
    优先跟进实测中P2非人为掉线/序号重头：保留现场，用受限只读STATUS诊断或独立UART读取复位原因，并核对电源/NRST；不得直接归因供电或把短窗口稳定视为问题解决。
 4. 主控0.9自身USB安装/END CRC/应用RUN/USB枚举和ECHO已通过；IR端口2、UL端口2正常全量升级已通过；其余端口与MOTOR、三类工厂镜像安装/回读、自动STOP/HOLD时序、各阶段断电、完整业务及真实停车仍待验收。native外接整链路到END，不执行ARM APP跳转。

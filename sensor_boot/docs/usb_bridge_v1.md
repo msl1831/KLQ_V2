@@ -42,7 +42,7 @@ port0为0～2，用户工具显示1～3。token由PC随机生成，必须非零�
 
 RESULT的state=0表示处理中或尚无事务；state=1后跟完整UART响应帧（含设备status）；state=2后跟reason:u8，1超时、2UART错误、3设备身份不匹配、4非法响应/分区、5取消。结果保留至下一个不同事务。查询不复用旧USB缓存，重复相同序号的查询也能观察状态推进。
 
-XFER只允许 INFO、HOLD、ENTER_BOOTLOADER、STOP、电机/传感器BEGIN/DATA/END/RUN和GET_LAYOUT。每次最多一个事务；相同内层帧的重发复用结果，不重复执行。终态后新内层序号可提交下一个事务；同序号改内容会拒绝。PC在外层ACK丢失时重发完全相同的USB请求；确认UART超时后才使用新内层序号重试同一逻辑请求。
+XFER允许 INFO、HOLD、ENTER_BOOTLOADER、STOP、电机/传感器BEGIN/DATA/END/RUN和GET_LAYOUT；0.10追加下述电机诊断SET_PWM/GET_STATUS。每次最多一个事务；相同内层帧的重发复用结果，不重复执行。终态后新内层序号可提交下一个事务；同序号改内容会拒绝。PC在外层ACK丢失时重发完全相同的USB请求；确认UART超时后才使用新内层序号重试同一逻辑请求。
 
 ## 主控转发约束
 
@@ -66,3 +66,25 @@ USB响应等待期间仍推进PC4电源键和外接端口状态机。会话活�
 ```
 
 业务合流的历史资源及旧包哈希见 [主控0.9验证](../../docs/verification_20261029_host_upgrade.md)。[来源验证记录](verification_20261029_usb_bridge.md)保留旧main软件基线。当前1.0.2已包含RUN应答/TC失败保持引导的修正和对应native边界回归；IR的真实Flash/USB升级正常流程已通过，真实发送故障注入、其它板及断电中断仍需单独验收。
+
+
+## 电机诊断（主机0.10）
+
+当前主机INFO为`KLQ ROBOT FW 0.10`，额外声明`EXT_MOTOR=1`。在原OPEN/XFER/RESULT/CLOSE会话内，先INFO锁定board2/hw2、UID及APP模式，新增：
+
+| 内层命令 | 请求 | 成功响应数据 |
+| --- | --- | --- |
+| SET_PWM `0x0300` | pwm:i16，±1000 | 相同pwm:i16 |
+| GET_STATUS `0x0301` | 空 | uptime:u32,pwm:i16,reserved:u8=0,active:u8 |
+
+检查长度/范围、回显和状态字段。SET等待UART ACK100 ms且不重发；PC也不得因超时重新发送旧转速，完全相同帧仍复用缓存结果。只有新SET续期，INFO/STATUS不续期。STOP `0x0302`仍可使用。
+
+PC4短按、USB STOP、USB重连会取消电机诊断；原固件升级会话的短按行为保持。取消停止后续SET，依赖接收端250 ms无SET归零兜底；未独立实测故障取消时延。正常工具结束先STOP、STATUS0、CLOSE，不把CLOSE响应当作输出归零确认。
+
+暂停观测工具、核对端口/UID且电机悬空后使用（COM/端口按实际接线）：
+
+```powershell
+python tools/test_motor_live.py --port COM123 --sensor-port 3 --uid 4150354C/38323609/00D86C62 --pwm 200 --seconds 1 --report build/motor_live.json
+```
+
+默认限±300，显式`--allow-high-pwm`才允许±800，单次≤2秒。N20本轮20%未转、用户明确要求80%后转动并停止，见[实物记录](../../docs/verification_20261029_motor.md)。该诊断不写Flash，也不代表Python电机驱动已完成；不要用旧factory重装当前板卡。

@@ -28,5 +28,6 @@ uint32_t external_upgrade_result(uint32_t token, uint8_t *out, uint16_t *length)
 uint32_t external_upgrade_close(uint32_t token);
 void external_upgrade_cancel(void);
 uint8_t external_upgrade_active(void);
+uint8_t external_motor_control_active(void);
 
 #endif

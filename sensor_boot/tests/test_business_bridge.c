@@ -117,4 +117,27 @@ static void errors_and_expiry(void)
     CHECK(!external_upgrade_active()&&user_program_state()==USER_PROGRAM_READY&&user_program_valid());
     puts("PASS error retry and lease expiry do not resume old actions");
 }
-int main(void){ownership();resets();power_and_display();errors_and_expiry();printf("Business/bridge coexistence: %u assertions passed\n",checks);return 0;}
+void USART1_IRQHandler(void);
+static void motor_control(uint32_t token)
+{
+    uint8_t wire[56],data[20];unsigned i;
+    memset(data,0,sizeof(data));data[0]=0;p32(data+1,token);p16(data+5,2);p16(data+7,2);rpc(CMD_EXT_OPEN,data,9,OK);
+    p32(data,token);memcpy(data+4,"KLQ1",4);p32(data+8,7);p16(data+12,1);p16(data+14,0);p32(data+16,crc32_update(0,data+4,12));rpc(CMD_EXT_XFER,data,20,OK);
+    board_ms+=50;for(i=0;i<20;i++)external_ports_poll();
+    memset(wire,0,sizeof(wire));memcpy(wire,"KLQ1",4);p32(wire+4,7);p16(wire+8,0x8001);p16(wire+10,40);
+    p16(wire+20,1);wire[22]=1;wire[23]=2;p16(wire+24,2);p16(wire+26,2);p16(wire+28,2);p32(wire+32,0x20000);p32(wire+36,9);p16(wire+40,132);p16(wire+42,18304);p32(wire+44,0x1234);
+    p32(wire+12,crc32_update(crc32_update(0,wire,12),wire+16,40));
+    for(i=0;i<56;i++){test_uart[0].STS=0xA0;test_uart[0].DATA=wire[i];USART1_IRQHandler();}test_uart[0].STS=0x80;external_ports_poll();
+    p32(data+8,8);p16(data+12,0x301);p32(data+16,crc32_update(0,data+4,12));rpc(CMD_EXT_XFER,data,20,OK);
+    CHECK(external_motor_control_active());
+}
+static void motor_stop_controls(void)
+{
+    setup();load("while True:\n    pass\n");motor_control(66);short_press();
+    CHECK(!external_upgrade_active() && user_program_valid() && user_program_state()==USER_PROGRAM_READY);
+    motor_control(67);rpc(CMD_STOP,0,0,OK);
+    CHECK(!external_upgrade_active() && user_program_valid() && user_program_state()==USER_PROGRAM_READY);
+    motor_control(68);reset_seen=1;protocol_poll();CHECK(!external_upgrade_active());
+    puts("PASS motor control PC4/USB STOP/USB reset cancel session without running old RAM code");
+}
+int main(void){ownership();resets();power_and_display();errors_and_expiry();motor_stop_controls();printf("Business/bridge coexistence: %u assertions passed\n",checks);return 0;}

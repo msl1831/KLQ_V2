@@ -24,7 +24,7 @@ static uint16_t reset_queue_size;
 static uint32_t in_size,in_pos,sent_size,owner_token;
 static unsigned writes,open_calls,submit_calls,result_calls,close_calls,cancel_calls,stop_calls;
 static unsigned begin_calls,data_calls,end_calls,run_calls,display_calls,finish_calls,reset_calls,boot_requests;
-static uint8_t selected;
+static uint8_t selected,motor_owner;
 static uint16_t expected_board,expected_hw,submitted_size;
 static uint8_t submitted[148];
 static user_program_state_t user_state;
@@ -80,6 +80,7 @@ uint32_t external_upgrade_close(uint32_t token)
 }
 void external_upgrade_cancel(void) { ++cancel_calls;owner=0U; }
 uint8_t external_upgrade_active(void) { return owner; }
+uint8_t external_motor_control_active(void) { return (uint8_t)(owner && motor_owner); }
 
 void user_program_init(void) {}
 bool user_program_begin(uint32_t n,uint32_t crc) { (void)n;(void)crc;++begin_calls;return true; }
@@ -112,7 +113,7 @@ static void setup(void)
 {
     memset(input,0,sizeof(input));memset(sent,0,sizeof(sent));memset(mock_meta,0,sizeof(mock_meta));
     in_size=in_pos=sent_size=0U;board_ms=100U;usb_reset_count=0U;
-    reset_seen=owner=result_state=result_reason=0U;owner_token=0U;
+    reset_seen=owner=result_state=result_reason=motor_owner=0U;owner_token=0U;
     inject_reset=0U;reset_queue_size=0U;
     writes=open_calls=submit_calls=result_calls=close_calls=cancel_calls=stop_calls=0U;
     begin_calls=data_calls=end_calls=run_calls=display_calls=finish_calls=reset_calls=boot_requests=0U;
@@ -215,6 +216,7 @@ static void budget_and_info(void)
     in_size=in_pos=sent_size=0U;append(200U,CMD_INFO,0,0U);protocol_poll();
     n=rd16(sent+10U)-4U;out=expect(200U,CMD_INFO,OK,(uint16_t)n);
     CHECK(n<1000U);sent[20U+n]=0U;
+    CHECK(strstr((const char *)out,"EXT_MOTOR=1"));
     CHECK(strstr((const char *)out,"KLQ ROBOT FW ")==(const char *)out);
     CHECK(strstr((const char *)out,"EXT_UPGRADE=1") && strstr((const char *)out,"EXT_PORTS=3"));
 }
@@ -230,8 +232,17 @@ static void reset_during_response(void)
     CHECK(!owner && cancel_calls==1U && !submitted_size);
     CHECK(sent_size==41U && rd32(sent+21U+16U)==ERR_STATE);
 }
+static void motor_stop_cancel(void)
+{
+    uint8_t invalid=0;
+    setup();open_session();motor_owner=1U;
+    in_size=in_pos=sent_size=0U;append(400U,CMD_STOP,&invalid,1U);protocol_poll();expect(400U,CMD_STOP,ERR_LENGTH,0U);
+    CHECK(owner && !cancel_calls);
+    in_size=in_pos=sent_size=0U;append(401U,CMD_STOP,0,0U);protocol_poll();expect(401U,CMD_STOP,OK,0U);
+    CHECK(!owner && cancel_calls==1U && stop_calls==2U);
+}
 int main(void)
 {
-    open_and_forward();malformed_requests();ownership_and_resets();budget_and_info();reset_during_response();
+    open_and_forward();malformed_requests();ownership_and_resets();budget_and_info();reset_during_response();motor_stop_cancel();
     printf("USB bridge integration: %u assertions passed\n",checks);return 0;
 }

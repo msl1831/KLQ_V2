@@ -7,7 +7,7 @@ import time
 from pack import PROFILES
 
 OPEN, XFER, POLL, CLOSE = range(0x40, 0x44)
-COMMANDS = {1, 9, 0x01F0, 0x0302, 0x0200, 0x0201, 0x0202, 0x0203, 0x0204}
+COMMANDS = {1, 9, 0x01F0, 0x0300, 0x0301, 0x0302, 0x0200, 0x0201, 0x0202, 0x0203, 0x0204}
 REASONS = {1: 'UART response timeout', 2: 'UART error', 3: 'device identity changed or wrong board',
            4: 'invalid device response or layout', 5: 'session cancelled'}
 
@@ -138,6 +138,8 @@ class HostLink:
             raise ValueError('controller upgrade session is not open')
         if cmd not in COMMANDS or len(payload) > 132 or timeout <= 0 or retries < 1:
             raise ValueError('invalid bridge command, payload or retry budget')
+        if cmd == 0x0300:
+            retries = 1  # A stale speed command must never restart a stopped motor.
         floor = 1.5 if cmd == 0x01F0 else (1.0 if cmd == 1 else 0.5)
         for attempt in range(retries):
             self.sequence = (self.sequence + 1) & 0xffffffff

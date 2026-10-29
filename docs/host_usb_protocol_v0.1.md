@@ -4,6 +4,8 @@
 
 系统固件0.9在保留下述Python命令的基础上，增加外接固件升级能力：INFO中的 `EXT_UPGRADE=1; EXT_PORTS=3` 表示支持 OPEN/XFER/RESULT/CLOSE `0x0040..0x0043`。这是电脑专用升级通道，使用 [USB外接升级协议](../sensor_boot/docs/usb_bridge_v1.md) 及 `*_update.klq`，不增加用户积木函数。升级OPEN会停止用户程序；升级期间拒绝Python BEGIN/DATA/END/RUN/DISPLAY/FINISH，允许STOP。实体短按也不能启动旧程序；长按1.5秒会先取消会话再关机。关闭/取消后旧RAM程序可保留，但必须手动重新运行。
 
+当前0.10追加`EXT_MOTOR=1`，通过上述端口会话提供电脑电机诊断SET_PWM/GET_STATUS；Python积木接口未因此接通。电机诊断期间，实体短按或USB STOP可取消会话，不重新启动旧RAM程序；停止后仍应按电机无SET 250 ms归零及滑行特性处理。命令和工具见[电机诊断](../sensor_boot/docs/usb_bridge_v1.md#电机诊断主机010)。
+
 ## 连接与运行环境
 
 连接机器人自身的 USB 数据口，打开其 CDC 虚拟串口。开发板当前使用 `VID:PID=314B:0108`、115200 8N1；COM 号会变化，不应固定。一次只能有一个程序占用该串口，串口监视器与下载器不能同时打开。

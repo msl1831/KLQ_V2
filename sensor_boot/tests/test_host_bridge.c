@@ -201,8 +201,106 @@ static void wrap_lease_and_close(void)
     CHECK(!p[0].s.online && !p[0].used && !p[0].expected && !p[0].pending);
     poll_at(p[0].next_at); CHECK(p[0].pending && p[0].command==1U);
 }
+static void motor_control_gate(void)
+{
+    uint8_t b[3]={0,0,0}; unsigned i;
+    setup(); CHECK(external_upgrade_open(0U,TOKEN,2U,2U)==0U);
+    make_request(0x0300U,b,2U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==4U);
+    make_request(0x0301U,0,0U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==4U);
+    CHECK(!external_motor_control_active());
+    for(i=1U;i<=3U;i+=2U) {
+        setup(); open_board((uint16_t)i,1U,1U);
+        make_request(0x0300U,b,2U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+        make_request(0x0301U,0,0U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+        CHECK(!external_motor_control_active());
+    }
+    setup(); open_board(2U,2U,0U);
+    make_request(0x0300U,b,2U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+    make_request(0x0301U,0,0U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+    setup(); open_board(2U,2U,1U);
+    up.hw=1U; make_request(0x0300U,b,2U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+    up.hw=2U;
+    for(i=0U;i<=3U;i++) if(i!=2U) {
+        make_request(0x0300U,b,(uint16_t)i); CHECK(external_upgrade_submit(TOKEN,req,req_n)==2U);
+    }
+    make_request(0x0301U,b,1U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==2U);
+    p16(b,1001U); make_request(0x0300U,b,2U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+    p16(b,(uint16_t)-1001); make_request(0x0300U,b,2U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+    CHECK(!external_motor_control_active());
+    submit(1U,0,0U); wait_tx(1U); info(2U,2U,1U,0x11223345UL);
+    CHECK(up.result==2U && up.reason==3U && up.mode==2U);
+    p16(b,100U); make_request(0x0300U,b,2U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+    make_request(0x0301U,0,0U); CHECK(external_upgrade_submit(TOKEN,req,req_n)==5U);
+}
+static void motor_control_responses(void)
+{
+    static const int16_t duty[]={-1000,-1,0,1,1000};
+    uint8_t b[3]={0,0,0},d[9]; unsigned i; uint32_t count;
+    setup(); open_board(2U,2U,1U); memset(d,0,sizeof(d));
+    submit(0x0301U,0,0U); CHECK(external_motor_control_active()); wait_tx(0x0301U); response(d,8U,0U);
+    CHECK(up.result==1U);
+    CHECK(external_upgrade_close(TOKEN)==0U && !external_motor_control_active());
+    setup(); open_board(2U,2U,1U);
+    for(i=0U;i<sizeof(duty)/sizeof(duty[0]);i++) {
+        p16(b,(uint16_t)duty[i]); submit(0x0300U,b,2U);
+        CHECK(external_motor_control_active()); wait_tx(0x0300U);
+        CHECK(up.deadline-board_ms==100U); response(b,2U,0U);
+        CHECK(up.result==1U && up.reply_n==22U);
+    }
+    count=p[0].s.request_count;
+    CHECK(external_upgrade_submit(TOKEN,req,req_n)==0U);
+    poll_at(board_ms+150U); CHECK(p[0].s.request_count==count && up.stage==UP_IDLE);
+    p16(b,200U);
+    for(i=0U;i<=3U;i++) if(i!=2U) {
+        submit(0x0300U,b,2U); wait_tx(0x0300U); response(b,(uint16_t)i,0U);
+        CHECK(up.result==2U && up.reason==4U);
+    }
+    submit(0x0300U,b,2U); wait_tx(0x0300U); p16(d,201U); response(d,2U,0U);
+    CHECK(up.result==2U && up.reason==4U);
+    memset(d,0,sizeof(d)); p32(d,0xFFFFFFFEUL); p16(d+4U,(uint16_t)-1000); d[7]=1U;
+    submit(0x0301U,0,0U); wait_tx(0x0301U); response(d,8U,0U);
+    CHECK(up.result==1U && up.reply_n==28U);
+    for(i=0U;i<5U;i++) {
+        memset(d,0,sizeof(d));
+        if(i==0U) p16(d+4U,1001U);
+        else if(i==1U) p16(d+4U,(uint16_t)-1001);
+        else if(i==2U) d[6]=1U;
+        else if(i==3U) d[7]=2U;
+        submit(0x0301U,0,0U); wait_tx(0x0301U); response(d,(uint16_t)(i==4U ? 7U : 8U),0U);
+        CHECK(up.result==2U && up.reason==4U);
+    }
+    submit(0x0301U,0,0U); wait_tx(0x0301U); response(d,9U,0U);
+    CHECK(up.result==2U && up.reason==4U);
+    CHECK(external_motor_control_active());
+    submit(0x0302U,0,0U); wait_tx(0x0302U); response(0,0U,0U);
+    CHECK(up.result==1U);
+    CHECK(external_upgrade_close(TOKEN)==0U && !external_motor_control_active());
+}
+static void motor_control_timeout_cancel(void)
+{
+    uint8_t b[2]; uint32_t t,count;
+    setup(); open_board(2U,2U,1U); board_ms=0xFFFFFFF0UL;
+    p16(b,200U); submit(0x0300U,b,2U); wait_tx(0x0300U);
+    count=p[0].s.request_count; t=up.deadline;
+    poll_at(t-1U); CHECK(up.waiting && !up.result);
+    poll_at(t); CHECK(up.result==2U && up.reason==1U && !up.retry && !up.waiting);
+    CHECK(up.stage==UP_IDLE && external_motor_control_active());
+    poll_at(t+600U); CHECK(p[0].s.request_count==count);
+    CHECK(external_upgrade_submit(TOKEN,req,req_n)==0U);
+    poll_at(t+900U); CHECK(p[0].s.request_count==count && up.result==2U);
+    submit(0x0302U,0,0U); wait_tx(0x0302U); response(0,0U,0U);
+    CHECK(up.result==1U);
+    submit(0x0300U,b,2U); wait_tx(0x0300U);
+    external_upgrade_cancel();
+    CHECK(!up.active && !up.raw_n && !external_motor_control_active());
+    CHECK(external_upgrade_submit(TOKEN,req,req_n)==4U);
+    CHECK(external_upgrade_open(0U,TOKEN,2U,2U)==4U);
+    poll_at(board_ms+600U); CHECK(!up.active && p[0].pending && p[0].command==1U);
+}
+
 int main(void)
 {
     ownership(); identity_and_idempotence(); gate_and_transfer(); motor_enter(); errors_and_recovery(); failed_info_and_data_retry(); wrap_lease_and_close();
+    motor_control_gate(); motor_control_responses(); motor_control_timeout_cancel();
     printf("USB port upgrade bridge: %u assertions passed\n",checks); return 0;
 }
