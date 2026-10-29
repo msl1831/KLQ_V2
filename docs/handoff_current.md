@@ -6,12 +6,12 @@
 
 - **main：本文件所在的同步提交。** 包含此前未提交的外接板、共用引导和语音试验输入。其主控应用仍是0.3桥接演示基线，未进行Python功能合并；不能用它覆盖已运行的主控0.9而期望保留全部功能。
 - **codex/python-runtime：8db761abff784cc3dd023a378b03def718a138c6，已核对远端一致。** 最新主控0.9的合流源码为ce714f7，包含Python业务和外接升级桥接。0.9应用24176 B，SHA-256 d255a4135526c10e24b18b01dd2dca1cbba46a5168b601bc348944355085a4b8；当天通过主控USB安装、END CRC、RUN、INFO和ECHO。证据在该分支docs/verification_20261029_usb_install.md。
-- **UL/IR：** 当天旧版共用引导工厂镜像的首次烧录/读回及应用启动已有新证据，见UL/docs/boot_integration_check_20261029.md、IR/docs/flash_20261029.md；后续共用引导1.0.1尚未烧录，真实主控转发升级与断电恢复仍待验收。
+- **UL/IR：** UL已有首次烧录/读回和应用启动证据，共用引导1.0.1尚未安装到UL。IR已重新安装共用引导1.0.1，新增读回10564 B一致、默认启动及双路采样38→48的证据，见[IR新版引导烧录](../IR/docs/reflash_boot101_20261029.md)。真实主控转发升级、故障注入和断电恢复仍待验收。
 - **PY32电机：** 同步期间已完成共用引导1.0.1和应用2.0.0首次烧录，整片24 KiB读回、复位跳转、SysTick推进、默认PWM=0及PA0/PA1低电平有证据，见[MOTOR首次烧录记录](../MOTOR/docs/flash_20261029.md)。实际转动、UART升级和250 ms失联停机仍待板测。
 - **Puya SDK：** 已正式登记.gitmodules和gitlink，固定394627d99085c5eae72142503b0405b84428bb20；子仓库干净，上游为OpenPuya/PY32F002B_Firmware。普通父仓库归档不包含子模块内容，需递归初始化。
 - **保留本机的内容：** build、Objects/Listings、中间文件、虚拟环境、tmp、outputs和VOICE/toolchains均不在本次源码提交内。语音SDK本身、必要预编译库、模型和源音频已纳入；安装软件及语音GCC仍按development_setup.md/environment_baseline.json另行准备。文件没有被删除。
-- **共用引导最新修复：** 1.0.1已修复RUN发送/TC超时后仍跳转的问题，并堵住500 ms自动启动旁路；UL/IR/Motor软件回归和重建已完成，见[sensor_boot验证记录](../sensor_boot/docs/verification_20261029_run_tx.md)。本次同步已收录此修复；安装它需要新版工厂镜像，应用升级容器不能更新引导。该修复尚未合入codex/python-runtime；Motor已安装1.0.1，UL/IR尚未安装新版引导。
-- **UL新需求与诊断：** 用户已确认测距芯片改为RCWL9610A，GPIO接口不变。偶发0 mm已定位到无效NO_ECHO状态展示，并在未改动的驱动中复现时间戳/状态竞态；修复与触发周期对照尚未实施，见[诊断记录](../UL/docs/rcwl9610_zero_diagnosis_20261029.md)和UL/RCWL-9610-V3.0.pdf。不能继续按旧CS100A的8 m范围作承诺。
+- **共用引导最新修复：** 1.0.1已修复RUN发送/TC超时后仍跳转的问题，并堵住500 ms自动启动旁路；UL/IR/Motor软件回归和重建已完成，见[sensor_boot验证记录](../sensor_boot/docs/verification_20261029_run_tx.md)。本次同步已收录此修复；安装它需要新版工厂镜像，应用升级容器不能更新引导。该修复尚未合入codex/python-runtime；Motor和IR已安装1.0.1，UL尚未安装新版引导。
+- **UL新需求与诊断：** 用户已确认测距芯片改为RCWL9610A，GPIO接口不变。偶发0 mm已定位到无效NO_ECHO状态展示，并在未改动的驱动中复现时间戳/状态竞态；修复与触发周期对照尚未实施，见[诊断记录](../UL/docs/rcwl9610_zero_diagnosis_20261029.md)。当前资料已由用户替换为UL/RGB超声波测距芯片RCWL-9610A-V2.0.pdf，反馈电阻已确认753（75 kΩ）。已按A版资料完成诊断修订：50 ms周期、753反馈电阻及R9量程调节；固件修复尚未实施。旧V3.0手册的时序/量程/电阻结论作废；不能继续按旧CS100A的8 m范围作承诺。
 - **已知待办：** 两条主控开发线仍并存，待后续按功能整合；主控分支8db761a增加了UL/IR实测及重启问题记录。语音工具链需另行安装。本次Git同步任务自身没有执行硬件访问。
 
 本次从Git快照构建和回归的结果见[同步验证记录](git_sync_verification_20261029.md)：主控及UL/IR/Motor均通过，Python升级30项和IR工具10项通过，环境0失败、1条分支提示。尚未完成另一台电脑实装；新版共用引导的实板范围以各板最新烧录记录为准。

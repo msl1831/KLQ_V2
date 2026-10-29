@@ -1,0 +1,34 @@
+{
+  "result": "FLASH_READBACK_PASS",
+  "probe": "LU_2022_8888",
+  "target": "PY32F002Bx5",
+  "uid": [
+    "0x4150354c",
+    "0x38323609",
+    "0xdb8962"
+  ],
+  "boot_version": "1.0.1",
+  "app_version": "1.0.0",
+  "image_sha256": "3e7534c7e4e4794d237140489b3455f7c650e5a6d6b485cc20aad648ef857c15",
+  "before_sha256": "e75f389388ad1f7e3950477f944571a2aafd3b9c2c97d7b1a4e06cc8d49c82a1",
+  "old_boot_4468_sha256": "ec24c019152e8166f52c414564820cea05ba723e2aec8ba1f780812c7fe8acd5",
+  "segments": [
+    {
+      "base": "0x8000000",
+      "bytes": 4496,
+      "sha256": "97d78fead1ee8fb274d3700b802969ec559242e483492ce7be835b93e5ac34be"
+    },
+    {
+      "base": "0x8001800",
+      "bytes": 6052,
+      "sha256": "19b7df54061df7583753b662352a77c93dd4d7bc6c8f0bf53ea2d22a6a653c54"
+    },
+    {
+      "base": "0x8005f80",
+      "bytes": 16,
+      "sha256": "b4baf87eaa8e9b1f7a422865dbb95f66cb9b68749262353b3d5ff90abc885af7"
+    }
+  ],
+  "verified_bytes": 10564,
+  "option_bytes_unchanged": true
+}

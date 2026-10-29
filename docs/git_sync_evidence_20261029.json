@@ -94,5 +94,10 @@
   "hardware_access": false,
   "voice_firmware_build": false,
   "python_runtime_remote_commit": "8db761abff784cc3dd023a378b03def718a138c6",
-  "additional_flash_helper": "MOTOR/tools/flash_factory.py: syntax checked only in this sync task; independent hardware evidence recorded in MOTOR/docs/flash_20261029.md"
+  "additional_flash_helper": "MOTOR/tools/flash_factory.py: syntax checked only in this sync task; independent hardware evidence recorded in MOTOR/docs/flash_20261029.md",
+  "additional_records_during_sync": [
+    "IR/docs/reflash_boot101_20261029.md",
+    "IR/flash_evidence/reflash_boot101_20261029_151527/",
+    "UL/RGB超声波测距芯片RCWL-9610A-V2.0.pdf"
+  ]
 }

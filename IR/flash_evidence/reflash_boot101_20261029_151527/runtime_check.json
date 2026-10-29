@@ -1,0 +1,46 @@
+{
+  "snapshots": [
+    {
+      "pc": "0x800243c",
+      "vtor": "0x8001800",
+      "sample": {
+        "sequence": 38,
+        "capture_time_ms": 374,
+        "left_delta": 9,
+        "right_delta": 5,
+        "left_value": 2,
+        "right_value": 1,
+        "left_ambient": 3490,
+        "left_active": 3481,
+        "right_ambient": 3737,
+        "right_active": 3732,
+        "status": 1,
+        "quality_flags": 0
+      },
+      "measurement_count": 38,
+      "fault_count": 0,
+      "adc_ok": 1
+    },
+    {
+      "pc": "0x8002918",
+      "vtor": "0x8001800",
+      "sample": {
+        "sequence": 48,
+        "capture_time_ms": 474,
+        "left_delta": 8,
+        "right_delta": 10,
+        "left_value": 2,
+        "right_value": 2,
+        "left_ambient": 3492,
+        "left_active": 3484,
+        "right_ambient": 3740,
+        "right_active": 3730,
+        "status": 1,
+        "quality_flags": 0
+      },
+      "measurement_count": 48,
+      "fault_count": 0,
+      "adc_ok": 1
+    }
+  ]
+}
