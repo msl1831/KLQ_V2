@@ -6,6 +6,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 - [当前机器人架构](docs/architecture_current.md)：现有硬件、固件分区、启动流程、通信和下一阶段应用分层。
 - [当前开发交接](docs/handoff_current.md)：主控分支、最新板上版本、测试结果与后续工作。
 - [主控0.9外接升级验证](docs/verification_20261029_host_upgrade.md)：最新Python业务与USB→UART升级的真实合流、资源、工具和交付。
+- [主控0.9 USB安装](docs/verification_20261029_usb_install.md)：通过主机自身USB完成安装、CRC提交、启动及版本/回显回读，原引导0.3保留。
 - [构建环境与依赖](docs/development_setup.md)：主控、三类PY32、固定SDK恢复及重复验证命令。
 - [传感器数据访问决策](docs/decisions/001_sensor_access_strategy.md)：后台采集、静态快照、数据新鲜度和后续 Python API 约束。
 - [精简 Python 与积木接口 V0.1](docs/python_api_v0.1.md)：上位机代码生成规则、26 个非语音积木映射、枚举和错误码。
@@ -25,7 +26,7 @@ APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/m
 - `vendor/APM32E10x_EVAL_SDK-main/Libraries/`：构建所需的 Geehy SDK 库，保留上游声明和许可证。
 - [首次成功版本对照](diagnostics/usb_first_success/README.md)：保留的历史诊断源码，可独立构建；当前板子运行修复后的主线引导。
 
-**当前开发固件0.9：保留精简Python业务，合入USB→UART外接固件升级。** PC4长按1.5秒开/关机、短按运行/停止，用户程序只驻留16 KiB RAM；支持显示、PC3、SC7、通用端口发现和CS100A距离等待。新增双路IR端口采样与UL/IR/PY32电机升级桥接，已完成构建和软件回归，本轮未烧录。26积木生成接口保持不变；Python电机控制/IR条件仍待主控驱动接入，不能把模拟成功当成物理动作通过。
+**当前固件0.9：保留精简Python业务，合入USB→UART外接固件升级。** PC4长按1.5秒开/关机、短按运行/停止，用户程序只驻留16 KiB RAM；支持显示、PC3、SC7、通用端口发现和CS100A距离等待。新增双路IR端口采样与UL/IR/PY32电机升级桥接，已完成构建和软件回归。2026-10-29另经主机自身USB安装0.9并核对CRC、版本、待机和ECHO，外接升级仍待实板验收。26积木生成接口保持不变；Python电机控制/IR条件仍待主控驱动接入，不能把模拟成功当成物理动作通过。
 
 构建依赖 Keil ARM Compiler 5；Python 工具依赖见 `tools/requirements.txt`。生成文件、本机虚拟环境及板载固件备份不提交到仓库。完整操作见引导说明。
 

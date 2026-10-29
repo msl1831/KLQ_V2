@@ -1,0 +1,104 @@
+{
+  "commit": "ce714f7f19a0e23156f4d92e5ea2c3a82c73ee4a",
+  "image": "build\\host_bridge_0_9\\app\\klq_demo_app.bin",
+  "bytes": 24176,
+  "sha256": "d255a4135526c10e24b18b01dd2dca1cbba46a5168b601bc348944355085a4b8",
+  "method": "KLQ native USB CDC only; boot not rewritten",
+  "before_info": "KLQ ROBOT FW 0.8; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2",
+  "events": [
+    {
+      "action": [
+        "reset"
+      ],
+      "port": "COM123",
+      "returncode": 0,
+      "stdout": "Reset to bootloader\n",
+      "stderr": ""
+    },
+    {
+      "action": [
+        "info"
+      ],
+      "port": "COM123",
+      "returncode": 0,
+      "stdout": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=0; USB_RESETS=2\n",
+      "stderr": ""
+    },
+    {
+      "action": [
+        "flash",
+        "build\\host_bridge_0_9\\app\\klq_demo_app.bin"
+      ],
+      "port": "COM123",
+      "returncode": 0,
+      "stdout": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=0; USB_RESETS=2\n\nDownloaded 1024/24176 bytes\nDownloaded 2048/24176 bytes\nDownloaded 3072/24176 bytes\nDownloaded 4096/24176 bytes\nDownloaded 5120/24176 bytes\nDownloaded 6144/24176 bytes\nDownloaded 7168/24176 bytes\nDownloaded 8192/24176 bytes\nDownloaded 9216/24176 bytes\nDownloaded 10240/24176 bytes\nDownloaded 11264/24176 bytes\nDownloaded 12288/24176 bytes\nDownloaded 13312/24176 bytes\nDownloaded 14336/24176 bytes\nDownloaded 15360/24176 bytes\nDownloaded 16384/24176 bytes\nDownloaded 17408/24176 bytes\nDownloaded 18432/24176 bytes\nDownloaded 19456/24176 bytes\nDownloaded 20480/24176 bytes\nDownloaded 21504/24176 bytes\nDownloaded 22528/24176 bytes\nDownloaded 23552/24176 bytes\nDownloaded 24176/24176 bytes\nFlash and image CRC verified.\n",
+      "stderr": ""
+    },
+    {
+      "action": [
+        "info"
+      ],
+      "port": "COM123",
+      "returncode": 0,
+      "stdout": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=24176; USB_RESETS=2\n",
+      "stderr": ""
+    },
+    {
+      "action": [
+        "run"
+      ],
+      "port": "COM123",
+      "returncode": 0,
+      "stdout": "System firmware started\n",
+      "stderr": ""
+    },
+    {
+      "action": [
+        "info"
+      ],
+      "port": "COM123",
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\tools\\klq_usb.py\", line 163, in <module>\n    if __name__=='__main__': main()\n                             ^^^^^^\n  File \"C:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\tools\\klq_usb.py\", line 138, in main\n    client=Client(args.port or find_port())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Administrator\\.codex\\worktrees\\python-runtime\\Codex\\tools\\klq_usb.py\", line 34, in __init__\n    self.serial = serial.Serial(port,115200,timeout=0.1,write_timeout=5)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\Python\\Python312\\Lib\\site-packages\\serial\\serialwin32.py\", line 33, in __init__\n    super(Serial, self).__init__(*args, **kwargs)\n  File \"D:\\Python\\Python312\\Lib\\site-packages\\serial\\serialutil.py\", line 244, in __init__\n    self.open()\n  File \"D:\\Python\\Python312\\Lib\\site-packages\\serial\\serialwin32.py\", line 64, in open\n    raise SerialException(\"could not open port {!r}: {!r}\".format(self.portstr, ctypes.WinError()))\nserial.serialutil.SerialException: could not open port 'COM123': FileNotFoundError(2, '系统找不到指定的文件。', None, 2)\n"
+    },
+    {
+      "action": [
+        "info"
+      ],
+      "port": "COM123",
+      "returncode": 0,
+      "stdout": "KLQ ROBOT FW 0.9; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3\n",
+      "stderr": ""
+    },
+    {
+      "action": [
+        "echo",
+        "KLQ_FW_0.9_USB_OK"
+      ],
+      "port": "COM123",
+      "returncode": 0,
+      "stdout": "KLQ_FW_0.9_USB_OK\n",
+      "stderr": ""
+    }
+  ],
+  "boot_info": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=0; USB_RESETS=2\n",
+  "after_flash_boot_info": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=24176; USB_RESETS=2\n",
+  "flash_crc_verified": true,
+  "after_info": "KLQ ROBOT FW 0.9; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3\n",
+  "port_after": "COM123",
+  "echo_verified": true,
+  "result": "PASS",
+  "documentation_recorded_at": "2026-10-29T14:28:41.146835+08:00",
+  "python": "3.12.3",
+  "usb_device": {
+    "vid": "314B",
+    "pid": "0108",
+    "serial": "000000000000",
+    "location": "1-4.2"
+  },
+  "not_verified": [
+    "SWD byte-for-byte flash readback",
+    "External-device upgrade",
+    "Physical display, power button, battery and sensor behavior"
+  ]
+}
