@@ -1,5 +1,12 @@
 # KLQ 主控当前交接（2026-10-30）
 
+## 最新：只读架构检查（2026-10-30）
+
+用户要求整体检查架构及优化。本轮代码基线8284847；未访问设备/串口、未烧录、未下载RAM、未触发运动，生产源码保持原样。详见architecture_review_20261030.md/json及更新后的architecture_current.md。确认待修：首次RESET应答失败后同序号重试只ACK不执行动作；重复或积压旧样本被当新鲜。另需优先处理USB同步等待、传感器故障等待/电机续行策略、驱动超时先于VM及Fault/watchdog恢复；策略去重、INFO全镜像CRC、关机额外300ms、跨程序功率默认、显示去重等已列优先级。**这些审查发现尚未实施，不能认为0.13已经修复。**
+
+真实C最小复现分别在build/architecture_usb_power_20261030、architecture_python_review_20261030、architecture_review_ports_20261030，调用图在build/architecture_review_20261030/audit.htm。静态路径660B+Unknown，不当作完整栈证明。0.13最近安装事实与RAM示例看下节，当前设备状态本轮未重查。共享F/main仍不覆盖；后续先修第一批，再做相应板测，不自动修改部署。
+
+
 ## Python电机积木已完成本轮（2026-10-30，最新）
 
 用户明确电机一直悬空，后续不再重复机械确认。当前主机0.13已USB安装，APP30952/RO30884/RAM27632 B（比0.12 Flash+248、RAM不变），SHA6637592656fdc0ebc5b681cb569433e5f1c40f9317c038ee342db9edd6d690ae。P2 N20实际motor_for正反和motor_run/motor_stop完整用户确认，另stop积木/EOF/参数错误/USBSTOP四例普通ACK停机通过，用户看到短转停止但未核对次数。异步故障→PY7只native验证。0x55只读快照和页面已启用，默认档位2恢复；当前RAM保留examples/motor_blocks_demo.py，READY/有效、未自动RUN、goal/ACK0、语音ARM0。驻留boot0.3/外设未写。详细见verification_20261030_python_motor.md/json及python_motor_worklog_20261030.md；旧60s工具窗口超时不当作电机故障，人工复测用RAM保留方式。当前提交/远端及PID收尾核对。

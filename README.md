@@ -1,5 +1,8 @@
 # KLQ V2
 
+[整体架构审查与优化优先级](docs/architecture_review_20261030.md)已更新；本轮只读检查发现的事务/调度/新鲜度问题尚未修复，不能把正常路径验收视为异常场景已全部闭合。
+
+
 最新主机0.13：单P2 Python电机正反/定时/停止完成本轮实物验收，新增异步故障退出及只读电机ACK观测。见[电机验收](docs/verification_20261030_python_motor.md)和[当前交接](docs/handoff_current.md)。RAM保留有限示例，短按可重跑。
 
 

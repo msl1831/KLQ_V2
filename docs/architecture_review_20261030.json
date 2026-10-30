@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-30",
+  "baseline": "82848471338358c8f2a4c0ca98ebc7bf050254d9",
+  "scope": "read-only production source and existing target objects; no hardware,serial,flash,RAMdownload or motor operations",
+  "firmware": "last installed0.13; no live state queried thisreview",
+  "evidence": {
+    "python": {
+      "result": "PASS_OBSERVATIONS",
+      "scope": "actual mini_python.c/klq_runtime.c; GPIO/UI/externalport mocks; no hardware",
+      "sources": {
+        "bootloader\\mini_python.c": "54739bc450f42b43fca03d8d346245e148c194f46a92c5c92ce78f75b9b84134",
+        "bootloader\\klq_runtime.c": "aeda0d38c49ee437c1b9ba42ecc0c5f0d622f11be55f44cded815a180f00e164"
+      },
+      "stdout": "OBS distance_offline after_ms=10000 status=1 error=0 motor2_running=1 display_count=0\r\nOBS imu_absent after_ms=10000 status=1 error=0 motor2_running=1\r\nOBS new_program_without_power motor2_power=3\r\nOBS CR_only error=2 reported_line=1 expected_line=2\r\nPASS review observations reproduced on actual interpreter/runtime with mocks; no hardware.\r\n"
+    },
+    "ports": {
+      "stale_sample": {
+        "result": "REPRODUCED",
+        "output": "same_seq=7 same_capture=123 first_host=100 now_host=1000 age=0 distance_condition=1\r\nREPRODUCED old measurement accepted fresh after900ms duplicate; nohardware\r\nUARTirqarrival=101 parseat=1000 sample_host=1000 condition=1\r\nREPRODUCED899ms queued reply acceptedfresh despite40ms requesttimeout; nohardware\r\n"
+      },
+      "voice_reset_seq": {
+        "result": "REPRODUCED",
+        "output": "newpeer_fresh_different_semantic_same_seq reason=11 sets=0 rejected=1\r\nREPRODUCED policy remembers onlyseq acrosspeerreset; nohardware\r\n"
+      },
+      "source_sha256": {
+        "bootloader\\external_ports.c": "f1d72ed4f0cc880594e81d287a0d4ab7b073f099e3681dc007072fac3bbe5f83",
+        "bootloader\\klq_runtime.c": "aeda0d38c49ee437c1b9ba42ecc0c5f0d622f11be55f44cded815a180f00e164",
+        "bootloader\\voice_control.c": "88a2e55d25f48ff83aecc0054d859d67d552db6be965e5d4bdbf329d24329d3b"
+      },
+      "lease_order": {
+        "result": "REPRODUCED_DIFFERENT_GOAL_ONLY",
+        "output": "same_goal afterstall: fault=1 goal=0 oldlease=168 now=318\r\ndifferent_goal afterstall: fault=0 goal=-1000 ack=-1000 state=2 oldlease=168 newlease=486 now=336\r\nSamegoal guardworks; nextdifferent Python command grantsnew lease beforeoldexpiry poll. No hardware.\r\n"
+      },
+      "queued_uart_stale_sample": {
+        "result": "REPRODUCED",
+        "irq_at": 101,
+        "parsed_at": 1000,
+        "receive_age_reported": 0
+      }
+    },
+    "reset_retry": "REPRO duplicate RESET ACK success but reset_calls=0 after first TXfailure\nCONTROL freshsequence RESET executes reset_calls=1\n"
+  },
+  "resources": {
+    "APP_ROM_bytes": 30952,
+    "RO_bytes": 30884,
+    "RW_ZI_bytes_including_stack": 27632,
+    "source_buffer_bytes": 16384,
+    "stack_reserved_bytes": 2048,
+    "heap_linked_bytes": 0,
+    "static_callgraph": "660 bytes + Unknown(Cycles, Untraceable Function Pointers), not full ISR runtime bound",
+    "chip_capacity_reference": "https://global.geehy.com/uploads/tool/APM32E103xCxE%20datasheet%20V1.9.pdf",
+    "flash_KiB": 512,
+    "SRAM_KiB": 128
+  },
+  "production_sha256": {
+    "bootloader/board.c": "6f94667697a2c6ee379b4afd8e16b6495e8ad4841a47601392f5be53a79e419a",
+    "bootloader/board.h": "a011a30547bad16a59b1d747c45cd069b93840933a00bf4076999e64f2c88460",
+    "bootloader/external_ports.c": "f1d72ed4f0cc880594e81d287a0d4ab7b073f099e3681dc007072fac3bbe5f83",
+    "bootloader/external_ports.h": "43448985d57a920345338f03eec29d1443a5e549207317c5d4e11ad94d40b950",
+    "bootloader/klq_runtime.c": "aeda0d38c49ee437c1b9ba42ecc0c5f0d622f11be55f44cded815a180f00e164",
+    "bootloader/klq_runtime.h": "8ab1456b6759957699995b5cb317747fe46ba917d07cb718b9d85a3ddb3d31e3",
+    "bootloader/main.c": "1ee40744c4544aa476e6e31a8d603613e42ce755abc69b2352dd3f54577b9142",
+    "bootloader/mini_python.c": "54739bc450f42b43fca03d8d346245e148c194f46a92c5c92ce78f75b9b84134",
+    "bootloader/mini_python.h": "03e9e289c685879801fe6370e897279b363c2a7a8b5413685c45537b91f5331c",
+    "bootloader/peripherals.c": "2a3a5e8575a2ec46125ae7a3242c48ff01b701140eb043f173eb7fcb1b0990ba",
+    "bootloader/peripherals.h": "0eb0d361ab794db2482c1713b6c0af8dd75c2d042aeb04290e61e8cb76ce702e",
+    "bootloader/power_key.c": "5488bd66a545592a14be9f57841fd8ce545960d1a9a778a330b002af3f2537c9",
+    "bootloader/power_key.h": "ef0d4dc730d4096b52c59a631dd6e54c8b895d925798f59ea46e0417f6bc42e4",
+    "bootloader/protocol.c": "8638b0ac62c9d92019b8087670456458cf13e2b5c2b9efae5210cc37c7373faa",
+    "bootloader/protocol.h": "9c2f4aca09c52bffc17dbd8c7faae267aa175a46f1fb8515357d7717bdf4b854",
+    "bootloader/robot_ui.c": "64afad858434cc54be8c8d5441941562cd8ceaae0d7ecca79b5a3eef4ff57628",
+    "bootloader/robot_ui.h": "124504a94683baaba8b4e5d9103bf88d07553a4758632af0f7e36352128d1f46",
+    "bootloader/sc7a20.c": "4784119bbd7ac2cbf9374d98e9f97a0a43092705842e2c2ef201e9bb42b023aa",
+    "bootloader/sc7a20.h": "61e0fd71105741c0234f9dac264c6a17ca26355b1dbf93a4fc20e4919523f66e",
+    "bootloader/startup.s": "b45d448d627377e5753a776b9f156dc14ee72b896dcf3c110356458abfadcb2c",
+    "bootloader/tm1640.c": "073dadf17b745e5f6db6390a3ea05d7d7632bffc6c2e19e2c066d091cb28f32a",
+    "bootloader/usb_bsp.h": "0a2c4b8898a6aba900b37fe8ef47e0a1c39c927c20e6fe0365fc47b6622dad32",
+    "bootloader/usb_config.h": "796a488a814fa9b39ec6bf486488b4789c1cbffce09716059a5a343dc500d014",
+    "bootloader/usb_serial.c": "ddca465e619cdcb50de3270967e9b00c862c4c2d0352851952bd2ac466d149cf",
+    "bootloader/usb_serial.h": "76fd2e5d262d96b741c5f8674ffcb799798f65d6a73af46c81c1dae607779ab5",
+    "bootloader/usbd_descriptor.c": "2738ace631931d92c0a4f8de473b691144edd04f9f711fa39d2ce02de1115a48",
+    "bootloader/usbd_descriptor.h": "abcbe6ab376a2a08d96ef1e31ee0c49289cb33694a011aad2c860054153813e3",
+    "bootloader/user_program.c": "6e339169518b29a9a8aebeab4f7d30deb473b341f6257c992b3727f14b2cbf0e",
+    "bootloader/user_program.h": "8990d668ef69f0d897bcd9c0c342478bc74781d3fb60c03a1efbe570e94b7e9a",
+    "bootloader/voice_control.c": "88a2e55d25f48ff83aecc0054d859d67d552db6be965e5d4bdbf329d24329d3b",
+    "bootloader/voice_control.h": "ae0e5a4a85f04a499a04302747d2659e21c5aec1bccf888394342fcc4d822a44",
+    "bootloader/voice_link.c": "49276daf1afc65bc60809c1d746f82f6b97d73c77071f624e4ba40a4a041ef2c",
+    "bootloader/voice_link.h": "66e0e64b402c4bdbd030e820c86f1c46925efdfb75f9703dfc28cdc18734aec8"
+  }
+}

@@ -1,55 +1,38 @@
-# KLQ 机器人当前架构
+# KLQ机器人当前架构
 
-版本：V0.9
+版本：主机0.13源码，基线codex/python-runtime@8284847；日期2026-10-30。本次更新为代码架构复核，没有操作设备、修改生产代码或升级固件。最近实物记录见[Python电机验收](verification_20261030_python_motor.md)；新发现且尚未修复的问题见[架构检查](architecture_review_20261030.md)。
 
-日期：2026-10-29
+## 1. 系统与存储边界
 
-基线：ff33f97的精简Python/26积木，合入2026-10-29外接升级；旧日期实测记录不表示今日板上状态
-
-## 1. 文档范围
-
-本文描述 KLQ 当前已经形成的硬件连接、固件分区、启动流程、通信链路、驱动组织和开发工具。文中的“当前实现”均可在现有源码中找到；“后续架构”用于指导下一阶段代码拆分，不表示功能已经完成。
-
-当前系统具备USB引导、系统固件校验与自动启动、7×13点阵、16 KiB RAM精简Python、PC3用户键、PC4短按运行/停止及1.5秒开关机、SC7采样和外接端口发现/CS100A服务。0.9另合入双路IR端口采样解析及USB→UART外接固件升级；本轮升级功能仅完成软件验证。菜单、蓝牙应用协议、Python电机控制/红外条件及音频业务仍待接入。
-
-本文严格区分两类下载内容：机器人系统固件包含驱动、菜单、通信、解释器和系统服务，保存在 MCU 内部 Flash；上位机生成的 Python 用户程序只在 RAM 中临时驻留，不写入 MCU 内部 Flash。是否将用户程序掉电保存在外部 GD25Q80ESIG 中尚未决定。
-
-## 2. 系统总览
+- MCU：APM32E103RET6；当前时钟72MHz，16MHz外部晶振，USB48MHz。
+- 系统固件包含通信、驱动、解释器和状态服务，写MCU内部Flash；菜单和低电量业务尚未完成。
+- Python用户文本仅存16KiB静态RAM。完成/停止/错误后文本保留，可再次RUN；新BEGIN覆盖，MCU复位/断电失效。外部Flash备用，尚未决定用户程序持久化；不把用户程序写内部Flash。
+- 上位机已有；机器人暴露Python积木API和下载协议。调度、轮询、驱动和超时由主机固件负责，不要求上位机生成这些内部调用。
 
 ```mermaid
 flowchart LR
-    PC[PC 上位机／开发工具]
-    DAP[DAPLink／SWD]
-    USB[机器人 USB CDC]
-    BLE[ECB02C 蓝牙]
-    MCU[APM32E103RET6]
-    BOOT[USB 引导]
-    FW[机器人系统固件<br/>驱动／协议／状态服务]
-    RAM[RAM<br/>16 KiB 用户程序缓冲]
-    LED[TM1640<br/>7×13 点阵]
-    ACC[SC7A20HTR<br/>三轴加速度计]
-    EXT[串口 1～3<br/>外接设备]
-    AUDIO[串口 4<br/>内置音频]
-    FLASH[GD25Q80ESIG<br/>暂时备用]
-
-    PC -->|固件下载／命令／日志| USB
-    PC -->|首次烧录／断点调试| DAP
-    DAP --> MCU
-    USB --> MCU
-    BLE -->|UART5，应用协议待实现| MCU
-    MCU --> BOOT
-    MCU --> FW
-    FW -->|接收／CRC／解释执行| RAM
-    MCU --> LED
-    ACC -->|PB8/PB9 软件 I²C| MCU
-    MCU <--> EXT
-    MCU <--> AUDIO
-    MCU -.->|尚未使用| FLASH
+    PC[已有图形化上位机] -->|Python文本/KLQ1| USB[USB CDC]
+    USB --> CMD[命令分发/下载CRC]
+    CMD --> RAM[16KiB RAM源码]
+    RAM --> VM[mini_python 协作执行]
+    VM --> RT[klq_runtime 硬件API/电机所有权]
+    RT --> PORT[external_ports 三口状态机]
+    PORT <-->|UART1至3/KLQ1| EXT[传感器/电机从板]
+    EXT --> CACHE[静态状态与样本快照]
+    CACHE --> RT
+    ACC[SC7A20HTR] -->|软件I2C| IMU[主循环采样/IMU缓存]
+    IMU --> RT
+    CI[CI1303] <-->|UART4/VMUP| VL[voice_link]
+    VL --> VC[voice_control 空闲门控]
+    VC --> PORT
+    RT --> UI[robot_ui/TM1640]
+    CMD --> UI
+    CMD -->|0x50/0x55只读| SNAP[语音/电机缓存]
+    BLE[ECB02C UART5] -.->|传输业务待接入| CMD
+    SPI[外部Flash] -.->|备用| RAM
 ```
 
-机器人自身 USB 与 DAPLink 是两条独立链路。机器人 USB 当前用于系统固件升级、把用户程序送入 RAM、运行期命令和传感器日志；DAPLink 经 SWD 用于首次写入引导、Flash 读回、寄存器检查和源码级调试。
-
-## 3. 硬件接口架构
+## 2. 硬件边界
 
 | 功能 | MCU 接口 | 当前状态 |
 | --- | --- | --- |
@@ -59,10 +42,10 @@ flowchart LR
 | USB CDC | PA11 / PA12 | 引导和演示系统固件均已实现并实测 |
 | LED 点阵 | PB6 / PB7，TM1640 | 7 行 × 13 列映射、引导图标、开机动画和系统显示状态机已实现；映射方向已实测 |
 | 加速度计 | PB8 / PB9，SC7A20HTR | 软件 I²C 驱动、三轴数据和 Roll/Pitch 已实测 |
-| 外接端口 1 | PA9 / PA10，USART1 | 通用KLQ1发现、CS100A/IR采样、排他升级；实际接线需重查 |
-| 外接端口 2 | PA2 / PA3，USART2 | 同上；历史P2 CS100A成功，不作为当前接线记录 |
+| 外接端口 1 | PA9 / PA10，USART1 | KLQ1发现、传感器采样、普通电机和排他升级；实际接线重查 |
+| 外接端口 2 | PA2 / PA3，USART2 | 同上；最近P2 N20实物验证，接线重查 |
 | 外接端口 3 | PB10 / PB11，USART3 | 同上；实际接线需重查 |
-| 内置音频 | PC10 / PC11，UART4 | 115200、8N1 基础初始化完成；模块协议待定 |
+| 内置音频 | PC10 / PC11，UART4 | CI1303 VMUP V0.2，版本/音效/语音事件及工程短时运动已接入 |
 | ECB02C 蓝牙 | PC12 / PD2，UART5；PA8 连接状态 | UART5 基础初始化完成；连接状态和应用协议未实现 |
 | 电池采样 | PA0 ADC | 硬件分配已确定；采样、换算和低电量策略未实现 |
 | 外部 Flash | PB12～PB15，SPI | 暂时备用；是否用于用户程序掉电保存尚未决定 |
@@ -72,299 +55,84 @@ flowchart LR
 
 仅靠 DAPLink 给主机 MCU 供电时，不能据此推定外接端口已正常给传感器供电。2026-09-23 无电池联调中，用户确认传感器未正常供电，三端口均无有效响应；单独给传感器供电后，端口 2 自动识别并连续采样。端口识别测试应先确认传感器电源，详见[外接端口验证记录](verification_20260915_external_ports.md)。
 
-## 4. 固件分层与构建模式
-
-```mermaid
-flowchart TB
-    HOST[PC 工具层<br/>klq_usb / serial_monitor / test scripts]
-    PROTO[通信层<br/>USB CDC + KLQ1 帧协议]
-    SERVICE[控制层<br/>显示状态／RAM 程序／传感器采样]
-    DRIVER[驱动层<br/>TM1640／SC7A20HTR／UART1～5]
-    PLATFORM[平台层<br/>时钟／SysTick／PC5／Flash／跳转／USB BSP]
-    SDK[Geehy CMSIS／标准外设库／USB Device 库]
-    HW[APM32E103RET6 与板载硬件]
-
-    HOST --> PROTO
-    PROTO --> SERVICE
-    SERVICE --> DRIVER
-    SERVICE --> PLATFORM
-    DRIVER --> SDK
-    PLATFORM --> SDK
-    SDK --> HW
-```
-
-当前引导和演示系统固件共用 `bootloader/` 下的大部分源码，构建脚本用两种模式生成不同镜像：
-
-| 构建命令 | 宏与链接地址 | 包含内容 |
-| --- | --- | --- |
-| `tools/build.py` | 无 `KLQ_DEMO_APP`；`0x08000000` | 最小引导、USB CDC、TM1640、内部 Flash 更新 |
-| `tools/build.py --demo` | 定义 `KLQ_DEMO_APP`；`0x08008000` | 当前机器人系统固件：USB CDC、显示、RAM Python、五路 UART、外接端口发现／CS100A、SC7A20HTR |
-
-引导构建会排除 `external_ports.c`、`peripherals.c`、`sc7a20.c`、`robot_ui.c`、`user_program.c`、`mini_python.c` 和 `klq_runtime.c`，因此保持“只驱动 USB 与显示”的最小边界。系统固件不是用户程序；它不编译 Flash 擦写路径，在其运行环境中 BEGIN／DATA／END 用于把用户程序放入 RAM。
-
-构建统一定义外部晶振为 16 MHz。系统使用 16 MHz HSE，经 PLL 得到 72 MHz 系统时钟；APB1 为 36 MHz，APB2 为 72 MHz，USB 时钟为 48 MHz。
-
-## 5. 启动与运行流程
-
-```mermaid
-flowchart TD
-    RESET[复位／上电]
-    HOLD[SystemInit 最早拉高 PC5]
-    CLOCK[建立 72 MHz 时钟]
-    VECTOR[设置向量表地址]
-    BOARD[启动 SysTick 和 TM1640]
-    GATE{冷上电按住 PC4 达 1.5 秒？}
-    OFF[PC5 拉低；等待释放后再次长按]
-    REQUEST{一次性引导请求？}
-    VALID{系统固件有效？}
-    BOOT[引导：显示下载图标并枚举 USB]
-    WAIT[等待 KLQ1 命令]
-    VERIFY[下载系统固件、读回、CRC 与向量校验]
-    JUMP[关闭 USB/SysTick/中断并跳转系统固件]
-    INIT[系统固件：播放开机动画<br/>初始化 UART1～5 和 SC7A20HTR]
-    STANDBY[待机表情；处理 USB 和传感器]
-    BACK[USB RESET：写一次性 RAM 请求并软复位]
-
-    RESET --> HOLD --> CLOCK --> VECTOR --> BOARD --> GATE
-    GATE -->|冷上电合格或软件复位| REQUEST
-    GATE -->|冷上电未满足| OFF
-    OFF -->|再次长按 1.5 秒| RESET
-    REQUEST -->|是| BOOT
-    REQUEST -->|否| VALID
-    VALID -->|无效| BOOT
-    VALID -->|有效| JUMP
-    BOOT --> WAIT
-    WAIT --> VERIFY --> JUMP --> INIT
-    INIT --> STANDBY
-    STANDBY --> BACK --> RESET
-```
-
-上电最早由 `SystemInit` 拉高 PC5 避免按键松开前掉电；引导随后确认 PC4 持续按住 1.5 秒，提前松开则拉低 PC5。软件复位跳过该门槛。USB／调试供电仍使 MCU 运行时，关机循环保持 USB 和点阵关闭，只接受松开后新一轮 1.5 秒长按，再置高 PC5 并软件复位。没有引导请求的正常启动会运行通过元数据、向量和 CRC 校验的系统固件。系统固件处理 USB `reset` 时在 RAM 顶部 `0x2001FFF8` 写入魔数及反码，然后软复位；引导消费并立即清除标记后停留在下载界面。系统固件无效时也停留在引导。实体按键强制进入引导尚未实现，恢复入口和键序待定。
-
-引导停留下载界面时也轮询 PC4，初始开机按压释放不计入关机；再次持续按住 1.5 秒会断开 USB、清屏并拉低 PC5。引导跳转系统固件前先关闭 USB 收发器和时钟，将 D+、D− 同时拉低 300 ms，关闭 SysTick，清除 NVIC 使能及待处理中断，然后设置 VTOR、MSP 和系统固件入口。系统固件随后重新初始化自己使用的全部外设。
-
-## 6. 内部 Flash 布局
-
-| 区域 | 地址 | 大小 | 用途 |
-| --- | --- | --- | --- |
-| 引导区 | `0x08000000`～`0x08007FFF` | 32 KiB | 固定 USB 引导；不允许通过当前 USB 协议更新自身 |
-| 系统固件区 | `0x08008000`～`0x0807F7FF` | 478 KiB | 单个机器人系统固件镜像；当前代码中仍命名为应用区 |
-| 系统固件元数据页 | `0x0807F800`～`0x0807FFFF` | 2 KiB | 系统固件长度、CRC、基址和有效标记 |
-
-开始升级系统固件时，引导先擦除元数据页使旧系统固件失效，再擦除需要的系统固件页。数据按连续偏移写入并读回检查；END 阶段校验完整镜像 CRC、初始栈和复位向量，最后写入有效标记。因此下载中断或 CRC 错误不会把残缺镜像标记为可运行。
-
-当前是单系统固件槽，没有旧版本回滚区。该分区只保存机器人固件，不保存 Python 源码、字节码或用户程序元数据。
-
-### 6.1 用户程序存储模型
-
-```mermaid
-flowchart LR
-    PC[上位机生成 Python 用户程序]
-    LINK[USB 用户程序下载协议<br/>已实现；蓝牙待接入]
-    RAM[MCU RAM<br/>16 KiB 源码缓冲／校验信息／运行状态]
-    VM[系统固件中的精简 Python 解释器<br/>固定状态／无堆分配]
-    HWAPI[受控硬件 API<br/>按键／传感器／电机]
-    EXT[外部 GD25Q80ESIG<br/>是否持久化待定]
-    INTERNAL[MCU 内部 Flash<br/>引导＋系统固件]
-    LOST[用户程序失效<br/>需要重新下载]
-
-    PC --> LINK --> RAM --> VM --> HWAPI
-    EXT -.->|后续决定后才启用| RAM
-    INTERNAL --> VM
-    RAM -.->|复位或断电| LOST
-```
-
-当前确定的存储规则如下：
-
-| 存储介质 | 保存内容 | 用户程序行为 |
-| --- | --- | --- |
-| MCU 内部 Flash | USB 引导、机器人系统驱动、菜单、通信服务、解释器和其他机器人固件 | 不写入用户 Python 程序 |
-| MCU RAM | 当前下载的用户程序、校验状态、解释器运行状态和临时数据 | 本次运行期间有效；复位或断电后视为不存在 |
-| 外部 GD25Q80ESIG | 当前保持备用 | 是否用于用户程序掉电保存后续决定 |
-
-当前系统固件分配 16 KiB 静态 RAM 源码缓冲。BEGIN 记录长度与 CRC，DATA 只接受连续偏移，END 对整个缓冲执行 CRC-32；成功后才标记为可运行，失败会清除有效状态。解释器直接扫描该缓冲，不复制源码、不构建语法树、不使用堆；循环栈固定为 8 层。当前系统固件总 RW 为 26,424 字节，在 128 KiB RAM 中保留约 102.2 KiB。
+## 3. 固件构建与Flash
 
-### 6.2 显示状态机
+同一个bootloader目录中放置共享平台和系统源码，由KLQ_DEMO_APP选择构建边界。文件目录名不是运行层级；build.py当前用glob与BOOT排除名单，后续可收敛为明确源码清单。
 
-```mermaid
-stateDiagram-v2
-    [*] --> 开机动画
-    开机动画 --> 待机
-    待机 --> 下载中: BEGIN
-    下载中 --> 完成提示: END + CRC 正确
-    下载中 --> 错误提示: CRC 错误
-    完成提示 --> 待机: 800 ms
-    错误提示 --> 待机: 800 ms
-    待机 --> 默认运行图标: RUN
-    默认运行图标 --> 用户图案: DISPLAY
-    用户图案 --> 用户图案: DISPLAY
-    默认运行图标 --> 待机: STOP／正常结束
-    用户图案 --> 待机: STOP／正常结束
-```
-
-开机动画由中心光点逐级扩展、收拢，再显示闭眼双目并睁眼进入待机。待机只显示两只眼睛，没有嘴巴；每隔约 4.5～8.6 秒左右看、回正并眨眼一次，间隔及方向由 16 位 LFSR 变化。离开待机后不执行眼睛动画。下载期间显示向下箭头，校验成功显示对勾 800 ms；用户程序进入运行状态时显示运行三角形。只有运行状态接受用户图案，停止或正常结束后清除用户图案并恢复待机双眼。错误 CRC 显示叉号 800 ms 后返回待机。
+| 模式 | 基址 | 行为 |
+|---|---|---|
+| tools/build.py | 0x08000000 | 最小BOOT、USB、点阵、电源、系统镜像更新 |
+| tools/build.py --demo | 0x08008000 | 实际机器人系统固件，含RAM解释器和业务驱动 |
 
-## 7. USB 通信架构
-
-上位机实现 Python 源码下载和运行控制的完整约定见 [上位机 USB 通信协议](host_usb_protocol_v0.1.md)；本节描述系统分层与内部实现。
-
-机器人 USB 当前枚举为 CDC 虚拟串口，开发阶段沿用 `VID:PID = 314B:0108`。现有系统固件升级协议使用小端二进制帧：
-
-```text
-"KLQ1" | sequence:u32 | command:u16 | payload_length:u16 | crc32:u32 | payload
-```
-
-响应命令为请求命令 OR `0x8000`，响应载荷以 32 位状态码开头。CRC-32 覆盖帧头前 12 字节和载荷。主机按请求／应答方式串行操作，设备缓存上一条有效请求的响应，用于相同序号请求的幂等重发。
-
-| 能力 | 引导 | 当前机器人系统固件 |
-| --- | --- | --- |
-| INFO / ECHO | 支持 | 支持 |
-| DISPLAY | 支持映射调试 | 仅运行中支持用户图案 |
-| BEGIN / DATA / END | 升级内部 Flash 的系统固件 | 下载并校验 RAM 用户程序 |
-| RUN | 跳转有效系统固件 | 启动精简 Python 解释执行 |
-| STOP / FINISH | 不支持 | 停止／完成用户程序并恢复待机 |
-| RESET | 写一次性请求并复位 | 写一次性请求并复位，返回引导 |
-| 文本日志 | 不输出 | 约 10 Hz 输出三轴和 Roll/Pitch |
-
-命令号根据 INFO 返回的运行环境解释：`KLQ USB BOOT` 中 BEGIN／DATA／END 操作内部 Flash 系统固件区；`KLQ ROBOT FW` 中同组命令只操作 16 KiB RAM 用户程序缓冲。主机工具会先读取 INFO，防止把用户程序交给引导。蓝牙后续可复用系统固件侧的用户程序状态机。
-
-当前系统固件在同一个 CDC 字节流中同时承载 KLQ1 二进制命令和 ASCII 传感器日志。主机协议客户端会搜索 `KLQ1` 魔数重新同步，串口监视器按行显示文本。调试日志发送单包等待上限为 3 ms；无人读取时丢弃日志，避免拖慢用户程序。控制命令应答仍使用可靠发送路径。正式应用建议把日志封装为协议消息或增加明确的通道管理，避免高日志量影响控制报文。
-
-### 7.1 UART1～3 外接端口服务
-
-三个物理端口均为通用设备口，不预设传感器或电机类型。每个未绑定端口每500 ms发出KLQ1 INFO；通过CRC/序号/命令/状态后按端口、类别、类型和UID绑定。应用模式且支持SAMPLE的CS100A（class1/type1）及双路IR（class1/type2）注册采样服务，其它合法设备只做INFO保活。IR每20 ms轮询并校验左右归一值、原始差分和质量位；CS100A保留待机100 ms、运行40 ms周期及主机快照时间戳。
-
-每口使用128 B接收环和最多148 B帧缓冲。普通请求40 ms超时、两次同帧重试，失败或连续非法帧后清样本并解绑。升级独占目标口时取消普通事务并排空50 ms，其它口继续轮询；专用非阻塞升级状态机使用独立有界超时，不沿用普通采样超时。实现和外层协议见第13节。
-
-## 8. SC7A20HTR 数据链路
-
-SC7A20HTR 驱动使用 PB8/PB9 软件 I²C，按顺序探测 7 位地址 `0x19` 和 `0x18`。总线操作包含时钟拉伸超时和九个 SCL 脉冲恢复，传感器不响应时不会无限阻塞主循环。
-
-当前配置为 100 Hz、±2 g、12 位高分辨率、块数据更新。驱动把左对齐的三轴原始值转换为毫 g，并按下面的关系计算倾角：
-
-```text
-Roll  = atan2(Y, Z)
-Pitch = atan2(-X, sqrt(Y² + Z²))
-```
-
-结果以 0.01° 为内部单位，通过 USB 格式化为十进制度数。当前使用芯片原始坐标，尚未加入安装方向变换、零偏校准和滤波。Roll/Pitch 只适合静止或低动态倾角，快速运动时会受到线性加速度影响；该传感器不能提供航向角。
-
-## 9. 源码与工具职责
-
-以下均为机器人固件内部接口，不交给上位机调用：`mini_python_poll()` 在主循环推进解释器；`klq_runtime_*()` 连接 Python 函数与板级服务；`external_port_status()` 提供后台端口快照；`external_ports_set_active()` 使 CS100A 在程序运行时由 10 Hz 提升到 25 Hz；`klq_runtime_update_imu()` 在程序运行时以 50 Hz 更新 SC7 快照、待机时以 10 Hz 更新；`external_port_motor()` 待按已归档电机协议实现主控驱动。程序停止、自然结束、运行错误或重新下载时调用 `klq_runtime_stop_all()`；电机设备仍需有通信超时自动停机能力，以覆盖线缆断开后主机停机帧无法送达的情况。
-
-| 路径 | 当前职责 |
-| --- | --- |
-| `bootloader/board.c` | 最早电源保持、冷上电 1.5 秒门槛、引导长按关机、软件关机等待、时钟、SysTick、一次性引导请求、USB 断开和系统固件跳转 |
-| `bootloader/tm1640.c` | 7×13 点阵映射、亮度命令和系统图标 |
-| `bootloader/robot_ui.c` | 开机动画及待机、下载、完成、错误、运行、用户图案状态机 |
-| `bootloader/user_program.c` | 16 KiB RAM 程序缓冲、顺序接收、CRC 和运行状态 |
-| `bootloader/power_key.c` | PC4 上拉输入、25 ms 去抖、短按运行／停止、长按关机及上电按压抑制 |
-| `bootloader/mini_python.c` | 受限 Python 语法扫描、固定 8 层循环栈、协作等待和错误行号 |
-| `bootloader/klq_runtime.c` | Python API、PC3、SC7/端口快照、点阵渲染和电机安全入口 |
-| `bootloader/usb_serial.c` | Geehy USB Device 库适配、CDC 收发和缓冲 |
-| `bootloader/protocol.c` | KLQ1 帧解析、命令处理、CRC，以及按运行环境分发系统固件或用户程序命令 |
-| `bootloader/peripherals.c` | USART1～3、UART4～5 引脚和 115200、8N1 初始化 |
-| `bootloader/external_ports.c` | UART1～3 中断接收、KLQ1 发现／事务状态机和 CS100A 样本服务 |
-| `bootloader/sc7a20.c` | 软件 I²C、传感器配置、采样和倾角计算 |
-| `bootloader/main.c` | 引导命令循环或演示系统固件采样循环 |
-| `tools/build.py` | ARM Compiler 5 构建、链接和 BIN/HEX 生成 |
-| `tools/dap_flash.py` | 经 DAPLink 备份、烧录和读回验证引导 |
-| `tools/klq_usb.py` | USB 引导客户端、系统固件下载和诊断命令 |
-| `tools/serial_monitor.py` | 自动识别并重连 KLQ USB，显示文本日志 |
-| `tools/test_protocol.py` | 帧格式、边界载荷、CRC、重复请求和错误恢复测试 |
-| `tools/test_update.py` | 系统固件分区中断下载、整包 CRC、运行和返回引导测试 |
-| `tools/test_user_program.py` | RAM 程序 CRC、显示状态、运行／停止和复位清空实机测试 |
-| `tools/test_python_runtime.py` | 解释器调用、循环、定时、错误行号、不支持设备和停止响应实机测试 |
-| `tools/test_external_ports.py` | 从主机 USB 日志验证 CS100A 识别、连续采样和错误计数 |
-| `tools/test_external_reconnect.py` | 暂停并复位 PY32 传感器，验证主机解绑和同 UID 重新发现 |
+| Flash区域 | 地址 | 大小 |
+|---|---|---:|
+| BOOT | 08000000..08007FFF | 32KiB |
+| 系统APP槽 | 08008000..0807F7FF | 478KiB |
+| 镜像元数据 | 0807F800..0807FFFF | 2KiB |
 
-`vendor/` 保存 Geehy SDK、CMSIS、标准外设库和 USB Device 库。`diagnostics/usb_first_success/` 保存第一次成功枚举的历史对照代码，不参与当前主线构建。
+BOOT先使元数据失效，再按连续偏移写APP；END检查CRC和向量，最后提交有效magic。单槽不自动回滚旧APP；失败时留BOOT重新下载。系统APP分支不包含FMC擦写路径，同名BEGIN/DATA/END只操作RAM用户程序。
 
-## 10. 已验证边界
+最近驻留BOOT为0.3；源码BOOT回归为0.4、9984B，没有安装到设备。主APP0.13已经含USB EP RC_W0修复，不能认为驻留BOOT也随之更新。当前USB协议不更新BOOT本身，恢复/安装仍保留SWD通道。
 
-当前实板已经验证以下链路：
+## 4. 启动与电源
 
-- PC5 在启动早期维持电源，72 MHz 主时钟和 USB 48 MHz 工作正常。
-- 7×13 点阵引导图标显示和方向正确。
-- 无一次性请求时自动启动有效系统固件；USB `reset` 写请求后停留在引导。
-- 开机动画、待机／下载／完成／错误／运行／用户图案状态在软件与 USB 状态字段上切换正确。
-- 16 KiB RAM 用户程序长度边界、连续接收、整包 CRC、运行／停止和复位清空正确；内部 Flash 更新路径未被调用。
-- USB CDC 枚举、命令回显、边界载荷、重复请求、错误 CRC 和错误后恢复正常。
-- 系统固件下载、逐包写入、完整 CRC、向量检查、中断下载失效保护、系统固件运行和复位返回引导正常。
-- SC7A20HTR 识别、连续三轴采样、重力幅值和角度输出正常。
-- 五路 UART 的波特率及收发使能寄存器已通过 DAPLink 读回确认。
-- UART1～3 周期 INFO、CS100A 类型／UID 绑定、连续 GET_SAMPLE 和端口 1 实际收发正常。
-- PY32 传感器暂停 1 秒后，主机状态按 `ON → OFF → ON` 转换并重新识别同一 UID。
+SystemInit在C库初始化前拉高PC5。BOOT冷上电要求PC4持续1.5s；软件复位可绕过冷启动门槛。正常通过元数据/CRC/向量检查后跳APP，跳转前关闭USB/SysTick、清NVIC、设置VTOR/MSP。一次性BOOT请求位于RAM顶端2001FFF8，链接器保留最后8B。
 
-精简 Python 已完成构建和实板执行验证。除 CS100A 外的外接设备类型、ECB02C 数据传输、音频播放及电池采样仍不在已验证范围内。PC4 短按运行／停止与 USB/DAPLink 供电下的长按关机、软件关机态唤醒已由实物按键测试确认；真正掉电后的冷启动门槛仍需独立验证。PC3 用户键驱动与 SC7 倾斜条件已实现，15° 阈值和前后左右方向仍需实物交互标定。电机和红外仅有稳定 Python API 与底层接入点，取得真实设备协议前会明确返回“不支持”。
+系统启动动画后初始化PC4/UART/SC7/USB，进入双眼待机。PC4短按在READY/RUNNING切换运行与停止，空RAM短按显示X；PC3供用户程序等待。长按1.5s先取消用户/语音/升级并请求电机停止，最多150ms后进入关机函数。该函数目前还先等USB断连300ms才拉低PC5，故150ms不是最终GPIO断电上界，属于待优化时序。
 
-## 11. 机器人系统固件分层
+USB/DAP可能绕过MOS供电；PC5拉低后MCU未必失电。软件关机循环要求先释放，再新长按1.5s软复位唤醒。电池供电/冷启动电气边界和芯片供电路径必须与软件状态区分。
 
-在保持引导分区和 KLQ1 更新协议稳定的前提下，下一阶段机器人系统固件继续拆成以下模块：
+## 5. 实际主循环与时间约束
 
-```mermaid
-flowchart TB
-    LOOP[系统主循环／调度器]
-    POWER[电源与按键状态机]
-    COMM[USB／蓝牙通信服务]
-    PROGRAM[用户程序下载、RAM 驻留与运行控制]
-    PY[精简 Python 解释器]
-    API[KLQ Python 硬件 API]
-    PORTS[外接端口设备服务]
-    AUDIO[音频服务]
-    SENSOR[板载传感器服务]
-    DISPLAY[显示服务]
+当前顺序是：
 
-    LOOP --> POWER
-    LOOP --> COMM
-    LOOP --> PROGRAM
-    PROGRAM --> PY
-    PY --> API
-    API --> PORTS
-    API --> AUDIO
-    API --> SENSOR
-    API --> DISPLAY
-    COMM --> PROGRAM
-```
+1. voice_link_poll → protocol_poll → power_key_poll → voice_control_poll。
+2. 未读到CI版本时每2s尝试查询；klq_runtime_poll更新用户键。
+3. user_program_poll推进一条语句；robot_ui_poll推进显示。
+4. 根据Python RUNNING切换外接采样模式；external_ports_poll处理串口与事务。
+5. 升级会话活跃时跳过SC7和日志；否则采集IMU、发送调试行/端口摘要。
 
-系统主循环需要持续处理通信、停止请求和长按关机，不能依赖用户 Python 程序主动让出控制。用户程序管理模块只在 RAM 中维护当前程序及有效状态。外接端口已经采用中断环形缓冲、帧解析、超时重试和设备状态；后续电机及其他传感器服务复用这一事务层。电源状态机负责区分开机按压、短按和长按，关机时停止用户程序及电机后再拉低 PC5。
+VM内部跳转预算32、USB接收每次256B，均是工作量预算，不是完整时间预算。USB普通回复可每63B同步等2s；该等待内部只服务电源键和升级外接轮询。INFO又会完整CRC整个APP。因此“协作式”不等于已证明实时上界，这也是架构检查第一批建议的重点。
 
-Python 层只暴露有限且稳定的 KLQ API，首要范围是用户按键检测、板载或串口传感器数据读取、串口电机控制和 7×13 用户图案显示。用户代码不直接操作 PC5、系统菜单、内部／外部 Flash 或任意 MCU 寄存器。SC7A20HTR、显示和外接端口均通过系统服务访问，以便停止、超时和错误处理保持一致；音频是否开放给用户程序后续再定。
+定时积木从命令入队计时，不从SET ACK开始；API保留协作等待。用户无延时循环合法，不能通过把它判为错误来替代固件调度。
 
-传感器 API 采用后台采集和静态快照。Python 条件只读最新快照，不同步操作 I²C 或串口。待机时 SC7A20HTR 与 CS100A 保持 10 Hz；用户程序运行时分别提升到 50 Hz 和 25 Hz，USB 日志仍为 10 Hz，页面刷新频率不参与业务采集调度。完整约束和验收方法见 [传感器数据访问策略](decisions/001_sensor_access_strategy.md)。
+## 6. Python执行与错误
 
-## 12. 当前必须保持的约束
+当前实现为直接扫描RAM源码的固定积木语言：字面量参数、固定函数、for/range、while True和pass；循环栈8层，无AST和堆。没有变量、表达式、if、函数或任意模块导入。详细生成约束见[Python API](python_api_v0.1.md)。
 
-- PC5 必须在 C 运行库初始化前拉高；任何 GPIOC 重配置都不能短暂释放该引脚。
-- 引导固定占用前 32 KiB，机器人系统固件必须链接到 `0x08008000` 并设置对应 VTOR。
-- USB 系统固件更新只能写系统固件区和元数据页，不能接受主机提供的任意目标地址。
-- 系统固件有效标记必须在完整镜像校验通过后最后写入。
-- 系统固件必须重新初始化自己的时钟、SysTick、USB 和业务外设。
-- 普通上电／复位只自动启动通过完整校验的系统固件；显式进入引导使用一次性 RAM 请求，读取后必须立即清除。
-- 用户程序及其有效标记只保存在 RAM，不得写入 MCU 内部 Flash。
-- 复位或断电后必须把 RAM 用户程序视为无效；没有重新下载时，运行操作应提示无有效程序。
-- 外部晶振构建值必须保持 16 MHz，否则 SDK 会错误计算 UART 等外设时钟。
-- 串口 4 专用于内置音频；串口 5 专用于 ECB02C；串口 1～3 作为外接端口。
-- GD25Q80ESIG 当前保持备用；只有后续明确决定支持掉电保存后，才增加用户程序持久化逻辑。
-- 后续嵌入式代码优先降低 Flash、RAM 和执行开销，可读性居次；优先静态紧凑表、固定缓冲和有界直接实现，但不得删减边界校验、协议完整性、故障恢复、电源控制或电机停止保障。
-- 用户传感器 API 必须读取后台静态快照；不得在普通读取调用中直接等待 I²C 或串口事务。数据必须带样本状态、序号和年龄，过期或离线时返回明确错误。
+END只验证传输CRC；语法和参数错误在RUN时发现，失败停止电机、报告PY_ERROR/PY_LINE、回READY并保留源码。0.13增加拥有电机的3-bit掩码，在处理等待前检测该程序电机的异步错误/离线，报7并全局停机；PENDING/ACTIVE/STOPPING不误报，确认IDLE释放所有权。故障7已有native注入，实际拔线场景尚未验收。
 
-## 13. 主控USB→外接UART固件升级
+wait_distance/tilt/button目前使用bool等待；距离口离线/IMU失效被当条件未达继续等，健康电机可能继续运行。这是需要明确故障策略的缺口。wait_ir仍未实现，不能因IR已在线就声称所有26项已具备实物功能。每次RUN只停机，不重置功率档位，档位会跨程序继承；是否改默认上下文尚待决定。
 
-2026-10-29同日后续实测：IR端口2已完成应用态自动进引导、6052 B/48包、END/CRC/RUN与有效采样恢复。外接引导最低版本现为1.0.2，修复EOPIE完成标志，包含RUN/TC失败不跳转保护；PC在BEGIN前拒绝旧/未知版本。主控仍0.9且不需重刷；其它板的构建/模拟不能代替其硬件升级验收，见verification_20261029_ir_via_host.md。
+## 7. 端口、传感器与电机
 
-PC以OPEN/XFER/RESULT/CLOSE（0x40～0x43）选择端口并逐包发送KLQ1内层请求；详见 [升级协议](../sensor_boot/docs/usb_bridge_v1.md)。主控应用0.9保留所有Python命令，并声明EXT_UPGRADE=1、EXT_PORTS=3。常驻主控引导0.4回归构建不链接UART/解释器，既有引导0.3也能安装0.9应用。
+- 三个口各自固定RX缓冲、一个未完成事务、CRC/序号/超时/重发现。识别UID/板型/兼容性后才绑定，拔插清缓存。
+- 传感器采用后台采集、API读缓存；不是每个Python调用直接进行I2C/UART。见[传感器访问决策](decisions/001_sensor_access_strategy.md)。
+- SC7硬件配置100Hz，主机待机读10Hz、Python运行目标50Hz；运行cache有效年龄当前100ms。
+- CS100A待机响应后间隔100ms、Python运行响应后40ms；IR响应后20ms。加线时延理论约CS22.5Hz/IR39.1Hz，未含设备处理；不能把间隔参数当实测帧率。距离cache有效年龄当前80ms。
+- 当前sample_host_ms使用处理回复的时刻，未区分重复测量和积压回复；已在只读审查复现假新鲜，尚未修复。决策文档的初始25/50ms新鲜度与当前100/80ms也需统一确认。
+- 普通电机支持signed PWM±1000，档位1/2/3为333/666/1000，默认2；每约60ms检查身份并刷新。主机旧目标lease150ms，子板软件250ms失联停机。STOP优先，SET超时不重发。
+- Python、语音共用普通电机驱动；升级/诊断通过独立会话排他占口，开始时停止用户程序和运动，结束重发现，不自动恢复旧动作。
+- 0.13新增只读0x55，读取普通目标/最后ACK/状态而不发UART、不停止设备；ACK不是机械速度。P2 motor_for和motor_run/motor_stop正反已完整实物确认；双电机移动与其他口/低中档机械响应尚未验收。
 
-升级锁定token、板型、兼容号和UID；电机先STOP确认再ENTER，主控自动执行HOLD握手。ENTER/RUN或身份错误后必须重新核对同UID引导INFO及GET_LAYOUT，才能BEGIN/DATA/END。固定缓冲只存一帧，不缓存整镜像。目标口暂停普通采样，其它口保持服务；USB等待期间继续推进升级及PC4，接收每轮最多256 B。
+## 8. 音频与语音
 
-OPEN停止用户程序。USB与实体键都不能在会话中启动旧程序，长按1.5秒先取消会话再关机；关闭、30秒租约到期、USB重配置/复位会释放端口并重新发现。完整RAM程序在仅USB重连时保留，半包下载取消。退出不自动恢复用户动作。
+UART4接CI1303，115200/8N1，VMUP独立解析，不与外接KLQ1共用帧。voice_link负责固定缓冲、校验、版本、播放与事件；voice_control负责动作门控。已测试CI0.2.0版本、5000..5007八音效和真实唤醒/正反/停止语义。
 
-三类外接板使用PY32统一布局：引导0x08000000/6144 B、应用0x08001800/18304 B、元数据0x08005F80/128 B；与APM32主控0x08008000应用区分开。首次SWD用各自factory.hex，日常升级用update.klq。0.9主控资源为BIN24176 B、RAM26784 B，新增代码不分配堆；完整构建、共存回归与未测边界见 [验证记录](verification_20261029_host_upgrade.md)。
+工程运动使能默认0，仅RAM；EMPTY/READY且UI待机、已唤醒、版本匹配、恰好一个兼容电机且无升级/关机/复位等占用时，可执行±800最多1s动作。RUNNING期间语音停止会拒绝，不终止用户程序。B0/B2/模式切换丢弃旧意图。当前策略层额外单seq去重存在重启/回绕误拒问题，详见检查报告。
 
+语音事件与系统音效已接入，但语音不在当前26项Python积木里；工程声控不是可直接交付上位机的完整语音积木API。
 
-## 主机0.10电机诊断增量（2026-10-29）
+## 9. USB与PC观测
 
-主机自身USB已安装0.10应用，保留引导0.3。INFO追加EXT_MOTOR=1；选定端口会话允许电机SET_PWM/GET_STATUS，锁定UID和应用身份，单次SET的UART ACK时限100 ms且两端不自动重发。PC4短按/USB STOP取消控制；电机板250 ms无SET归零为兜底，尚未单独实测故障取消时延。
+- USB模式INFO区分KLQ USB BOOT与KLQ ROBOT FW；上位机必须据此区分系统固件更新和RAM文本下载。
+- 基本协议见[USB文档](host_usb_protocol_v0.1.md)；0x40..43为排他外接升级，0x50..54为语音工程接口，0x55为普通电机只读缓存。
+- Python/普通电机停止、电源关闭、升级取消需保留控制完整性；重复RESET首次TX失败后重试假成功已在本次纯主机复现，尚未修复。
+- 观测页由一个CDC worker读取，HTTP仅输出状态。运行CLI前POST/api/pause且released=true，CLI关闭后resume，不能同时抢串口。页面收到合法匹配INFO才在线；电机陈旧快照显示未知。
+- 当前传感器仍依赖ASCII日志、工程状态用二进制帧混流。可逐步统一版本化只读快照，将调试输出放低优先级；蓝牙接入前需先设计独立解析和控制/下载所有者。
 
-N20在P3以80%/1秒实际转动并停止；20%/2秒未转，启动阈值未确定。Python电机接口仍不支持，后续应通过普通端口调度落实持续保活及积木接口。APP24404 B/RAM26784 B，相比0.9增加228 B Flash、RAM不变。详细证据见[电机实测](verification_20261029_motor.md)。
+## 10. 资源与待完成事项
+
+0.13实际APP BIN30952B、RO30884B、RW/ZI27632B，含16KiB源码及2KiB栈；芯片512KiB Flash/128KiB SRAM，见[极海数据手册](https://global.geehy.com/uploads/tool/APM32E103xCxE%20datasheet%20V1.9.pdf)。无动态分配，HEAP512B声明未实际链接。静态调用图可见660B路径，但含未知回调/默认异常循环，不能替代栈水位或完整IRQ最坏情况。
+
+目前的重点是有界调度、事务重试、新鲜度/故障策略和故障恢复；当前资源并不紧张。菜单、电池ADC/低电量策略、蓝牙应用协议、wait_ir、变量/条件语法及实际故障注入/双电机等验收仍待完成。来源与未提交外部资源见当前handoff；整机不能只用单一主机版本号代替各从板/模型构建manifest。
