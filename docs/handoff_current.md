@@ -6,6 +6,8 @@
 
 ## 当前结果
 
+- 2026-10-30继续测试：右侧监测已恢复，主机0.10/P1 IR/P2 UL/P3 N20在线。用户确认悬空后，-800/1秒反转及单次+800不续期自动归零均通过，用户确认两次方向相反且均停止；迟到STATUS在设备uptime相隔383 ms时为0/0，不代表精确250 ms边界。之后约9.77秒三口无新增通信错误。目标固件未改/未烧录；仅修正页面电机0mm假测距显示、通用超声名称。另据共享main既往烧录/读回记录，Motor最新已知引导为1.0.2（本轮未查引导）。见verification_20261030_continue.md、continuation_20261030.json，原始文件及当前PID在build/continuation_20261030。
+
 - 同日后续电机实物通过：主机经USB从0.9到0.10应用，24404 B（Flash+228/RAM仍26784 B），新增EXT_MOTOR及选定口0x0300/0301诊断，SET超时不重发，PC4/USBSTOP取消控制。P1 IR/P2 UL/P3 N20；motor UID4150354C/38323609/00D86C62/APP2.0.0。20%/2秒未转；用户要求80%后，+800/1秒实物转动并停止，STOP/STATUS0/CLOSE通过。电机固件未改，Python电机接口仍未接通；启动阈值和取消时延待测。观测PID31352（重查），三口在线。原生303/239/322、Python41、工具12、26积木164175断言通过。见verification_20261029_motor.md、motor_live_20261029.json；日志/0.9恢复镜像在build/motor_live_20261029。
 
 - 同日后续UL经主控USB正常升级流程通过：当前接线P1 IR/P2 UL/P3空；UID4150354C/3832360B/0064B862，实际APP1.0.2→boot1.0.2→APP1.0.2。用共享main尚未提交的最新RCWL9610A修复包完整重写5832 B/46包，3.328秒，END/CRC/RUN/同UID及主机ECHO通过；不使用本分支旧UL5776 B应用。本轮无SWD、无固件源码变更。之后30秒两口有效采样，无新增TO/FE/UE或序号重头，UL报告23 mm（未独立校准）。观测PID27832（接力重查）。见verification_20261029_ul_via_host.md、ul_via_host_20261029.json；冻结包/源快照及原始日志在build/ul_via_host_20261029。

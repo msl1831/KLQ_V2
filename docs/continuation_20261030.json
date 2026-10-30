@@ -1,0 +1,498 @@
+{
+  "date": "2026-10-30",
+  "baseline_commit": "e331d3b273a1078e5b7442d0c79875b71657bb64",
+  "controller": "0.10",
+  "setup_user_confirmation": "已悬空，可以继续",
+  "physical_confirmation": "两次都有转动，方向相反且均停止",
+  "mapping": {
+    "P1": "IR 4150354C/38323609/00DB8962",
+    "P2": "UL 4150354C/3832360B/0064B862",
+    "P3": "N20 4150354C/38323609/00D86C62"
+  },
+  "reverse": {
+    "started_at": "2026-10-30T09:13:01.532234+08:00",
+    "method": "KLQ native USB -> selected UART -> motor APP; no Flash commands",
+    "sensor_port": 3,
+    "uid": "4150354C/38323609/00D86C62",
+    "pwm": -800,
+    "allow_high_pwm": true,
+    "seconds_requested": 1.0,
+    "events": [
+      {
+        "cmd": "0x0001",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+        "seconds": 0.094
+      },
+      {
+        "cmd": "0x0302",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "bfdb050000000000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "fddb0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "3bdc0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "79dc0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "b7dc0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "f4dc0500e0fc0001",
+        "seconds": 0.015
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.015
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "32dd0500e0fc0001",
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.016
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "70dd0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.015
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "afdd0500e0fc0001",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "eedd0500e0fc0001",
+        "seconds": 0.015
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "2dde0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "6dde0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "abde0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "e8de0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.015
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "26df0500e0fc0001",
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.016
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "64df0500e0fc0001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "e0fc",
+        "ok": true,
+        "response_hex": "e0fc",
+        "seconds": 0.015
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "a3df0500e0fc0001",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0302",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.016
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "e2df050000000000",
+        "seconds": 0.047
+      }
+    ],
+    "result": "PASS",
+    "identity_verified": true,
+    "stop_confirmed": true,
+    "close_confirmed": true,
+    "host_before": "KLQ ROBOT FW 0.10; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1",
+    "motor_info_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+    "status_before": {
+      "uptime_ms": 383935,
+      "pwm": 0,
+      "active": 0
+    },
+    "status_running": {
+      "uptime_ms": 384931,
+      "pwm": -800,
+      "active": 1
+    },
+    "run_seconds": 1.0,
+    "stop_acknowledged": true,
+    "status_after": {
+      "uptime_ms": 384994,
+      "pwm": 0,
+      "active": 0
+    },
+    "cleanup_errors": []
+  },
+  "no_refresh": {
+    "date": "2026-10-30",
+    "started_at": "2026-10-30T09:13:04.138534+08:00",
+    "sensor_port": 3,
+    "uid": "4150354C/38323609/00D86C62",
+    "pwm": 800,
+    "events": [
+      {
+        "cmd": "0x0001",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0302",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.032
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "c5e5050000000000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0300",
+        "request_hex": "2003",
+        "ok": true,
+        "response_hex": "2003",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "04e6050020030001",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "83e7050000000000",
+        "seconds": 0.047
+      },
+      {
+        "cmd": "0x0302",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.031
+      },
+      {
+        "cmd": "0x0301",
+        "request_hex": "",
+        "ok": true,
+        "response_hex": "c4e7050000000000",
+        "seconds": 0.031
+      }
+    ],
+    "result": "PASS",
+    "host": "KLQ ROBOT FW 0.10; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1",
+    "motor_info_hex": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+    "before": {
+      "uptime_ms": 386501,
+      "pwm": 0,
+      "active": 0
+    },
+    "during": {
+      "uptime_ms": 386564,
+      "pwm": 800,
+      "active": 1
+    },
+    "no_set_pause_seconds": 0.344,
+    "after_no_set": {
+      "uptime_ms": 386947,
+      "pwm": 0,
+      "active": 0
+    },
+    "wall_seconds_set_start_to_late_status": 0.453,
+    "device_uptime_delta_ms": 383,
+    "final_stop_ack": true,
+    "final_status": {
+      "uptime_ms": 387012,
+      "pwm": 0,
+      "active": 0
+    },
+    "cleanup_errors": [],
+    "close_confirmed": true
+  },
+  "post_observation": {
+    "duration_seconds": 9.767010688781738,
+    "all_connected": true,
+    "ports": [
+      {
+        "index": 1,
+        "uid": "4150354C/38323609/00DB8962",
+        "type": 2,
+        "all_online": true,
+        "errors_delta": {
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0
+        },
+        "sequence_first": 45172,
+        "sequence_last": 46171
+      },
+      {
+        "index": 2,
+        "uid": "4150354C/3832360B/0064B862",
+        "type": 1,
+        "all_online": true,
+        "errors_delta": {
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0
+        },
+        "sequence_first": 7528,
+        "sequence_last": 7695
+      },
+      {
+        "index": 3,
+        "uid": "4150354C/38323609/00D86C62",
+        "type": 2,
+        "all_online": true,
+        "errors_delta": {
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0
+        },
+        "sequence_first": 0,
+        "sequence_last": 0
+      }
+    ],
+    "host": {
+      "name": "KLQ ROBOT FW 0.10",
+      "APP": "0x08008000",
+      "MAX": "489472",
+      "PAGE": "2048",
+      "VALID": "1",
+      "USER_STATE": "0",
+      "USER_VALID": "0",
+      "USER_LENGTH": "0",
+      "USER_RECEIVED": "0",
+      "USER_MAX": "16384",
+      "UI": "1",
+      "PY_ERROR": "0",
+      "PY_LINE": "0",
+      "PK_RAW": "1",
+      "PK_DOWN": "0",
+      "PK_SHORT": "0",
+      "USB_RESETS": "2",
+      "EXT_UPGRADE": "1",
+      "EXT_PORTS": "3",
+      "EXT_MOTOR": "1"
+    },
+    "pass": true
+  },
+  "executed_source_sha256": {
+    "tools/test_motor_live.py": "7252266fedfa0932f96d5d31064ae23b2be37e0d5ee51e74f64be0e43e32961b",
+    "sensor_boot/tools/host_link.py": "594051de11f8112ed960f9e8583a0482f937cbf2daf9c895e9f02d8d441bc082",
+    "sensor_boot/tools/pack.py": "77a99f46a92c2a933504506f21574e72da6d3592336f2b71689f672bec42bf7f"
+  },
+  "no_refresh_script_sha256": "85826dddfabee3224f3e2823e295a988e59b40acb1e9027ccd2b7b754748d62c",
+  "no_refresh_script_utf8": "import sys,time,json,struct,datetime,traceback\nfrom pathlib import Path\nROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'tools'));sys.path.insert(0,str(ROOT/'sensor_boot/tools'))\nfrom host_link import HostLink\nfrom test_motor_live import uid_bytes,status\nimport serial\nfrom serial.tools import list_ports\nOUT=Path(__file__).with_name('deadman.json');UID=uid_bytes('4150354C/38323609/00D86C62')\nrec={'date':'2026-10-30','started_at':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(),'sensor_port':3,'uid':'4150354C/38323609/00D86C62','pwm':800,'events':[],'result':'STARTED'}\ndef save():OUT.write_text(json.dumps(rec,indent=2)+'\\n',encoding='utf-8')\ndef rpc(link,cmd,payload=b''):\n e={'cmd':f'0x{cmd:04X}','request_hex':payload.hex()};t=time.monotonic()\n try:\n  data=link.request(cmd,payload,timeout=.1,retries=1);e.update(ok=True,response_hex=data.hex());return data\n except BaseException as err:e.update(ok=False,error=repr(err));raise\n finally:e['seconds']=round(time.monotonic()-t,6);rec['events'].append(e);save()\ntry:\n ports=[p.device for p in list_ports.comports() if (p.vid,p.pid)==(0x314b,0x0108)];assert len(ports)==1\n with serial.Serial(ports[0],115200,timeout=.01,write_timeout=1) as port:\n  port.reset_input_buffer()\n  with HostLink(port,3,'motor') as link:\n   verified=False;failure=None;cleanup=[]\n   try:\n    host=link.usb.request(1).decode('ascii');assert 'EXT_MOTOR=1' in host;rec['host']=host\n    info=rpc(link,1);assert len(info)==36 and info[2:4]==b'\\x01\\x02' and struct.unpack_from('<HHH',info,4)==(2,2,2) and info[24:]==UID\n    verified=True;rec['motor_info_hex']=info.hex();assert rpc(link,0x302)==b''\n    before=status(rpc(link,0x301));assert before['pwm']==0 and before['active']==0;rec['before']=before\n    t0=time.monotonic();assert rpc(link,0x300,struct.pack('<h',800))==struct.pack('<h',800)\n    during=status(rpc(link,0x301));assert during['pwm']==800 and during['active']==1;rec['during']=during\n    pause=time.monotonic();time.sleep(.35);rec['no_set_pause_seconds']=round(time.monotonic()-pause,6)\n    after=status(rpc(link,0x301));rec['after_no_set']=after;rec['wall_seconds_set_start_to_late_status']=round(time.monotonic()-t0,6)\n    rec['device_uptime_delta_ms']=(after['uptime_ms']-during['uptime_ms'])&0xffffffff\n    assert after['pwm']==0 and after['active']==0 and rec['device_uptime_delta_ms']>=250\n   except BaseException as err:failure=err;rec['error']=repr(err)\n   finally:\n    if verified:\n     try:assert rpc(link,0x302)==b'';rec['final_stop_ack']=True\n     except BaseException as err:cleanup.append('STOP '+repr(err))\n     try:\n      final=status(rpc(link,0x301));rec['final_status']=final;assert final['pwm']==0 and final['active']==0\n     except BaseException as err:cleanup.append('STATUS '+repr(err))\n    rec['cleanup_errors']=cleanup;save()\n   if failure:raise failure\n   if cleanup:raise RuntimeError('cleanup failed')\n  rec['close_confirmed']=True\n sets=[e for e in rec['events'] if e['cmd']=='0x0300'];assert len(sets)==1\n rec['result']='PASS';save();print('PASS: one SET800, active confirmed, no further SET for350ms then PWM0/active0, finalSTOP/STATUS0/CLOSE.',flush=True)\nexcept BaseException as err:rec.update(result='FAIL',error=repr(err));save();traceback.print_exc();raise\n",
+  "motor_boot_prior_evidence": {
+    "source_path": "F:\\work\\KLQ_V2\\Codex\\MOTOR\\docs\\reflash_boot_1_0_2_20261029.md",
+    "source_sha256": "85fedf7b9e8ddac92237763145a54c9468dd2d8c30b6e776ed3b0613b00d0175",
+    "source_document": "# 电机板重新烧录引导1.0.2（2026-10-29）\n\n用户明确要求使用1.02（1.0.2）引导重烧Motor。开始时分支 `main`、HEAD=`72e2ac4`；现有未提交的共用引导版本/Flash EOP处理修改保留，未重写这些源文件，也未切分支、提交或推送。\n\n## 镜像与目标\n\n重新读取 `sensor_boot/include/update.h`，版本为 `0x00010002`；本地1.0.2改动包含Flash擦写时EOPIE使能及结束清理。通过 `& sensor_boot/tools/build.ps1 -Device motor` 重建，Motor实际C协议测试通过，包含INFO版本、RUN发送失败/TC超时/HOLD旁路及重试。\n\n- 探针：唯一 `jixin.pro CMSIS-DAP_LU / LU_2022_8888`。\n- MCU UID：`4150354C-38323609-00D86C62`，与上次Motor板一致，CPUID=`0x410CC601`。目标为Puya DFP1.2.6的 `py32f002bx5`，1 MHz SWD，关闭自动解锁。\n- 统一工厂HEX：`sensor_boot/build/motor/release/motor_factory.hex`，SHA-256=`ce345ef4bb393294f9a083f180f8a029a2e1534b83c60b1e12395a92b7d3005a`。\n- 引导1.0.2：ROM4508/6144 B、RO4488 B、RAM1600/3072 B；应用2.0.0：ROM2880/18304 B、RO2860 B、RAM1448/3072 B。KID1 board/hw=2/2、ABI=1，应用CRC=`0x0897C604`，应用BIN与此前一致。\n\n## 重烧与回读\n\n初次重烧的擦除算法进入HardFault。检查发现旧应用SysTick仍开启（CSR低位为7），只暂停CPU不足以隔离RAM烧录算法。已修正 `MOTOR/tools/flash_factory.py`：核对UID后先SYSRESETREQ复位并暂停、PRIMASK=1、停止SysTick并清理NVIC及SysTick/PendSV挂起状态，再将两路DRV8837输入预置低后编程。SysTick CSR的CLKSOURCE位读取仍为1，因此验证ENABLE/TICKINT两位关闭，成功时CSR=4；不要求CLKSOURCE清零。\n\n第一次错误与随后准备检查中止的JSON分别保留在 `flash_20261029_173754`、`flash_20261029_173917`；没有修改选项字节。完成上述工具修正后重烧成功，独立会话逐字节回读：\n\n| 区域 | 地址/字节 | SHA-256 |\n| --- | --- | --- |\n| 引导 | 0x08000000 / 4508 B | `7d33933265015e749c1e2141449a923468d6c50e5b7087413e1714595d1da8c0` |\n| 应用 | 0x08001800 / 2880 B | `8272fc74e30b5e2bcbc28a904a5d29b0e43e02ed1663ab5f1e8a1556d4bd9b07` |\n| 完整有效记录页 | 0x08005F80 / 128 B | `5ceb5e82210f8a3eec0e5ed8d113a672d5194c75744cb572609219eebcd445f2` |\n\n整片24576 B也与工厂BIN完全一致，SHA-256=`c230ee4203772acab5276c52d7230286a9d2e2b60653747d27259250d346fa79`。选项字节前后均为 `aab0554f0700f8ff0000ffff3f00c0ff`；按此前要求未备份旧Flash，没有进行保护解除。\n\n## 启动检查与证据\n\n软件复位后等待1.2 s，PC=`0x08001D3C`，VTOR=`0x08001800`，PA0/PA1读低，TIM1 ARR=1199、CCR1=CCR2=0。随后两次暂停快照之间恢复约120 ms：tick_ms从45828到45951，PRIMASK均0，requested_pwm、motor.active及两路CCR始终0，PC均在应用范围。检查后恢复运行。\n\n最终证据：[flash_result.json](../flash_evidence/flash_20261029_174034/flash_result.json)，状态 `passed_running`，记录了镜像hash、回读、选项字节、烧录前中断状态和运行快照。\n\n这次只重烧电机板并检查默认启动；未发送转动命令，未进行实际UART升级、PWM波形、机械动作、250 ms失联或升级断电测试。当前有效记录与APP均保留在新工厂包中；以后更新应用使用 `motor_update.klq`，该容器本轮未改变。\n",
+    "boot_version_in_prior_install_record": "1.0.2",
+    "queried_in_this_test": false
+  },
+  "limits": [
+    "No exact250ms transition timing proof: one late STATUS only",
+    "No encoder/RPM/angle/stop distance or waveform measurement",
+    "No active PC4/USB STOP/physicalUSBdisconnect fault injection",
+    "No Flash/SWD or target-firmware changes",
+    "Python motor blocks still unsupported"
+  ],
+  "result": "PASS_REVERSE_AND_NO_REFRESH_STOP",
+  "dashboard": {
+    "url": "http://127.0.0.1:8765/",
+    "pid": 8976,
+    "source_sha256": "92334b50d884e0a4768bb713589bbace590249a82effca2dcbbe5bb170a34bcc",
+    "visible_dom_verified": true,
+    "motor_card": "直流电机 / 通信在线 / PWM未采集",
+    "ultrasonic_label": "超声波"
+  }
+}
