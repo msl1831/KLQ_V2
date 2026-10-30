@@ -1,0 +1,3269 @@
+{
+  "date": "2026-10-30",
+  "branch": "codex/python-runtime",
+  "baseline": "64837d5",
+  "physical_voice_cases_on_firmware": "0.11",
+  "physical_cases": {
+    "gate_downloading": {
+      "result": "PASS",
+      "mode": "downloading",
+      "host_gate": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=1; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=5; USER_MAX=16384; UI=2; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "host_after_gate": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=1; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=5; USER_MAX=16384; UI=2; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "host_cleanup": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "base": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 34,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599875,
+        "rx_frames": 105,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 3,
+        "rejected": 5,
+        "completed": 2,
+        "errors": 0,
+        "events": [
+          0,
+          3,
+          3,
+          27,
+          27
+        ],
+        "recognitions": 11,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 27,
+        "play_done": 27,
+        "play_id": 5003,
+        "rx_bytes": 1302,
+        "tx_frames": 45,
+        "last_rx_ms": 5401268,
+        "cancelled": 0,
+        "score": 196,
+        "intent_seq": 67,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16599.609
+      },
+      "end": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 1,
+        "request": 146,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 36,
+        "active": 0,
+        "port": 2,
+        "reason": 2,
+        "semantic": 1263599875,
+        "rx_frames": 112,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 3,
+        "rejected": 7,
+        "completed": 2,
+        "errors": 0,
+        "events": [
+          0,
+          4,
+          3,
+          28,
+          28
+        ],
+        "recognitions": 14,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 28,
+        "play_done": 28,
+        "play_id": 5007,
+        "rx_bytes": 1400,
+        "tx_frames": 50,
+        "last_rx_ms": 5427437,
+        "cancelled": 0,
+        "score": 209,
+        "intent_seq": 78,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16625.859
+      },
+      "accepted_delta": 0,
+      "rejected_delta": 2,
+      "error_delta": 0,
+      "seen_semantics": [
+        "0x4B510001",
+        "0x4B510101",
+        "0x4B510103"
+      ],
+      "sound_in_gate_pass": true,
+      "cleanup_pass": true,
+      "real_stop_ack": true,
+      "disarmed": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 2,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 36,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599875,
+        "rx_frames": 114,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 3,
+        "rejected": 7,
+        "completed": 2,
+        "errors": 0,
+        "events": [
+          0,
+          4,
+          3,
+          29,
+          28
+        ],
+        "recognitions": 14,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 29,
+        "play_done": 28,
+        "play_id": 5007,
+        "rx_bytes": 1423,
+        "tx_frames": 50,
+        "last_rx_ms": 5427551,
+        "cancelled": 0,
+        "score": 209,
+        "intent_seq": 78,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16626.265
+      },
+      "user_confirmation": "始终没转"
+    },
+    "gate_diagnostic": {
+      "result": "PASS",
+      "mode": "diagnostic",
+      "host_gate": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "host_after_gate": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "host_cleanup": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "base": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 38,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599875,
+        "rx_frames": 120,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 3,
+        "rejected": 7,
+        "completed": 2,
+        "errors": 0,
+        "events": [
+          0,
+          4,
+          4,
+          30,
+          30
+        ],
+        "recognitions": 14,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 30,
+        "play_done": 30,
+        "play_id": 5003,
+        "rx_bytes": 1496,
+        "tx_frames": 52,
+        "last_rx_ms": 5506223,
+        "cancelled": 0,
+        "score": 209,
+        "intent_seq": 78,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16704.625
+      },
+      "end": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 1,
+        "request": 146,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 40,
+        "active": 0,
+        "port": 2,
+        "reason": 2,
+        "semantic": 1263599875,
+        "rx_frames": 127,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 3,
+        "rejected": 9,
+        "completed": 2,
+        "errors": 0,
+        "events": [
+          0,
+          5,
+          4,
+          31,
+          31
+        ],
+        "recognitions": 17,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 31,
+        "play_done": 31,
+        "play_id": 5007,
+        "rx_bytes": 1594,
+        "tx_frames": 57,
+        "last_rx_ms": 5531624,
+        "cancelled": 0,
+        "score": 152,
+        "intent_seq": 89,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16730.031
+      },
+      "accepted_delta": 0,
+      "rejected_delta": 2,
+      "error_delta": 0,
+      "seen_semantics": [
+        "0x4B510001",
+        "0x4B510101",
+        "0x4B510103"
+      ],
+      "sound_in_gate_pass": true,
+      "cleanup_pass": true,
+      "real_stop_ack": true,
+      "disarmed": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 2,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 40,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599875,
+        "rx_frames": 129,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 3,
+        "rejected": 9,
+        "completed": 2,
+        "errors": 0,
+        "events": [
+          0,
+          5,
+          4,
+          32,
+          31
+        ],
+        "recognitions": 17,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 32,
+        "play_done": 31,
+        "play_id": 5007,
+        "rx_bytes": 1617,
+        "tx_frames": 57,
+        "last_rx_ms": 5531739,
+        "cancelled": 0,
+        "score": 152,
+        "intent_seq": 89,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16730.468
+      },
+      "user_confirmation": "始终没转"
+    },
+    "gate_ready": {
+      "result": "PASS",
+      "mode": "ready",
+      "host_gate": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "host_after_gate": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "host_cleanup": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "base": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 148,
+        "last_seq": 41,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599875,
+        "rx_frames": 132,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 3,
+        "rejected": 9,
+        "completed": 2,
+        "errors": 0,
+        "events": [
+          0,
+          5,
+          5,
+          32,
+          32
+        ],
+        "recognitions": 17,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 32,
+        "play_done": 32,
+        "play_id": 5007,
+        "rx_bytes": 1655,
+        "tx_frames": 58,
+        "last_rx_ms": 5562314,
+        "cancelled": 0,
+        "score": 152,
+        "intent_seq": 89,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16761.625
+      },
+      "end": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 42,
+        "active": 0,
+        "port": 2,
+        "reason": 0,
+        "semantic": 1263599873,
+        "rx_frames": 138,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 4,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          6,
+          5,
+          33,
+          33
+        ],
+        "recognitions": 19,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 33,
+        "play_done": 33,
+        "play_id": 5002,
+        "rx_bytes": 1736,
+        "tx_frames": 61,
+        "last_rx_ms": 5581011,
+        "cancelled": 0,
+        "score": 115,
+        "intent_seq": 95,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16780.0
+      },
+      "accepted_delta": 1,
+      "rejected_delta": 0,
+      "error_delta": 0,
+      "seen_semantics": [
+        "0x4B510001",
+        "0x4B510101"
+      ],
+      "cleanup_pass": true,
+      "real_stop_ack": true,
+      "disarmed": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 2,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 43,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599873,
+        "rx_frames": 140,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 4,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          6,
+          5,
+          34,
+          33
+        ],
+        "recognitions": 19,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 34,
+        "play_done": 33,
+        "play_id": 5005,
+        "rx_bytes": 1759,
+        "tx_frames": 62,
+        "last_rx_ms": 5581938,
+        "cancelled": 0,
+        "score": 115,
+        "intent_seq": 95,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 16780.437
+      },
+      "user_confirmation": "正常"
+    },
+    "active_usb_stop": {
+      "result": "PASS",
+      "mode": "realASR READY, autoUSBSTOP after300ms observedACTIVE",
+      "host_cleanup": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "base": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 148,
+        "last_seq": 44,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599873,
+        "rx_frames": 143,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 4,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          6,
+          6,
+          34,
+          34
+        ],
+        "recognitions": 19,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 34,
+        "play_done": 34,
+        "play_id": 5005,
+        "rx_bytes": 1797,
+        "tx_frames": 63,
+        "last_rx_ms": 5832420,
+        "cancelled": 0,
+        "score": 115,
+        "intent_seq": 95,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17031.75
+      },
+      "cleanup_pass": true,
+      "cleanup_real_stop_ack": true,
+      "active_seen": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 1,
+        "request": 146,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 45,
+        "active": 1,
+        "port": 2,
+        "reason": 0,
+        "semantic": 1263599873,
+        "rx_frames": 146,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 5,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          7,
+          6,
+          34,
+          34
+        ],
+        "recognitions": 21,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 34,
+        "play_done": 34,
+        "play_id": 5002,
+        "rx_bytes": 1843,
+        "tx_frames": 66,
+        "last_rx_ms": 5853323,
+        "cancelled": 0,
+        "score": 135,
+        "intent_seq": 103,
+        "phase": 2,
+        "pending_sound": 0,
+        "pwm": 800,
+        "pc_monotonic": 17051.703
+      },
+      "after_usb_stop": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 2,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 45,
+        "active": 0,
+        "port": 2,
+        "reason": 13,
+        "semantic": 1263599873,
+        "rx_frames": 148,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 5,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          7,
+          6,
+          35,
+          34
+        ],
+        "recognitions": 21,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 35,
+        "play_done": 34,
+        "play_id": 5002,
+        "rx_bytes": 1866,
+        "tx_frames": 66,
+        "last_rx_ms": 5853444,
+        "cancelled": 1,
+        "score": 135,
+        "intent_seq": 103,
+        "phase": 0,
+        "pending_sound": 5005,
+        "pwm": 0,
+        "pc_monotonic": 17052.062
+      },
+      "disarmed": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 2,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 47,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599873,
+        "rx_frames": 154,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 5,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          7,
+          6,
+          37,
+          36
+        ],
+        "recognitions": 21,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 37,
+        "play_done": 36,
+        "play_id": 5005,
+        "rx_bytes": 1936,
+        "tx_frames": 68,
+        "last_rx_ms": 5856122,
+        "cancelled": 1,
+        "score": 135,
+        "intent_seq": 103,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17054.593
+      },
+      "timing_scope": "PC command/state observation only, not measured electrical motor-stop latency",
+      "user_confirmation": "正常"
+    },
+    "active_pc4_stop": {
+      "result": "PASS",
+      "mode": "realASR READY, physicalPC4 shortpress whileACTIVE",
+      "host_cleanup": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=1; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+      "base": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 148,
+        "last_seq": 48,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599873,
+        "rx_frames": 157,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 5,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          7,
+          7,
+          37,
+          37
+        ],
+        "recognitions": 21,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 37,
+        "play_done": 37,
+        "play_id": 5005,
+        "rx_bytes": 1974,
+        "tx_frames": 69,
+        "last_rx_ms": 5944348,
+        "cancelled": 1,
+        "score": 135,
+        "intent_seq": 103,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17143.671
+      },
+      "cleanup_pass": true,
+      "cleanup_real_stop_ack": true,
+      "active_seen": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 1,
+        "request": 146,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 49,
+        "active": 1,
+        "port": 2,
+        "reason": 0,
+        "semantic": 1263599873,
+        "rx_frames": 160,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 6,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          8,
+          7,
+          37,
+          37
+        ],
+        "recognitions": 23,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 37,
+        "play_done": 37,
+        "play_id": 5002,
+        "rx_bytes": 2020,
+        "tx_frames": 72,
+        "last_rx_ms": 5980800,
+        "cancelled": 1,
+        "score": 84,
+        "intent_seq": 113,
+        "phase": 2,
+        "pending_sound": 0,
+        "pwm": 800,
+        "pc_monotonic": 17179.171
+      },
+      "after_pc4": {
+        "abi": 1,
+        "enabled": 1,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 1,
+        "request": 146,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 50,
+        "active": 0,
+        "port": 2,
+        "reason": 13,
+        "semantic": 1263599873,
+        "rx_frames": 163,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 6,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          8,
+          7,
+          38,
+          38
+        ],
+        "recognitions": 23,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 38,
+        "play_done": 38,
+        "play_id": 5005,
+        "rx_bytes": 2055,
+        "tx_frames": 73,
+        "last_rx_ms": 5981260,
+        "cancelled": 2,
+        "score": 84,
+        "intent_seq": 113,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17179.75
+      },
+      "button_samples": [
+        {
+          "pc": 17179.359,
+          "short": 0,
+          "down": 0,
+          "active": 1,
+          "cancelled": 1,
+          "state": "2"
+        },
+        {
+          "pc": 17179.5,
+          "short": 0,
+          "down": 0,
+          "active": 1,
+          "cancelled": 1,
+          "state": "2"
+        },
+        {
+          "pc": 17179.625,
+          "short": 0,
+          "down": 1,
+          "active": 1,
+          "cancelled": 1,
+          "state": "2"
+        },
+        {
+          "pc": 17179.796,
+          "short": 1,
+          "down": 0,
+          "active": 0,
+          "cancelled": 2,
+          "state": "2"
+        }
+      ],
+      "disarmed": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 1,
+        "version": "0.2.0",
+        "play_state": 2,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 51,
+        "active": 0,
+        "port": 2,
+        "reason": 1,
+        "semantic": 1263599873,
+        "rx_frames": 168,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 6,
+        "rejected": 9,
+        "completed": 3,
+        "errors": 0,
+        "events": [
+          0,
+          8,
+          7,
+          40,
+          39
+        ],
+        "recognitions": 23,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 40,
+        "play_done": 39,
+        "play_id": 5005,
+        "rx_bytes": 2113,
+        "tx_frames": 74,
+        "last_rx_ms": 5984885,
+        "cancelled": 2,
+        "score": 84,
+        "intent_seq": 113,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17183.359
+      },
+      "timing_scope": "PC command/state observation only, not measured electrical motor-stop latency",
+      "user_confirmation": "正常"
+    }
+  },
+  "installed_firmware": "0.12",
+  "install": {
+    "date": "2026-10-30",
+    "method": "main native USB system APP only",
+    "events": [
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "4b4c5120524f424f5420465720302e31313b204150503d307830383030383030303b204d41583d3438393437323b20504147453d323034383b2056414c49443d313b20555345525f53544154453d303b20555345525f56414c49443d303b20555345525f4c454e4754483d303b20555345525f52454345495645443d303b20555345525f4d41583d31363338343b2055493d313b2050595f4552524f523d303b2050595f4c494e453d303b20504b5f5241573d313b20504b5f444f574e3d303b20504b5f53484f52543d313b205553425f5245534554533d363b204558545f555047524144453d313b204558545f504f5254533d333b204558545f4d4f544f523d313b204558545f564f4943453d31",
+        "seconds": 0.047
+      },
+      {
+        "cmd": 7,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.0
+      },
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "4b4c512055534220424f4f5420302e333b204150503d307830383030383030303b204d41583d3438393437323b20504147453d323034383b2056414c49443d313b2052454345495645443d303b205553425f5245534554533d32",
+        "seconds": 0.047
+      },
+      {
+        "cmd": 2,
+        "request_bytes": 8,
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.11
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 0,
+        "ok": true,
+        "response_hex": "00040000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 1024,
+        "ok": true,
+        "response_hex": "00080000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 2048,
+        "ok": true,
+        "response_hex": "000c0000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 3072,
+        "ok": true,
+        "response_hex": "00100000",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 4096,
+        "ok": true,
+        "response_hex": "00140000",
+        "seconds": 0.015
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 5120,
+        "ok": true,
+        "response_hex": "00180000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 6144,
+        "ok": true,
+        "response_hex": "001c0000",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 7168,
+        "ok": true,
+        "response_hex": "00200000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 8192,
+        "ok": true,
+        "response_hex": "00240000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 9216,
+        "ok": true,
+        "response_hex": "00280000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 10240,
+        "ok": true,
+        "response_hex": "002c0000",
+        "seconds": 0.016
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 11264,
+        "ok": true,
+        "response_hex": "00300000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 12288,
+        "ok": true,
+        "response_hex": "00340000",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 13312,
+        "ok": true,
+        "response_hex": "00380000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 14336,
+        "ok": true,
+        "response_hex": "003c0000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 15360,
+        "ok": true,
+        "response_hex": "00400000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 16384,
+        "ok": true,
+        "response_hex": "00440000",
+        "seconds": 0.016
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 17408,
+        "ok": true,
+        "response_hex": "00480000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 18432,
+        "ok": true,
+        "response_hex": "004c0000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 19456,
+        "ok": true,
+        "response_hex": "00500000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 20480,
+        "ok": true,
+        "response_hex": "00540000",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 21504,
+        "ok": true,
+        "response_hex": "00580000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 22528,
+        "ok": true,
+        "response_hex": "005c0000",
+        "seconds": 0.015
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 23552,
+        "ok": true,
+        "response_hex": "00600000",
+        "seconds": 0.016
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 24576,
+        "ok": true,
+        "response_hex": "00640000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 25600,
+        "ok": true,
+        "response_hex": "00680000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 26624,
+        "ok": true,
+        "response_hex": "006c0000",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 27648,
+        "ok": true,
+        "response_hex": "00700000",
+        "seconds": 0.032
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1028,
+        "offset": 28672,
+        "ok": true,
+        "response_hex": "00740000",
+        "seconds": 0.015
+      },
+      {
+        "cmd": 3,
+        "request_bytes": 1012,
+        "offset": 29696,
+        "ok": true,
+        "response_hex": "f0770000",
+        "seconds": 0.016
+      },
+      {
+        "cmd": 4,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.078
+      },
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "4b4c512055534220424f4f5420302e333b204150503d307830383030383030303b204d41583d3438393437323b20504147453d323034383b2056414c49443d313b2052454345495645443d33303730343b205553425f5245534554533d32",
+        "seconds": 0.047
+      },
+      {
+        "cmd": 5,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "",
+        "seconds": 0.031
+      },
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": false,
+        "error": "SerialException(\"WriteFile failed (PermissionError(13, '设备不识别此命令。', None, 22))\")",
+        "seconds": 0.0
+      },
+      {
+        "cmd": 1,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "4b4c5120524f424f5420465720302e31323b204150503d307830383030383030303b204d41583d3438393437323b20504147453d323034383b2056414c49443d313b20555345525f53544154453d303b20555345525f56414c49443d303b20555345525f4c454e4754483d303b20555345525f52454345495645443d303b20555345525f4d41583d31363338343b2055493d313b2050595f4552524f523d303b2050595f4c494e453d303b20504b5f5241573d313b20504b5f444f574e3d303b20504b5f53484f52543d303b205553425f5245534554533d323b204558545f555047524144453d313b204558545f504f5254533d333b204558545f4d4f544f523d313b204558545f564f4943453d31",
+        "seconds": 0.047
+      },
+      {
+        "cmd": 80,
+        "request_bytes": 0,
+        "ok": true,
+        "response_hex": "0100010000020000000000940100000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e0000000100000000040000000000000000000000000000",
+        "seconds": 0.0
+      },
+      {
+        "cmd": 6,
+        "request_bytes": 17,
+        "ok": true,
+        "response_hex": "5553425f45505f46575f302e31325f4f4b",
+        "seconds": 0.0
+      }
+    ],
+    "result": "PASS",
+    "main_boot_written": false,
+    "motor_firmware_written": false,
+    "bytes": 30704,
+    "sha256": "d3242f3958ae24eb4b240c5b9b8be796e63cf47f47a0045aa06ccbf3301f3335",
+    "crc32": "F066562B",
+    "host_before": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=1; USB_RESETS=6; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+    "motor_stop_before_install": true,
+    "motor_info_before": "0100010202000200020000000000020009000000840080474c35504109363238626cd800",
+    "boot_info": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=0; USB_RESETS=2",
+    "image_committed_crc_verified": true,
+    "boot_after_end": "KLQ USB BOOT 0.3; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; RECEIVED=30704; USB_RESETS=2",
+    "initial_voice_status_hex": "0100010000020000000000940100000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e0000000100000000040000000000000000000000000000",
+    "host_after": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+    "host_echo": true
+  },
+  "bench": {
+    "result": "PASS",
+    "date": "2026-10-30",
+    "motion_enabled": false,
+    "serial_cycles": [
+      {
+        "cycle": 0,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 3523407757
+          },
+          {
+            "bytes": 47,
+            "crc32": 2751922826
+          },
+          {
+            "bytes": 48,
+            "crc32": 1672282539
+          },
+          {
+            "bytes": 63,
+            "crc32": 3640951275
+          },
+          {
+            "bytes": 64,
+            "crc32": 1154630530
+          },
+          {
+            "bytes": 65,
+            "crc32": 1251220850
+          },
+          {
+            "bytes": 126,
+            "crc32": 3422592382
+          },
+          {
+            "bytes": 127,
+            "crc32": 4255224727
+          },
+          {
+            "bytes": 128,
+            "crc32": 2250316087
+          },
+          {
+            "bytes": 255,
+            "crc32": 2955036931
+          },
+          {
+            "bytes": 1024,
+            "crc32": 3116570725
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 1,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 2768625435
+          },
+          {
+            "bytes": 47,
+            "crc32": 3855070973
+          },
+          {
+            "bytes": 48,
+            "crc32": 881095738
+          },
+          {
+            "bytes": 63,
+            "crc32": 2698864134
+          },
+          {
+            "bytes": 64,
+            "crc32": 51991834
+          },
+          {
+            "bytes": 65,
+            "crc32": 3271622020
+          },
+          {
+            "bytes": 126,
+            "crc32": 112851395
+          },
+          {
+            "bytes": 127,
+            "crc32": 1069339988
+          },
+          {
+            "bytes": 128,
+            "crc32": 495437505
+          },
+          {
+            "bytes": 255,
+            "crc32": 443562992
+          },
+          {
+            "bytes": 1024,
+            "crc32": 590801520
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 2,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 1007455905
+          },
+          {
+            "bytes": 47,
+            "crc32": 1616348540
+          },
+          {
+            "bytes": 48,
+            "crc32": 3652806441
+          },
+          {
+            "bytes": 63,
+            "crc32": 1716843008
+          },
+          {
+            "bytes": 64,
+            "crc32": 2646296877
+          },
+          {
+            "bytes": 65,
+            "crc32": 3794447149
+          },
+          {
+            "bytes": 126,
+            "crc32": 624940791
+          },
+          {
+            "bytes": 127,
+            "crc32": 2152673901
+          },
+          {
+            "bytes": 128,
+            "crc32": 893029816
+          },
+          {
+            "bytes": 255,
+            "crc32": 2403355353
+          },
+          {
+            "bytes": 1024,
+            "crc32": 2633534774
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 3,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 1259060791
+          },
+          {
+            "bytes": 47,
+            "crc32": 1190027186
+          },
+          {
+            "bytes": 48,
+            "crc32": 992453863
+          },
+          {
+            "bytes": 63,
+            "crc32": 2992253773
+          },
+          {
+            "bytes": 64,
+            "crc32": 191295354
+          },
+          {
+            "bytes": 65,
+            "crc32": 1622442570
+          },
+          {
+            "bytes": 126,
+            "crc32": 1039913161
+          },
+          {
+            "bytes": 127,
+            "crc32": 909237078
+          },
+          {
+            "bytes": 128,
+            "crc32": 451121110
+          },
+          {
+            "bytes": 255,
+            "crc32": 4015597589
+          },
+          {
+            "bytes": 1024,
+            "crc32": 1697545457
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 4,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 3580832660
+          },
+          {
+            "bytes": 47,
+            "crc32": 2688037498
+          },
+          {
+            "bytes": 48,
+            "crc32": 3648587934
+          },
+          {
+            "bytes": 63,
+            "crc32": 2356623570
+          },
+          {
+            "bytes": 64,
+            "crc32": 485456938
+          },
+          {
+            "bytes": 65,
+            "crc32": 2511130510
+          },
+          {
+            "bytes": 126,
+            "crc32": 3878561876
+          },
+          {
+            "bytes": 127,
+            "crc32": 559722733
+          },
+          {
+            "bytes": 128,
+            "crc32": 826325039
+          },
+          {
+            "bytes": 255,
+            "crc32": 2608916872
+          },
+          {
+            "bytes": 1024,
+            "crc32": 4110017684
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 5,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 2724731650
+          },
+          {
+            "bytes": 47,
+            "crc32": 3517255738
+          },
+          {
+            "bytes": 48,
+            "crc32": 920487318
+          },
+          {
+            "bytes": 63,
+            "crc32": 62940261
+          },
+          {
+            "bytes": 64,
+            "crc32": 3496787171
+          },
+          {
+            "bytes": 65,
+            "crc32": 14616268
+          },
+          {
+            "bytes": 126,
+            "crc32": 1993036547
+          },
+          {
+            "bytes": 127,
+            "crc32": 2747638103
+          },
+          {
+            "bytes": 128,
+            "crc32": 2206149142
+          },
+          {
+            "bytes": 255,
+            "crc32": 2378020459
+          },
+          {
+            "bytes": 1024,
+            "crc32": 3918622901
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 6,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 996231864
+          },
+          {
+            "bytes": 47,
+            "crc32": 1325081017
+          },
+          {
+            "bytes": 48,
+            "crc32": 905197995
+          },
+          {
+            "bytes": 63,
+            "crc32": 2865872851
+          },
+          {
+            "bytes": 64,
+            "crc32": 2243988247
+          },
+          {
+            "bytes": 65,
+            "crc32": 592694596
+          },
+          {
+            "bytes": 126,
+            "crc32": 2985994434
+          },
+          {
+            "bytes": 127,
+            "crc32": 3755900699
+          },
+          {
+            "bytes": 128,
+            "crc32": 2339245285
+          },
+          {
+            "bytes": 255,
+            "crc32": 17941091
+          },
+          {
+            "bytes": 1024,
+            "crc32": 638061919
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 7,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 1281784366
+          },
+          {
+            "bytes": 47,
+            "crc32": 2327104770
+          },
+          {
+            "bytes": 48,
+            "crc32": 4181459410
+          },
+          {
+            "bytes": 63,
+            "crc32": 2034968221
+          },
+          {
+            "bytes": 64,
+            "crc32": 2227724424
+          },
+          {
+            "bytes": 65,
+            "crc32": 887454700
+          },
+          {
+            "bytes": 126,
+            "crc32": 1425980171
+          },
+          {
+            "bytes": 127,
+            "crc32": 1250177418
+          },
+          {
+            "bytes": 128,
+            "crc32": 2622286056
+          },
+          {
+            "bytes": 255,
+            "crc32": 1352805125
+          },
+          {
+            "bytes": 1024,
+            "crc32": 2083658589
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 8,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 3705235391
+          },
+          {
+            "bytes": 47,
+            "crc32": 1345526010
+          },
+          {
+            "bytes": 48,
+            "crc32": 1032309951
+          },
+          {
+            "bytes": 63,
+            "crc32": 1569650987
+          },
+          {
+            "bytes": 64,
+            "crc32": 3521741688
+          },
+          {
+            "bytes": 65,
+            "crc32": 431142274
+          },
+          {
+            "bytes": 126,
+            "crc32": 3958567867
+          },
+          {
+            "bytes": 127,
+            "crc32": 408150004
+          },
+          {
+            "bytes": 128,
+            "crc32": 1554273195
+          },
+          {
+            "bytes": 255,
+            "crc32": 1811567078
+          },
+          {
+            "bytes": 1024,
+            "crc32": 2950639611
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 9,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 2883475241
+          },
+          {
+            "bytes": 47,
+            "crc32": 3646384795
+          },
+          {
+            "bytes": 48,
+            "crc32": 2662508729
+          },
+          {
+            "bytes": 63,
+            "crc32": 1113347983
+          },
+          {
+            "bytes": 64,
+            "crc32": 2571397021
+          },
+          {
+            "bytes": 65,
+            "crc32": 3197976071
+          },
+          {
+            "bytes": 126,
+            "crc32": 3007063226
+          },
+          {
+            "bytes": 127,
+            "crc32": 403378467
+          },
+          {
+            "bytes": 128,
+            "crc32": 3709476264
+          },
+          {
+            "bytes": 255,
+            "crc32": 4095774536
+          },
+          {
+            "bytes": 1024,
+            "crc32": 3319052
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 10,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 852952723
+          },
+          {
+            "bytes": 47,
+            "crc32": 1863346882
+          },
+          {
+            "bytes": 48,
+            "crc32": 4222891647
+          },
+          {
+            "bytes": 63,
+            "crc32": 291081464
+          },
+          {
+            "bytes": 64,
+            "crc32": 544323151
+          },
+          {
+            "bytes": 65,
+            "crc32": 1341188500
+          },
+          {
+            "bytes": 126,
+            "crc32": 2079327654
+          },
+          {
+            "bytes": 127,
+            "crc32": 2460357870
+          },
+          {
+            "bytes": 128,
+            "crc32": 1329741366
+          },
+          {
+            "bytes": 255,
+            "crc32": 4023526826
+          },
+          {
+            "bytes": 1024,
+            "crc32": 3649565391
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 11,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 1171273221
+          },
+          {
+            "bytes": 47,
+            "crc32": 2411190352
+          },
+          {
+            "bytes": 48,
+            "crc32": 2066871814
+          },
+          {
+            "bytes": 63,
+            "crc32": 1806794643
+          },
+          {
+            "bytes": 64,
+            "crc32": 1678734287
+          },
+          {
+            "bytes": 65,
+            "crc32": 3574277351
+          },
+          {
+            "bytes": 126,
+            "crc32": 1169311641
+          },
+          {
+            "bytes": 127,
+            "crc32": 1408846599
+          },
+          {
+            "bytes": 128,
+            "crc32": 137473558
+          },
+          {
+            "bytes": 255,
+            "crc32": 1950340805
+          },
+          {
+            "bytes": 1024,
+            "crc32": 240653821
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 12,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 3686048678
+          },
+          {
+            "bytes": 47,
+            "crc32": 3199324183
+          },
+          {
+            "bytes": 48,
+            "crc32": 3837727915
+          },
+          {
+            "bytes": 63,
+            "crc32": 873024080
+          },
+          {
+            "bytes": 64,
+            "crc32": 289040486
+          },
+          {
+            "bytes": 65,
+            "crc32": 3826294547
+          },
+          {
+            "bytes": 126,
+            "crc32": 3321291569
+          },
+          {
+            "bytes": 127,
+            "crc32": 310212035
+          },
+          {
+            "bytes": 128,
+            "crc32": 3816692759
+          },
+          {
+            "bytes": 255,
+            "crc32": 2942967641
+          },
+          {
+            "bytes": 1024,
+            "crc32": 3872509178
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 13,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 2897449776
+          },
+          {
+            "bytes": 47,
+            "crc32": 346884420
+          },
+          {
+            "bytes": 48,
+            "crc32": 2407422342
+          },
+          {
+            "bytes": 63,
+            "crc32": 3745980554
+          },
+          {
+            "bytes": 64,
+            "crc32": 4007545980
+          },
+          {
+            "bytes": 65,
+            "crc32": 1854583515
+          },
+          {
+            "bytes": 126,
+            "crc32": 392245762
+          },
+          {
+            "bytes": 127,
+            "crc32": 3665343378
+          },
+          {
+            "bytes": 128,
+            "crc32": 1725114633
+          },
+          {
+            "bytes": 255,
+            "crc32": 1160930614
+          },
+          {
+            "bytes": 1024,
+            "crc32": 3406277412
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 14,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 901431946
+          },
+          {
+            "bytes": 47,
+            "crc32": 4078557310
+          },
+          {
+            "bytes": 48,
+            "crc32": 1049756787
+          },
+          {
+            "bytes": 63,
+            "crc32": 2255007489
+          },
+          {
+            "bytes": 64,
+            "crc32": 3823765965
+          },
+          {
+            "bytes": 65,
+            "crc32": 1273517118
+          },
+          {
+            "bytes": 126,
+            "crc32": 2170433328
+          },
+          {
+            "bytes": 127,
+            "crc32": 2670842106
+          },
+          {
+            "bytes": 128,
+            "crc32": 1392032150
+          },
+          {
+            "bytes": 255,
+            "crc32": 2277150822
+          },
+          {
+            "bytes": 1024,
+            "crc32": 2841891157
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 15,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 1119744540
+          },
+          {
+            "bytes": 47,
+            "crc32": 3824768398
+          },
+          {
+            "bytes": 48,
+            "crc32": 1132821071
+          },
+          {
+            "bytes": 63,
+            "crc32": 144026637
+          },
+          {
+            "bytes": 64,
+            "crc32": 1742386448
+          },
+          {
+            "bytes": 65,
+            "crc32": 3288988285
+          },
+          {
+            "bytes": 126,
+            "crc32": 3184651376
+          },
+          {
+            "bytes": 127,
+            "crc32": 2664836671
+          },
+          {
+            "bytes": 128,
+            "crc32": 889152930
+          },
+          {
+            "bytes": 255,
+            "crc32": 3847206536
+          },
+          {
+            "bytes": 1024,
+            "crc32": 1889512502
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 16,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 3484811241
+          },
+          {
+            "bytes": 47,
+            "crc32": 3510075030
+          },
+          {
+            "bytes": 48,
+            "crc32": 668736676
+          },
+          {
+            "bytes": 63,
+            "crc32": 1548236832
+          },
+          {
+            "bytes": 64,
+            "crc32": 1431700583
+          },
+          {
+            "bytes": 65,
+            "crc32": 2270338982
+          },
+          {
+            "bytes": 126,
+            "crc32": 662563549
+          },
+          {
+            "bytes": 127,
+            "crc32": 2938244310
+          },
+          {
+            "bytes": 128,
+            "crc32": 2585787338
+          },
+          {
+            "bytes": 255,
+            "crc32": 2310690670
+          },
+          {
+            "bytes": 1024,
+            "crc32": 1675389558
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 17,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 3098726271
+          },
+          {
+            "bytes": 47,
+            "crc32": 2269877255
+          },
+          {
+            "bytes": 48,
+            "crc32": 965448230
+          },
+          {
+            "bytes": 63,
+            "crc32": 3034370095
+          },
+          {
+            "bytes": 64,
+            "crc32": 1544084644
+          },
+          {
+            "bytes": 65,
+            "crc32": 4063322850
+          },
+          {
+            "bytes": 126,
+            "crc32": 3835124503
+          },
+          {
+            "bytes": 127,
+            "crc32": 2740452703
+          },
+          {
+            "bytes": 128,
+            "crc32": 2541675525
+          },
+          {
+            "bytes": 255,
+            "crc32": 461189784
+          },
+          {
+            "bytes": 1024,
+            "crc32": 2220093665
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 18,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 565944005
+          },
+          {
+            "bytes": 47,
+            "crc32": 2237597003
+          },
+          {
+            "bytes": 48,
+            "crc32": 837073818
+          },
+          {
+            "bytes": 63,
+            "crc32": 2480958089
+          },
+          {
+            "bytes": 64,
+            "crc32": 345888341
+          },
+          {
+            "bytes": 65,
+            "crc32": 2714395864
+          },
+          {
+            "bytes": 126,
+            "crc32": 2748981908
+          },
+          {
+            "bytes": 127,
+            "crc32": 1237710623
+          },
+          {
+            "bytes": 128,
+            "crc32": 2521761545
+          },
+          {
+            "bytes": 255,
+            "crc32": 1570769830
+          },
+          {
+            "bytes": 1024,
+            "crc32": 2040986912
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      },
+      {
+        "cycle": 19,
+        "echo": [
+          {
+            "bytes": 0,
+            "crc32": 0
+          },
+          {
+            "bytes": 1,
+            "crc32": 1455205971
+          },
+          {
+            "bytes": 47,
+            "crc32": 4166717354
+          },
+          {
+            "bytes": 48,
+            "crc32": 2029058269
+          },
+          {
+            "bytes": 63,
+            "crc32": 1198228701
+          },
+          {
+            "bytes": 64,
+            "crc32": 3861601781
+          },
+          {
+            "bytes": 65,
+            "crc32": 15286573
+          },
+          {
+            "bytes": 126,
+            "crc32": 470756225
+          },
+          {
+            "bytes": 127,
+            "crc32": 1403057771
+          },
+          {
+            "bytes": 128,
+            "crc32": 1599685262
+          },
+          {
+            "bytes": 255,
+            "crc32": 950792258
+          },
+          {
+            "bytes": 1024,
+            "crc32": 2072398958
+          }
+        ],
+        "usb_resets": 2,
+        "voice_errors": 0
+      }
+    ],
+    "monitor_cycles": [
+      {
+        "cycle": 0,
+        "voice_updated": 1793339766.673257,
+        "usb_resets": "2",
+        "ports": [
+          true,
+          true,
+          true
+        ],
+        "error": ""
+      },
+      {
+        "cycle": 1,
+        "voice_updated": 1793339767.729672,
+        "usb_resets": "2",
+        "ports": [
+          true,
+          true,
+          true
+        ],
+        "error": ""
+      },
+      {
+        "cycle": 2,
+        "voice_updated": 1793339768.9150958,
+        "usb_resets": "2",
+        "ports": [
+          true,
+          true,
+          true
+        ],
+        "error": ""
+      },
+      {
+        "cycle": 3,
+        "voice_updated": 1793339770.0561452,
+        "usb_resets": "2",
+        "ports": [
+          true,
+          true,
+          true
+        ],
+        "error": ""
+      },
+      {
+        "cycle": 4,
+        "voice_updated": 1793339771.2297118,
+        "usb_resets": "2",
+        "ports": [
+          true,
+          true,
+          true
+        ],
+        "error": ""
+      }
+    ],
+    "elapsed_seconds": 12.61,
+    "usb_resets_first_last": [
+      2,
+      2
+    ],
+    "final_state": {
+      "connected": true,
+      "port": "COM123",
+      "since": 1793339771.540714,
+      "last_update": 1793339771.8917139,
+      "error": "",
+      "firmware": {
+        "name": "KLQ ROBOT FW 0.12",
+        "APP": "0x08008000",
+        "MAX": "489472",
+        "PAGE": "2048",
+        "VALID": "1",
+        "USER_STATE": "0",
+        "USER_VALID": "0",
+        "USER_LENGTH": "0",
+        "USER_RECEIVED": "0",
+        "USER_MAX": "16384",
+        "UI": "1",
+        "PY_ERROR": "0",
+        "PY_LINE": "0",
+        "PK_RAW": "1",
+        "PK_DOWN": "0",
+        "PK_SHORT": "0",
+        "USB_RESETS": "2",
+        "EXT_UPGRADE": "1",
+        "EXT_PORTS": "3",
+        "EXT_MOTOR": "1",
+        "EXT_VOICE": "1"
+      },
+      "voice": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 148,
+        "last_seq": 1,
+        "active": 0,
+        "port": 0,
+        "reason": 0,
+        "semantic": 0,
+        "rx_frames": 1,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "completed": 0,
+        "errors": 0,
+        "events": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "recognitions": 0,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 0,
+        "play_done": 0,
+        "play_id": 0,
+        "rx_bytes": 14,
+        "tx_frames": 1,
+        "last_rx_ms": 1024,
+        "cancelled": 0,
+        "score": 0,
+        "intent_seq": 0,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "supported": true,
+        "updated": 1793339771.8917139,
+        "error": ""
+      },
+      "accelerometer": {
+        "online": true,
+        "x": 857,
+        "y": -105,
+        "z": 570,
+        "roll": -10.43,
+        "pitch": -55.92,
+        "address": "--",
+        "identity": "--",
+        "version": "--",
+        "updated": 1793339771.8917139
+      },
+      "ports": [
+        {
+          "index": 1,
+          "online": true,
+          "class": 1,
+          "type": 2,
+          "uid": "4150354C/38323609/00DB8962",
+          "distance": 0,
+          "ticks": 0,
+          "sample_status": 1,
+          "sequence": 806459,
+          "left": 8,
+          "right": 5,
+          "quality_flags": 0,
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0,
+          "requests": 0,
+          "responses": 0,
+          "updated": 1793339771.7267141
+        },
+        {
+          "index": 2,
+          "online": true,
+          "class": 2,
+          "type": 2,
+          "uid": "4150354C/38323609/00D86C62",
+          "distance": 0,
+          "ticks": 0,
+          "sample_status": 0,
+          "sequence": 0,
+          "left": 0,
+          "right": 0,
+          "quality_flags": 0,
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0,
+          "requests": 0,
+          "responses": 0,
+          "updated": 1793339771.7277124
+        },
+        {
+          "index": 3,
+          "online": true,
+          "class": 1,
+          "type": 1,
+          "uid": "4150354C/3832360B/0064B862",
+          "distance": 17,
+          "ticks": 49,
+          "sample_status": 2,
+          "sequence": 134501,
+          "left": 0,
+          "right": 0,
+          "quality_flags": 0,
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0,
+          "requests": 0,
+          "responses": 0,
+          "updated": 1793339771.7297127
+        }
+      ],
+      "events": [
+        {
+          "time": "13:56:11",
+          "message": "端口 3 设备上线：4150354C/3832360B/0064B862"
+        },
+        {
+          "time": "13:56:11",
+          "message": "端口 2 设备上线：4150354C/38323609/00D86C62"
+        },
+        {
+          "time": "13:56:11",
+          "message": "端口 1 红外传感器上线：4150354C/38323609/00DB8962"
+        },
+        {
+          "time": "13:56:11",
+          "message": "主机状态已更新"
+        },
+        {
+          "time": "13:56:11",
+          "message": "已连接 COM123"
+        },
+        {
+          "time": "13:56:11",
+          "message": "连接断开：监测已暂停，串口已释放"
+        },
+        {
+          "time": "13:56:11",
+          "message": "连接断开：监测已暂停，串口已释放"
+        },
+        {
+          "time": "13:56:10",
+          "message": "端口 3 设备上线：4150354C/3832360B/0064B862"
+        },
+        {
+          "time": "13:56:10",
+          "message": "端口 2 设备上线：4150354C/38323609/00D86C62"
+        },
+        {
+          "time": "13:56:10",
+          "message": "端口 1 红外传感器上线：4150354C/38323609/00DB8962"
+        },
+        {
+          "time": "13:56:10",
+          "message": "主机状态已更新"
+        },
+        {
+          "time": "13:56:10",
+          "message": "已连接 COM123"
+        },
+        {
+          "time": "13:56:10",
+          "message": "连接断开：监测已暂停，串口已释放"
+        },
+        {
+          "time": "13:56:10",
+          "message": "连接断开：监测已暂停，串口已释放"
+        },
+        {
+          "time": "13:56:09",
+          "message": "端口 3 设备上线：4150354C/3832360B/0064B862"
+        },
+        {
+          "time": "13:56:09",
+          "message": "端口 2 设备上线：4150354C/38323609/00D86C62"
+        },
+        {
+          "time": "13:56:09",
+          "message": "端口 1 红外传感器上线：4150354C/38323609/00DB8962"
+        },
+        {
+          "time": "13:56:09",
+          "message": "主机状态已更新"
+        },
+        {
+          "time": "13:56:09",
+          "message": "已连接 COM123"
+        },
+        {
+          "time": "13:56:09",
+          "message": "连接断开：监测已暂停，串口已释放"
+        },
+        {
+          "time": "13:56:09",
+          "message": "连接断开：监测已暂停，串口已释放"
+        },
+        {
+          "time": "13:56:08",
+          "message": "端口 3 设备上线：4150354C/3832360B/0064B862"
+        },
+        {
+          "time": "13:56:08",
+          "message": "端口 2 设备上线：4150354C/38323609/00D86C62"
+        },
+        {
+          "time": "13:56:08",
+          "message": "端口 1 红外传感器上线：4150354C/38323609/00DB8962"
+        },
+        {
+          "time": "13:56:08",
+          "message": "主机状态已更新"
+        },
+        {
+          "time": "13:56:07",
+          "message": "已连接 COM123"
+        },
+        {
+          "time": "13:56:07",
+          "message": "连接断开：监测已暂停，串口已释放"
+        },
+        {
+          "time": "13:56:07",
+          "message": "连接断开：监测已暂停，串口已释放"
+        },
+        {
+          "time": "13:56:07",
+          "message": "端口 3 设备上线：4150354C/3832360B/0064B862"
+        },
+        {
+          "time": "13:56:07",
+          "message": "端口 2 设备上线：4150354C/38323609/00D86C62"
+        }
+      ],
+      "server_time": 1793339771.9816701,
+      "paused": false,
+      "serial_released": false
+    }
+  },
+  "post_update_smoke": {
+    "result": "PASS",
+    "motion_enabled": false,
+    "samples": [
+      {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 148,
+        "last_seq": 1,
+        "active": 0,
+        "port": 0,
+        "reason": 0,
+        "semantic": 0,
+        "rx_frames": 1,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "completed": 0,
+        "errors": 0,
+        "events": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "recognitions": 0,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 0,
+        "play_done": 0,
+        "play_id": 0,
+        "rx_bytes": 14,
+        "tx_frames": 1,
+        "last_rx_ms": 1024,
+        "cancelled": 0,
+        "score": 0,
+        "intent_seq": 0,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17610.375
+      },
+      {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 148,
+        "last_seq": 2,
+        "active": 0,
+        "port": 0,
+        "reason": 0,
+        "semantic": 0,
+        "rx_frames": 2,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "completed": 0,
+        "errors": 0,
+        "events": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "recognitions": 0,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 0,
+        "play_done": 0,
+        "play_id": 0,
+        "rx_bytes": 28,
+        "tx_frames": 2,
+        "last_rx_ms": 209389,
+        "cancelled": 0,
+        "score": 0,
+        "intent_seq": 0,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17610.406
+      },
+      {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 2,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 3,
+        "active": 0,
+        "port": 0,
+        "reason": 0,
+        "semantic": 0,
+        "rx_frames": 4,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "completed": 0,
+        "errors": 0,
+        "events": [
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        "recognitions": 0,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 1,
+        "play_done": 0,
+        "play_id": 5004,
+        "rx_bytes": 51,
+        "tx_frames": 3,
+        "last_rx_ms": 210526,
+        "cancelled": 0,
+        "score": 0,
+        "intent_seq": 0,
+        "phase": 0,
+        "pending_sound": 5005,
+        "pwm": 0,
+        "pc_monotonic": 17611.984
+      }
+    ],
+    "events": [
+      {
+        "label": "before",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "ready",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=3; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "ready",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=3; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "ready",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=3; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "ready",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=3; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "ready",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=3; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "ready",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "run0",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=3; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=5; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "stop0",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "run1",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=3; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=5; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "stop1",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=2; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      },
+      {
+        "label": "cleanup",
+        "info": "KLQ ROBOT FW 0.12; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=2; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1"
+      }
+    ],
+    "version_exchange": {
+      "before": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 148,
+        "last_seq": 1,
+        "active": 0,
+        "port": 0,
+        "reason": 0,
+        "semantic": 0,
+        "rx_frames": 1,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "completed": 0,
+        "errors": 0,
+        "events": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "recognitions": 0,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 0,
+        "play_done": 0,
+        "play_id": 0,
+        "rx_bytes": 14,
+        "tx_frames": 1,
+        "last_rx_ms": 1024,
+        "cancelled": 0,
+        "score": 0,
+        "intent_seq": 0,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17610.375
+      },
+      "after": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 0,
+        "last_error": 0,
+        "last_cmd": 148,
+        "last_seq": 2,
+        "active": 0,
+        "port": 0,
+        "reason": 0,
+        "semantic": 0,
+        "rx_frames": 2,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "completed": 0,
+        "errors": 0,
+        "events": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "recognitions": 0,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 0,
+        "play_done": 0,
+        "play_id": 0,
+        "rx_bytes": 28,
+        "tx_frames": 2,
+        "last_rx_ms": 209389,
+        "cancelled": 0,
+        "score": 0,
+        "intent_seq": 0,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "pc_monotonic": 17610.406
+      }
+    },
+    "ram_reuse_pass": true,
+    "cleanup_pass": true
+  },
+  "remaining": [
+    "active voice STOP/wake-exit with electrical timing",
+    "actual USB unplug during voice motion",
+    "new150ms shutdown/reset physical timing",
+    "direct Python motor/movement blocks on physical motor",
+    "long-duration intermittent USB fault investigation"
+  ],
+  "not_claimed": [
+    "CTR fix established as previous timeout cause",
+    "precise electrical motor stopping latency",
+    "resident boot0.3 contains CTRfix",
+    "all USB hardware concurrent-state behavior modeled"
+  ],
+  "dashboard_connection_fix": {
+    "unit_tests": 8,
+    "test_command": "python tools/test_status_dashboard_connection.py",
+    "reload": "old process identity checked, HTTPpause200/releasedtrue before termination, hidden newprocess",
+    "pid": 20812,
+    "state": {
+      "connected": true,
+      "port": "COM123",
+      "since": 1793340454.2837012,
+      "last_update": 1793340454.8006933,
+      "error": "",
+      "firmware": {
+        "name": "KLQ ROBOT FW 0.12",
+        "APP": "0x08008000",
+        "MAX": "489472",
+        "PAGE": "2048",
+        "VALID": "1",
+        "USER_STATE": "0",
+        "USER_VALID": "0",
+        "USER_LENGTH": "0",
+        "USER_RECEIVED": "0",
+        "USER_MAX": "16384",
+        "UI": "1",
+        "PY_ERROR": "0",
+        "PY_LINE": "0",
+        "PK_RAW": "1",
+        "PK_DOWN": "0",
+        "PK_SHORT": "0",
+        "USB_RESETS": "2",
+        "EXT_UPGRADE": "1",
+        "EXT_PORTS": "3",
+        "EXT_MOTOR": "1",
+        "EXT_VOICE": "1"
+      },
+      "voice": {
+        "abi": 1,
+        "enabled": 0,
+        "version_valid": 1,
+        "awake": 0,
+        "version": "0.2.0",
+        "play_state": 0,
+        "request": 0,
+        "last_ack": 128,
+        "last_error": 0,
+        "last_cmd": 146,
+        "last_seq": 4,
+        "active": 0,
+        "port": 0,
+        "reason": 0,
+        "semantic": 0,
+        "rx_frames": 8,
+        "bad_frames": 0,
+        "uart_errors": 0,
+        "rx_overflows": 0,
+        "tx_errors": 0,
+        "timeouts": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "completed": 0,
+        "errors": 0,
+        "events": [
+          0,
+          0,
+          0,
+          2,
+          2
+        ],
+        "recognitions": 0,
+        "duplicates": 0,
+        "dropped": 0,
+        "play_acks": 2,
+        "play_done": 2,
+        "play_id": 5005,
+        "rx_bytes": 98,
+        "tx_frames": 4,
+        "last_rx_ms": 211568,
+        "cancelled": 0,
+        "score": 0,
+        "intent_seq": 0,
+        "phase": 0,
+        "pending_sound": 0,
+        "pwm": 0,
+        "supported": true,
+        "updated": 1793340454.6012335,
+        "error": ""
+      },
+      "accelerometer": {
+        "online": true,
+        "x": 848,
+        "y": -112,
+        "z": 586,
+        "roll": -10.82,
+        "pitch": -54.87,
+        "address": "--",
+        "identity": "--",
+        "version": "--",
+        "updated": 1793340454.8006933
+      },
+      "ports": [
+        {
+          "index": 1,
+          "online": true,
+          "class": 1,
+          "type": 2,
+          "uid": "4150354C/38323609/00DB8962",
+          "distance": 0,
+          "ticks": 0,
+          "sample_status": 1,
+          "sequence": 874644,
+          "left": 8,
+          "right": 5,
+          "quality_flags": 0,
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0,
+          "requests": 0,
+          "responses": 0,
+          "updated": 1793340454.721244
+        },
+        {
+          "index": 2,
+          "online": true,
+          "class": 2,
+          "type": 2,
+          "uid": "4150354C/38323609/00D86C62",
+          "distance": 0,
+          "ticks": 0,
+          "sample_status": 0,
+          "sequence": 0,
+          "left": 0,
+          "right": 0,
+          "quality_flags": 0,
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0,
+          "requests": 0,
+          "responses": 0,
+          "updated": 1793340454.7222476
+        },
+        {
+          "index": 3,
+          "online": true,
+          "class": 1,
+          "type": 1,
+          "uid": "4150354C/3832360B/0064B862",
+          "distance": 17,
+          "ticks": 49,
+          "sample_status": 2,
+          "sequence": 145861,
+          "left": 0,
+          "right": 0,
+          "quality_flags": 0,
+          "timeout": 0,
+          "frame_error": 0,
+          "uart_error": 0,
+          "requests": 0,
+          "responses": 0,
+          "updated": 1793340454.7242465
+        }
+      ],
+      "events": [
+        {
+          "time": "14:07:34",
+          "message": "端口 3 设备上线：4150354C/3832360B/0064B862"
+        },
+        {
+          "time": "14:07:34",
+          "message": "端口 2 设备上线：4150354C/38323609/00D86C62"
+        },
+        {
+          "time": "14:07:34",
+          "message": "端口 1 红外传感器上线：4150354C/38323609/00DB8962"
+        },
+        {
+          "time": "14:07:34",
+          "message": "已连接 COM123"
+        },
+        {
+          "time": "14:07:34",
+          "message": "主机状态已更新"
+        },
+        {
+          "time": "14:07:34",
+          "message": "连接断开：等待主机响应"
+        }
+      ],
+      "server_time": 1793340454.8338785,
+      "paused": false,
+      "serial_released": false
+    },
+    "sha256": "344eeaf3d56a47f2104f9cac47daade48ffcda8f7793ebc76150820a5ff82e7e"
+  }
+}

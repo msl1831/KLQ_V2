@@ -17,6 +17,8 @@ enum {
     CMD_FINISH
 };
 enum { CMD_EXT_OPEN=0x0040, CMD_EXT_XFER, CMD_EXT_RESULT, CMD_EXT_CLOSE };
+enum { CMD_VOICE_STATUS=0x0050, CMD_VOICE_QUERY, CMD_VOICE_PLAY, CMD_VOICE_ARM, CMD_VOICE_CANCEL };
+uint8_t protocol_reset_pending(void);
 enum { OK=0, ERR_COMMAND, ERR_LENGTH, ERR_CRC, ERR_STATE, ERR_RANGE, ERR_FLASH, ERR_IMAGE };
 uint32_t crc32_update(uint32_t crc, const void *data, uint32_t n);
 bool protocol_system_firmware_valid(void);

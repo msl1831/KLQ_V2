@@ -25,6 +25,9 @@
 
 #include "drv_usb_device.h"
 
+/* CTFR/CTFT are RC_W0: write 1 to preserve hardware completions.
+ * Only ResetEPRxFlag/ResetEPTxFlag clear their selected flag. */
+
 /*!
  * @brief       Set Endpoint type
  *
@@ -44,7 +47,7 @@ void USBD_SetEPType(uint8_t ep, USBD_REG_EP_TYPE_T type)
     reg &= ~USBD_EP_BIT_TYPE;
     reg |= type << 9;
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 /*!
@@ -63,7 +66,7 @@ void USBD_SetEPKind(uint8_t ep)
     reg &= (uint32_t)(USBD_EP_MASK_DEFAULT);
     reg |= USBD_EP_BIT_KIND;
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 /*!
@@ -82,7 +85,7 @@ void USBD_ResetEPKind(uint8_t ep)
     reg &= (uint32_t)(USBD_EP_MASK_DEFAULT);
     reg &= ~USBD_EP_BIT_KIND;
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 
@@ -102,7 +105,7 @@ void USBD_ResetEPRxFlag(uint8_t ep)
     reg &= (uint32_t)(USBD_EP_MASK_DEFAULT);
     reg &= ~USBD_EP_BIT_CTFR;
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFT;
 }
 
 /*!
@@ -121,7 +124,7 @@ void USBD_ResetEPTxFlag(uint8_t ep)
     reg &= (uint32_t)(USBD_EP_MASK_DEFAULT);
     reg &= ~USBD_EP_BIT_CTFT;
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR;
 }
 
 /*!
@@ -140,7 +143,7 @@ void USBD_ToggleTx(uint8_t ep)
     reg &= (uint32_t)(USBD_EP_MASK_DEFAULT);
     reg |= USBD_EP_BIT_TXDTOG;
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 /*!
@@ -159,7 +162,7 @@ void USBD_ToggleRx(uint8_t ep)
     reg &= (uint32_t)(USBD_EP_MASK_DEFAULT);
     reg |= USBD_EP_BIT_RXDTOG;
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 /*!
@@ -211,7 +214,7 @@ void USBD_SetEpAddr(uint8_t ep, uint8_t addr)
     reg &= ~USBD_EP_BIT_ADDR;
     reg |= addr;
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 /*!
@@ -234,7 +237,7 @@ void USBD_SetEPTxStatus(uint8_t ep, USBD_EP_STATUS_T status)
     reg &= (uint32_t)(USBD_EP_MASK_DEFAULT | USBD_EP_BIT_TXSTS);
     reg ^= ((uint32_t)status & (uint32_t)USBD_EP_BIT_TXSTS);
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 /*!
@@ -258,7 +261,7 @@ void USBD_SetEPRxStatus(uint8_t ep, USBD_EP_STATUS_T status)
     reg &= (uint32_t)(USBD_EP_MASK_DEFAULT | USBD_EP_BIT_RXSTS);
     reg ^= (tmp & USBD_EP_BIT_RXSTS);
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 
@@ -286,7 +289,7 @@ void USBD_SetEPTxRxStatus(uint8_t ep, USBD_EP_STATUS_T txStatus, USBD_EP_STATUS_
     tmp = txStatus << 4;
     reg ^= (tmp & USBD_EP_BIT_TXSTS);
 
-    USBD->EP[ep].EP = reg;
+    USBD->EP[ep].EP = reg | USBD_EP_BIT_CTFR | USBD_EP_BIT_CTFT;
 }
 
 /*!

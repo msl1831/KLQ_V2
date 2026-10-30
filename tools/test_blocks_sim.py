@@ -57,7 +57,7 @@ def main():
                               for p in sources + sorted(fixtures.rglob('*.h'))},
                       boundaries=['actual mini_python.c and klq_runtime.c unchanged',
                                   'GPIO clock/config/input, external ports and robot UI mocked',
-                                  'motor support success is simulated; current production motor protocol unsupported',
+                                  'motor success is simulated; production normal-port motor needs separate physical validation',
                                   'no USB, sensor hardware, physical motors or actual button tested',
                                   'VC mode uses C++ parsing; production ARMCC build remains required']
                      if msvc else ['actual mini_python.c and klq_runtime.c unchanged',

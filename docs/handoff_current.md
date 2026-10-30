@@ -1,5 +1,21 @@
 # KLQ 主控当前交接（2026-10-29）
 
+## 最新复测结果（2026-10-30，本节优先）
+
+用户已恢复测试并确认N20仍悬空。0.11新增下载中/诊断占用真实语音拒绝、READY语音1s动作、活动中USB STOP、活动中PC4短按五项均软件证据+用户确认PASS，PC4不误启动READY程序。每项ARM0/清RAM/真实STOP ACK。
+
+随后修复USB EP读改写的RC_W0标志保留遗漏（11处），纯模型及负对照通过、独立审查通过；不能称此前Write timeout已定因。0.12已通过主机USB安装，APP30704/RO30636/RAM27632 B，比0.11仅多40 B Flash，SHA d3242f3958ae24eb4b240c5b9b8be796e63cf47f47a0045aa06ccbf3301f3335；驻留引导仍0.3且未应用该修复，外设固件未写。20次串口开关+240边界ECHO+5次观测交接通过，无额外USBreset，CI版本和RAM无延时循环RUN/STOP复用回归通过。已恢复正常监测，ARM0/空RAM。 观测页假在线已修，8组mock通过；确认released后安全重载为PID20812（下次重查），实机新INFO/voice/三端口快照通过。P1 IR/P2 N20/P3 UL。
+
+详见[本轮验收](verification_20261030_voice.md)、verification_20261030_voice.json和[语音工程USB接口](host_voice_protocol_v0.1.md)。代码仍以C工作树codex/python-runtime为准，提交/远程状态结束时核对；F共享main不覆盖。剩余Python电机/移动实物、USB物理拔线、关机复位150ms实际时序及长期USB稳定性，不把模型或短测当作这些验收。以下暂停记录保留为历史。
+
+
+## 最新暂停检查点（2026-10-30，本节优先）
+
+用户要求暂停其他测试。主机0.11已安装，UART4真实CI0.2.0版本、8音效听音、真实语义及EMPTY有限正反转/停止通过；RUNNING时语音正转/停止拒绝、不结束用户程序，用户确认电机未转。收尾已ARM0/active0/空RAM/精确P2 UID后的真实STOP ACK。P1 IR/P2 N20/P3 UL。监测恢复后又出现USB Write timeout，无INFO快照；现HTTP pause200/releasedtrue，保留页面但停止重试，不宣称正常在线。根因留待恢复后查。
+
+代码在codex/python-runtime@64837d5之上未提交/未推送；F共享main包含其他任务，勿覆盖。详细见[暂停交接](voice_integration_paused_20261030.md)和[工作记录](voice_integration_worklog_20261030.md)。READY/DOWNLOADING/排他/活动取消/关机复位新时序实物待测；不自动ARM。以下为此前进度。
+
+
 当前主控分支为 `codex/python-runtime`，本机工作树 `C:/Users/Administrator/.codex/worktrees/python-runtime/Codex`。合流源码ce714f7已推送。2026-10-29同日后续用户授权通过主机自身USB安装：实际COM123已从0.8升级到0.9并回到待机；原引导0.3保留，0.4只做过构建回归。实际应答/CRC和范围见verification_20261029_usb_install.md及usb_install_20261029.json。接力仍先查HEAD/工作区，并重新识别端口，不能照搬COM号。
 
 共享 `F:/work/KLQ_V2/Codex` 仍为旧main@63d1ea3加未提交工作。按sensor boot对话转达的用户要求，将其USB→UART升级代码真实合流到本分支，未整文件覆盖Python业务；未改写共享源码。sensor_boot及UL/IR/MOTOR第一方输入已纳入本分支，44个板端生产文件与当前来源逐字节一致。语音、环境审计工具及其它共享未提交材料仍未纳入，不能宣称克隆即可恢复整个产品。Puya SDK以sensor_boot/dependencies.json固定提交，恢复见development_setup.md，不跟踪裸gitlink。

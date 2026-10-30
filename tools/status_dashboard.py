@@ -12,9 +12,11 @@ import zlib
 from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import serial
 from serial.tools import list_ports
+from voice_usb import STATUS as VOICE_STATUS, decode as decode_voice
 
 MAGIC = b"KLQ1"
 INFO = 1
@@ -32,10 +34,14 @@ SC7 = re.compile(r"X=(-?\d+)mg Y=(-?\d+)mg Z=(-?\d+)mg ROLL=(-?[\d.]+)deg PITCH=
 SC7_READY = re.compile(r"SC7A20 READY ADDR=(\S+) ID=(\S+) VER=(\S+)")
 
 
+def blank_voice() -> dict:
+    return {"supported": False, "updated": 0.0, "error": ""}
+
+
 def blank_state(port: str | None = None) -> dict:
     return {
         "connected": False, "port": port or "自动识别", "since": 0.0,
-        "last_update": 0.0, "error": "等待 KLQ USB CDC", "firmware": {},
+        "last_update": 0.0, "error": "等待 KLQ USB CDC", "firmware": {}, "voice": blank_voice(),
         "accelerometer": {"online": False, "x": 0, "y": 0, "z": 0,
                           "roll": 0.0, "pitch": 0.0, "address": "--",
                           "identity": "--", "version": "--", "updated": 0.0},
@@ -59,6 +65,27 @@ class Monitor:
         self.events = deque(maxlen=30)
         self.seq = int(time.time()) & 0xFFFFFFFF
         self.stop = threading.Event()
+        self.paused = threading.Event()
+        self.released = threading.Event(); self.released.set()
+        self.owner_lock = threading.Lock()
+        self.control_lock = threading.Lock()
+        self.voice_seq: int | None = None
+        self.info_seq: int | None = None
+
+    def pause_reader(self, timeout: float = 3.0) -> dict:
+        with self.control_lock:
+            with self.owner_lock:
+                self.paused.set()
+            released = self.released.wait(timeout)
+            return {"paused": True, "released": released}
+
+    def resume_reader(self) -> dict:
+        with self.control_lock:
+            with self.owner_lock:
+                if self.stop.is_set():
+                    return {"paused": self.paused.is_set(), "released": self.released.is_set(), "error": "reader is stopped"}
+                self.paused.clear()
+            return {"paused": False, "released": self.released.is_set()}
 
     def find_port(self) -> str | None:
         if self.explicit_port:
@@ -75,10 +102,12 @@ class Monitor:
 
     def set_connection(self, connected: bool, port: str, error: str = "") -> None:
         with self.lock:
-            was_connected = self.state["connected"]
             changed = self.state["connected"] != connected or self.state["port"] != port
-            if not connected and was_connected:
+            if not connected or changed:
+                self.voice_seq = self.info_seq = None
+            if not connected:
                 self.state = blank_state(port)
+                self.state["events"] = list(self.events)
             self.state["connected"], self.state["port"], self.state["error"] = connected, port, error
             if connected and changed:
                 self.state["since"] = time.time()
@@ -87,25 +116,63 @@ class Monitor:
                 self.event(f"连接断开：{error}")
 
     @staticmethod
-    def packet(seq: int) -> bytes:
-        head = struct.pack("<4sIHH", MAGIC, seq, INFO, 0)
+    def packet(seq: int, command: int = INFO) -> bytes:
+        head = struct.pack("<4sIHH", MAGIC, seq, command, 0)
         return head + struct.pack("<I", zlib.crc32(b"", zlib.crc32(head)))
 
-    def parse_info(self, payload: bytes) -> None:
+    def parse_info(self, payload: bytes) -> bool:
         if len(payload) < 4 or struct.unpack_from("<I", payload)[0]:
-            return
-        text = payload[4:].decode("ascii", "replace")
-        parts = [v.strip() for v in text.split(";")]
-        info = {"name": parts[0]} if parts else {}
-        for part in parts[1:]:
-            if "=" in part:
+            return False
+        try:
+            text = payload[4:].decode("ascii").strip()
+            if any(ord(c) < 32 or ord(c) > 126 for c in text):
+                return False
+            parts = [v.strip() for v in text.split(";")]
+            if not re.fullmatch(r"KLQ (?:ROBOT FW|USB BOOT) \d+(?:\.\d+){1,2}", parts[0]):
+                return False
+            info = {"name": parts[0]}
+            for part in parts[1:]:
+                if not part:
+                    continue
                 key, value = part.split("=", 1)
+                if not re.fullmatch(r"[A-Z][A-Z0-9_]*", key) or not value or key in info:
+                    return False
                 info[key] = value
+            if (not 0 < int(info["APP"], 0) <= 0xFFFFFFFF or int(info["MAX"], 0) <= 0
+                    or int(info["PAGE"], 0) <= 0 or info["VALID"] not in ("0", "1")):
+                return False
+        except (UnicodeError, ValueError, KeyError):
+            return False
         with self.lock:
             changed = self.state["firmware"] != info
             self.state["firmware"] = info
+            if info.get("EXT_VOICE") == "1":
+                self.state["voice"]["supported"] = True
+            else:
+                self.state["voice"] = blank_voice()
+                self.voice_seq = None
             if changed:
                 self.event("主机状态已更新")
+            port = self.state["port"]
+        self.set_connection(True, port)
+        return True
+
+    def parse_voice(self, payload: bytes) -> None:
+        try:
+            if len(payload) < 4:
+                raise ValueError("语音状态响应过短")
+            status = struct.unpack_from("<I", payload)[0]
+            if status:
+                raise ValueError(f"主机语音状态返回错误 {status}")
+            voice = decode_voice(payload[4:])
+            voice.update(supported=True, updated=time.time(), error="")
+        except ValueError as error:
+            with self.lock:
+                self.state["voice"]["error"] = str(error)
+            return
+        with self.lock:
+            self.state["voice"] = voice
+            self.state["last_update"] = voice["updated"]
 
     def parse_line(self, raw: bytes) -> None:
         line = raw.decode("ascii", "ignore").strip()
@@ -195,8 +262,13 @@ class Monitor:
                 if len(data) < total:
                     return
                 frame = bytes(data[:total]); del data[:total]
-                if zlib.crc32(frame[16:], zlib.crc32(frame[:12])) == crc and cmd == INFO | 0x8000:
-                    self.parse_info(frame[16:])
+                if zlib.crc32(frame[16:], zlib.crc32(frame[:12])) == crc:
+                    if cmd == INFO | 0x8000 and seq == self.info_seq:
+                        if self.parse_info(frame[16:]):
+                            self.info_seq = None
+                    elif cmd == (VOICE_STATUS | 0x8000) and seq == self.voice_seq:
+                        self.voice_seq = None
+                        self.parse_voice(frame[16:])
                 continue
             if newline < 0:
                 if len(data) > 2048:
@@ -205,29 +277,62 @@ class Monitor:
 
     def run(self) -> None:
         while not self.stop.is_set():
-            port = self.find_port()
-            if not port:
-                self.set_connection(False, self.explicit_port or "自动识别", "未找到 KLQ USB CDC")
-                self.stop.wait(0.5); continue
+            with self.owner_lock:
+                claimed = not self.paused.is_set()
+                if claimed:
+                    self.released.clear()
+            if not claimed:
+                self.set_connection(False, self.explicit_port or "自动识别", "监测已暂停，串口已释放")
+                self.stop.wait(0.05); continue
+            port = self.explicit_port or "自动识别"
+            device = None
             try:
+                found = self.find_port()
+                if self.paused.is_set() or self.stop.is_set():
+                    continue
+                if not found:
+                    self.set_connection(False, port, "未找到 KLQ USB CDC")
+                    self.stop.wait(0.5); continue
+                port = found
                 with serial.Serial(port, 115200, timeout=0.1, write_timeout=1) as device:
-                    device.reset_input_buffer(); self.set_connection(True, port)
-                    data, info_at = bytearray(), 0.0
-                    while not self.stop.is_set():
+                    if self.paused.is_set() or self.stop.is_set():
+                        continue
+                    device.reset_input_buffer(); self.set_connection(False, port, "等待主机响应")
+                    data, info_at, voice_at = bytearray(), 0.0, 0.0
+                    while not self.stop.is_set() and not self.paused.is_set():
                         now = time.monotonic()
                         if now >= info_at:
                             self.seq = (self.seq + 1) & 0xFFFFFFFF
+                            self.info_seq = self.seq
                             device.write(self.packet(self.seq)); info_at = now + 2.0
+                        elif now >= voice_at:
+                            with self.lock:
+                                supported = self.state["voice"]["supported"]
+                            if supported:
+                                self.seq = (self.seq + 1) & 0xFFFFFFFF
+                                self.voice_seq = self.seq
+                                device.write(self.packet(self.seq, VOICE_STATUS))
+                            voice_at = now + 0.25
                         chunk = device.read(max(1, device.in_waiting))
                         if chunk:
                             data.extend(chunk); self.consume(data)
             except (serial.SerialException, OSError) as error:
                 self.set_connection(False, port, str(error)); self.stop.wait(0.5)
+            finally:
+                if device is not None and device.is_open:
+                    self.stop.set()
+                    self.set_connection(False, port, "串口关闭未确认，监测读取已停止")
+                else:
+                    if self.paused.is_set():
+                        self.set_connection(False, port, "监测已暂停，串口已释放")
+                    self.released.set()
 
     def snapshot(self) -> bytes:
         with self.lock:
             data = copy.deepcopy(self.state)
         data["server_time"] = time.time()
+        data["paused"] = self.paused.is_set()
+        data["serial_released"] = self.released.is_set()
         return json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
@@ -240,16 +345,20 @@ HTML = r'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <div class="grid"><div id="ports" style="display:contents"></div>
 <section class="card wide"><h2>内置加速度传感器</h2><div class="axes"><div class="axis"><span>X 轴</span><b id="ax">--</b><span>mg</span></div><div class="axis"><span>Y 轴</span><b id="ay">--</b><span>mg</span></div><div class="axis"><span>Z 轴</span><b id="az">--</b><span>mg</span></div></div><div class="tilt"><div class="horizon"><div id="plane" class="plane"><div class="sky"></div><div class="ground"></div><div class="hline"></div></div><div class="cross"></div></div><div><div class="angle"><span id="roll">--</span>° <small>ROLL</small></div><div class="angle"><span id="pitch">--</span>° <small>PITCH</small></div><div class="subtitle" id="scmeta">等待 SC7A20HTR</div></div></div></section>
 <section class="card"><h2>机器人主机</h2><div id="sysname" class="sysname">等待状态</div><div id="chips" class="chips"></div></section>
+<section class="card wide"><h2>内置语音 · CI1303 · 只读观测</h2><div id="vversion" class="sysname">等待主机语音状态</div><div class="kv"><span>语音运动</span><b id="venabled">--</b><span>唤醒记录</span><b id="vawake">--</b><span>最近接收语义</span><b id="vsemantic" class="mono">--</b><span>最近处理 score / seq</span><b id="vscore">--</b><span>策略阶段</span><b id="vphase">--</b><span>策略结果记录</span><b id="vreason">--</b><span>动作记录</span><b id="vactive">--</b></div><div id="vmeta" class="subtitle" style="margin:10px 0">版本为最近查询记录，不作为CI在线心跳</div><div id="vcounts" class="chips"></div></section>
 <section class="card wide"><h2>状态事件</h2><div id="events" class="events"><div class="empty">等待数据…</div></div></section></div></main>
 <script>
 const $=id=>document.getElementById(id), esc=v=>String(v??'--').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const ports=$('ports'); ports.innerHTML=[1,2,3].map(i=>`<section class="card"><div class="port-title"><h2>外接端口 ${i}</h2><span id="pb${i}" class="badge">离线</span></div><div id="pd${i}" class="distance">--<small>mm</small></div><div class="kv"><span>设备</span><b id="pt${i}">等待发现</b><span>UID</span><b id="pu${i}" class="mono">--</b><span>回波</span><b id="pk${i}">-- ticks</b><span>样本</span><b id="ps${i}">--</b></div><div class="errors"><div class="err"><b id="pto${i}">0</b>超时</div><div class="err"><b id="pfe${i}">0</b>帧错误</div><div class="err"><b id="pue${i}">0</b>UART</div></div></section>`).join('');
 function device(p){return !p.online?'等待发现':p.class===2&&p.type===2?'直流电机':p.class===1&&p.type===1?'超声波':p.class===1&&p.type===2?'双路红外':p.class||p.type?`类别 ${p.class} / 类型 ${p.type}`:'未知设备'}
 function age(d,t){return t?Math.max(0,(d.server_time-t)).toFixed(1)+'s 前':'--'}
+function renderVoice(d){const v=d.voice||{},available=v.supported&&v.updated,phases=['空闲','等待启动确认','有限时运行','等待停止确认'],reasons=['无拒绝记录','运动未启用','主机忙碌','未唤醒','版本未确认','没有可用电机','存在多个电机','驱动异常','设备身份变化','请求超时','意图过期','重复意图','不支持语义','已取消'];
+$('vversion').textContent=available?(v.version_valid?`已读版本 ${v.version}`:'尚无有效版本记录'):d.connected?(v.supported?'等待语音状态快照':'当前主机尚未提供语音观测'):'等待主机连接';
+$('venabled').textContent=available?(v.enabled?'语音运动已启用':'运动禁用'):'--';$('vawake').textContent=available?(v.awake?'主机记录：已唤醒':'主机记录：休眠'):'--';const semantic=available?Number(v.semantic).toString(16).toUpperCase().padStart(8,'0'):null,words={'4B510001':'小奇小奇','4B510101':'电机正转','4B510102':'电机反转','4B510103':'停止电机'};$('vsemantic').textContent=available&&v.semantic?`0x${semantic}${words[semantic]?' · '+words[semantic]:''}`:'--';$('vscore').textContent=available&&v.recognitions?`${v.score} / ${v.intent_seq}`:'--';$('vphase').textContent=available?(phases[v.phase]??`阶段 ${v.phase}`):'--';$('vreason').textContent=available?(reasons[v.reason]??`原因 ${v.reason}`):'--';$('vactive').textContent=available?(v.active?`控制阶段中 · 端口 ${v.port}`:'无活动动作'):'--';$('vmeta').textContent=v.error?v.error:available?`主机快照 ${age(d,v.updated)} · 版本为最近已读记录，无CI在线心跳 · 接收语义与最近处理score可能分属不同帧`:'只查询状态，不发送唤醒、音效或运动指令';const e=v.events||[],counts=[['识别接收',v.recognitions],['重复',v.duplicates],['过期/丢弃',v.dropped],['接受动作',v.accepted],['拒绝动作',v.rejected],['动作完成',v.completed],['动作错误',v.errors],['动作取消',v.cancelled],['B0上电',e[0]],['B1唤醒',e[1]],['B2退出',e[2]],['B3播放接受',e[3]],['B4完成回调',e[4]],['播放ACK',v.play_acks],['播放回调',v.play_done],['UART错误',v.uart_errors],['RX溢出',v.rx_overflows],['TX错误',v.tx_errors],['请求超时',v.timeouts]];$('vcounts').innerHTML=available?counts.map(([k,n])=>`<div class="chip"><span>${k}</span>${esc(n)}</div>`).join(''):''}
 function render(d){const c=$('conn');c.classList.toggle('connected',d.connected);c.querySelector('span').textContent=d.connected?`${d.port} 已连接`:`${d.port} 未连接${d.error?' · '+d.error:''}`;
 d.ports.forEach(p=>{const i=p.index,b=$(`pb${i}`),ir=p.class===1&&p.type===2,motor=p.class===2&&p.type===2;b.classList.toggle('on',p.online);b.textContent=p.online?'在线':'离线';$(`pd${i}`).innerHTML=!p.online?'--':motor?'通信在线<small>PWM未采集</small>':ir?`左 ${esc(p.left)} / 右 ${esc(p.right)}<small>0～1000</small>`:esc(p.distance)+'<small>mm</small>';$(`pt${i}`).textContent=device(p);$(`pu${i}`).textContent=p.online?p.uid:'--';$(`pk${i}`).previousElementSibling.textContent=motor?'PWM反馈':ir?'质量标志':'回波';$(`pk${i}`).textContent=p.online?(motor?'未采集':ir?`${p.quality_flags}`:`${p.ticks} ticks`):'--';$(`ps${i}`).previousElementSibling.textContent=motor?'运行反馈':'样本';$(`ps${i}`).textContent=p.online?(motor?'未采集':`#${p.sequence} · 状态 ${p.sample_status}`):motor?'--':`REQ ${p.requests} / RESP ${p.responses}`;$(`pto${i}`).textContent=p.timeout;$(`pfe${i}`).textContent=p.frame_error;$(`pue${i}`).textContent=p.uart_error;});
 const a=d.accelerometer;$('ax').textContent=a.online?a.x:'--';$('ay').textContent=a.online?a.y:'--';$('az').textContent=a.online?a.z:'--';$('roll').textContent=a.online?a.roll.toFixed(2):'--';$('pitch').textContent=a.online?a.pitch.toFixed(2):'--';$('plane').style.transform=`rotate(${a.roll||0}deg) translateY(${Math.max(-35,Math.min(35,a.pitch||0))}px)`;$('scmeta').textContent=a.online?`地址 ${a.address} · ID ${a.identity} · VER ${a.version} · ${age(d,a.updated)}`:'传感器离线';
-const f=d.firmware||{};$('sysname').textContent=f.name||'等待主机 INFO';const keys=['APP','VALID','UI','USER_STATE','USER_VALID','USER_LENGTH','USER_RECEIVED','USER_MAX','PY_ERROR','PY_LINE','PK_SHORT','USB_RESETS'];$('chips').innerHTML=keys.filter(k=>f[k]!==undefined).map(k=>`<div class="chip"><span>${k}</span>${esc(f[k])}</div>`).join('');$('events').innerHTML=d.events.length?d.events.map(e=>`<div class="event"><time>${esc(e.time)}</time><div>${esc(e.message)}</div></div>`).join(''):'<div class="empty">等待数据…</div>'}
+renderVoice(d);const f=d.firmware||{};$('sysname').textContent=f.name||'等待主机 INFO';const keys=['APP','VALID','UI','USER_STATE','USER_VALID','USER_LENGTH','USER_RECEIVED','USER_MAX','PY_ERROR','PY_LINE','PK_SHORT','USB_RESETS'];$('chips').innerHTML=keys.filter(k=>f[k]!==undefined).map(k=>`<div class="chip"><span>${k}</span>${esc(f[k])}</div>`).join('');$('events').innerHTML=d.events.length?d.events.map(e=>`<div class="event"><time>${esc(e.time)}</time><div>${esc(e.message)}</div></div>`).join(''):'<div class="empty">等待数据…</div>'}
 async function update(){try{const r=await fetch('/api/state',{cache:'no-store'});render(await r.json())}catch(e){$('conn').classList.remove('connected');$('conn').querySelector('span').textContent='监控服务断开'}}setInterval(update,250);update();
 </script></body></html>'''
 
@@ -257,6 +366,44 @@ async function update(){try{const r=await fetch('/api/state',{cache:'no-store'})
 class Handler(BaseHTTPRequestHandler):
     monitor: Monitor
     faces = Path(__file__).with_name("idle_faces.html").read_bytes()
+
+    def json_reply(self, code: int, value: dict) -> None:
+        body = json.dumps(value, ensure_ascii=False).encode("utf-8")
+        self.send_response(code); self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body))); self.send_header("Cache-Control", "no-store")
+        self.end_headers(); self.wfile.write(body)
+
+    def local_origin(self) -> bool:
+        origin = self.headers.get("Origin")
+        if origin is None:
+            return True
+        try:
+            actual = urlsplit(origin)
+            target = urlsplit("http://" + self.headers.get("Host", ""))
+            return (actual.scheme == "http" and target.hostname in {"127.0.0.1", "localhost", "::1"}
+                    and actual.hostname == target.hostname
+                    and (actual.port or 80) == (target.port or 80) == self.server.server_port
+                    and not actual.username and not actual.password and not target.username
+                    and not actual.path and not actual.query and not actual.fragment)
+        except ValueError:
+            return False
+
+    def do_POST(self) -> None:
+        if self.path not in ("/api/pause", "/api/resume"):
+            self.send_error(404); return
+        if not self.local_origin():
+            self.json_reply(403, {"error": "unexpected HTTP Origin"}); return
+        try:
+            if int(self.headers.get("Content-Length", "0")) != 0:
+                raise ValueError()
+        except ValueError:
+            self.json_reply(400, {"error": "empty POST body required"}); return
+        if self.path == "/api/pause":
+            result = self.monitor.pause_reader()
+            self.json_reply(200 if result["released"] else 503, result)
+        else:
+            result = self.monitor.resume_reader()
+            self.json_reply(503 if result.get("error") else 200, result)
 
     def do_GET(self) -> None:
         if self.path == "/api/state":

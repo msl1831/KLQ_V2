@@ -17,6 +17,10 @@
 #define SAMPLE_ACTIVE_MS 40u
 #define IR_SAMPLE_MS 20u
 #define RETRIES 2u
+#define CMD_MOTOR_SET 0x0300u
+#define CMD_MOTOR_STOP 0x0302u
+#define MOTOR_REFRESH_MS 60u
+#define MOTOR_LEASE_MS 150u
 
 typedef struct {
     USART_T *uart;
@@ -24,6 +28,9 @@ typedef struct {
     uint8_t frame[FRAME_N], used, expected, pending, retry, bad;
     uint16_t command;
     uint32_t sequence, deadline, next_at, last_byte;
+    int16_t motor_goal, motor_sent, motor_ack;
+    uint32_t motor_refresh, motor_lease, motor_uart_errors;
+    uint8_t motor_stop, motor_fault, motor_need_set, motor_tx_n, motor_tx_pos, motor_tx[18];
     klq_port_status_t s;
 } Port;
 
@@ -36,7 +43,7 @@ typedef struct {
     uint32_t token, activity, deadline, drain_at, uid[3], uart_errors;
     uint16_t board, hw, raw_n, reply_n, pos, image_n;
     uint8_t active, port, result, reason, stage, waiting, retry;
-    uint8_t pinned, boot_id, layout, mode, hold_for, draining, motor_control;
+    uint8_t pinned, boot_id, layout, mode, hold_for, draining, motor_control, pre_stop;
     uint8_t raw[FRAME_N], reply[56], internal[16];
 } Upgrade;
 static Upgrade up;
@@ -46,6 +53,13 @@ static uint16_t g16(const uint8_t *q) { return q[0] | ((uint16_t)q[1] << 8); }
 static uint32_t g32(const uint8_t *q) { return q[0] | ((uint32_t)q[1] << 8) | ((uint32_t)q[2] << 16) | ((uint32_t)q[3] << 24); }
 static void p16(uint8_t *q, uint16_t v) { q[0]=v; q[1]=v>>8; }
 static void p32(uint8_t *q, uint32_t v) { q[0]=v; q[1]=v>>8; q[2]=v>>16; q[3]=v>>24; }
+
+static uint8_t motor_identity(const Port *x)
+{
+    return x->s.online && x->s.mode==1u && x->s.device_class==2u &&
+           x->s.board_id==2u && x->s.hw_compat==2u && x->s.sensor_type==2u &&
+           (x->s.capabilities&1u) && (x->s.uid[0] || x->s.uid[1] || x->s.uid[2]);
+}
 
 static uint8_t sample_supported(const Port *x)
 {
@@ -73,8 +87,31 @@ static void unbind(Port *x)
     clear_sample(x);
 }
 
+static void motor_stop_queue(Port *x,uint8_t fault)
+{
+    uint8_t partial;
+    if (x->motor_stop) {
+        x->motor_goal=0; x->motor_need_set=0u; x->motor_fault=fault;
+        x->motor_uart_errors=x->s.uart_error_count; return;
+    }
+    partial=(uint8_t)(x->motor_tx_n && x->motor_tx_pos);
+    x->motor_goal=0; x->motor_stop=1u; x->motor_need_set=0u; x->motor_fault=fault;
+    x->motor_tx_n=x->motor_tx_pos=x->pending=x->retry=x->used=x->expected=0u;
+    x->rt=x->rh; x->motor_refresh=board_ms+(partial?25u:0u);
+    x->motor_uart_errors=x->s.uart_error_count;
+}
+
+static void motor_fail(Port *x)
+{
+    if (x->pending && x->command==CMD_MOTOR_STOP) {
+        x->motor_goal=x->motor_stop=x->motor_tx_n=x->pending=0u; x->motor_fault=1u;
+    } else motor_stop_queue(x,1u);
+    unbind(x); x->next_at=board_ms+DISCOVER_MS;
+}
+
 static void up_fail(uint8_t reason)
 {
+    if (up.stage==UP_STOP) { up.pre_stop=0u; p[up.port].motor_fault=1u; }
     if (reason==3u || (up.raw_n && g16(up.raw+8u)==1u)) {
         up.boot_id=up.layout=0u; up.mode=2u; up.image_n=0u;
     }
@@ -120,7 +157,7 @@ static void up_valid(Port *x)
     status=g32(f+16u);
     if (up.stage!=UP_RAW) {
         if (n!=4u || status) { up_fail(4u); return; }
-        if (up.stage==UP_STOP) { up_start(UP_RAW); return; }
+        if (up.stage==UP_STOP) { up.pre_stop=0u; x->motor_ack=0; x->motor_fault=0u; up_start(UP_RAW); return; }
         up.mode=0u; up.layout=0u;
         if (up.hold_for==2u) up.boot_id=0u;
         if (up.hold_for==2u) up_synth_enter();
@@ -222,17 +259,21 @@ uint8_t external_motor_control_active(void) { return up.active && up.motor_contr
 void external_upgrade_cancel(void)
 {
     Port *x;
+    uint8_t stop;
     if (!up.active) return;
+    stop=(uint8_t)(up.board==2u && (up.motor_control || up.pre_stop || p[up.port].motor_fault));
     /* Discard queued control; never replay SET_PWM. Receiver's 250 ms deadman remains the fallback. */
     x=&p[up.port]; closed_token=up.token;
     x->pending=x->retry=x->bad=x->used=x->expected=0u; x->rt=x->rh;
     unbind(x); x->next_at=board_ms+50u;
     memset(&up,0,sizeof(up));
+    if (stop) { motor_stop_queue(x,0u); x->motor_refresh=board_ms+50u; }
 }
 
 uint32_t external_upgrade_open(uint8_t port0,uint32_t token,uint16_t board,uint16_t hw)
 {
     Port *x;
+    uint8_t stop_first;
     if (port0>=KLQ_EXTERNAL_PORT_COUNT || !token ||
         !((board==1u && hw==1u) || (board==3u && hw==1u) || (board==2u && hw==2u))) return 5u;
     if (up.active) {
@@ -240,9 +281,15 @@ uint32_t external_upgrade_open(uint8_t port0,uint32_t token,uint16_t board,uint1
         up.activity=board_ms; return 0u;
     }
     if (token==closed_token) return 4u;
+    x=&p[port0];
+    stop_first=(uint8_t)(x->motor_goal || x->motor_ack || x->motor_stop ||
+                        (x->pending && x->command==CMD_MOTOR_SET));
+    external_ports_motor_stop_all();
     memset(&up,0,sizeof(up)); up.active=1u; up.port=port0; up.token=token; up.board=board; up.hw=hw;
+    up.pre_stop=stop_first;
     up.activity=board_ms; up.draining=1u; up.drain_at=board_ms+50u; up.mode=2u;
     x=&p[port0]; x->pending=x->retry=x->bad=x->used=x->expected=0u; x->rt=x->rh;
+    x->motor_goal=x->motor_ack=0; x->motor_stop=x->motor_fault=x->motor_need_set=x->motor_tx_n=x->motor_tx_pos=0u;
     unbind(x); up.uart_errors=x->s.uart_error_count;
     return 0u;
 }
@@ -292,7 +339,7 @@ uint32_t external_upgrade_submit(uint32_t token,const uint8_t *f,uint16_t length
     if (cmd==0x0200u) up.image_n=0u;
     memcpy(up.raw,f,length); up.raw_n=length; up.reply_n=0u; up.result=up.reason=0u;
     up.uart_errors=p[up.port].s.uart_error_count;
-    up_start((uint8_t)(cmd==0x01f0u && up.board==2u && up.mode==1u ? UP_STOP : UP_RAW));
+    up_start((uint8_t)(up.pre_stop || (cmd==0x01f0u && up.board==2u && up.mode==1u) ? UP_STOP : UP_RAW));
     return 0u;
 }
 
@@ -321,6 +368,10 @@ static void bad_frame(Port *x)
     if (up.active && x==&p[up.port]) {
         if (up.stage && ++x->bad>=3u) up_fail(4u);
         return;
+    }
+    if (x->motor_goal || x->motor_stop || x->motor_tx_n ||
+        (x->pending && (x->command==CMD_MOTOR_SET || x->command==CMD_MOTOR_STOP))) {
+        motor_fail(x); return;
     }
     if (++x->bad>=3u) {
         unbind(x); x->pending=x->bad=x->used=x->expected=0;
@@ -352,15 +403,59 @@ static void request(Port *x, uint16_t command)
     x->command=command; ++x->sequence; x->used=x->expected=0; send(x,0);
 }
 
+static void motor_tx_start(Port *x,uint16_t command,uint8_t retry)
+{
+    uint8_t *f=x->motor_tx;
+    uint16_t n=command==CMD_MOTOR_SET?2u:0u;
+    x->command=command; ++x->sequence; x->used=x->expected=0u;
+    x->pending=1u; x->retry=retry; x->motor_tx_n=(uint8_t)(16u+n); x->motor_tx_pos=0u;
+    x->motor_sent=command==CMD_MOTOR_SET?x->motor_goal:0;
+    p32(f,MAGIC); p32(f+4u,x->sequence); p16(f+8u,command); p16(f+10u,n);
+    p16(f+16u,(uint16_t)x->motor_sent);
+    p32(f+12u,crc32_update(crc32_update(0,f,12u),f+16u,n));
+    x->deadline=board_ms+REQ_TIMEOUT; x->motor_uart_errors=x->s.uart_error_count;
+}
+
+static void motor_poll(Port *x)
+{
+    if (x->motor_goal && (!motor_identity(x) || (int32_t)(board_ms-x->motor_lease)>=0)) motor_fail(x);
+    if ((x->motor_goal || x->motor_stop || x->motor_tx_n) &&
+        x->s.uart_error_count!=x->motor_uart_errors) motor_fail(x);
+    if (x->motor_tx_n) {
+        if (x->uart->STS_B.TXBEFLG) {
+            x->uart->DATA=x->motor_tx[x->motor_tx_pos++];
+            if (x->motor_tx_pos==x->motor_tx_n) {
+                x->motor_tx_n=0u; x->deadline=board_ms+REQ_TIMEOUT; ++x->s.request_count;
+                if (x->command==CMD_MOTOR_SET) {
+                    x->motor_lease=board_ms+MOTOR_LEASE_MS; x->motor_refresh=board_ms+MOTOR_REFRESH_MS;
+                }
+            }
+        }
+        return;
+    }
+    if (x->pending) return;
+    if (x->motor_stop) {
+        if ((int32_t)(board_ms-x->motor_refresh)>=0) motor_tx_start(x,CMD_MOTOR_STOP,0u);
+    } else if (x->motor_goal && !up.active) {
+        if (x->motor_need_set) { x->motor_need_set=0u; motor_tx_start(x,CMD_MOTOR_SET,0u); }
+        else if ((int32_t)(board_ms-x->motor_refresh)>=0) request(x,CMD_INFO);
+    }
+}
+
 static void valid(Port *x)
 {
     const uint8_t *d=x->frame+20;
     uint16_t n=g16(x->frame+10);
     if (up.active && x==&p[up.port]) { up_valid(x); return; }
+    if ((x->motor_goal || x->motor_stop || x->command==CMD_MOTOR_SET || x->command==CMD_MOTOR_STOP) &&
+        (!x->pending || g32(x->frame+4)!=x->sequence || g16(x->frame+8)!=(uint16_t)(x->command|RESP))) return;
     if (n<4u || !x->pending || g32(x->frame+16) || g32(x->frame+4)!=x->sequence ||
         g16(x->frame+8)!=(uint16_t)(x->command|RESP)) goto bad;
     if (x->command==CMD_INFO) {
         if (n!=40u || g16(d)!=1u) goto bad;
+        if (x->motor_goal && (d[2]!=1u || d[3]!=2u || g16(d+4u)!=2u || g16(d+6u)!=2u ||
+            g16(d+8u)!=2u || !(g32(d+16u)&1u) || g32(d+24u)!=x->s.uid[0] ||
+            g32(d+28u)!=x->s.uid[1] || g32(d+32u)!=x->s.uid[2])) { motor_fail(x); return; }
         clear_sample(x);
         x->s.mode=d[2]; x->s.device_class=d[3];
         x->s.board_id=g16(d+4); x->s.hw_compat=g16(d+6); x->s.sensor_type=g16(d+8);
@@ -389,7 +484,15 @@ static void valid(Port *x)
         }
         x->s.sample_sequence=g32(d); x->s.capture_time_ms=g32(d+4);
         x->s.sample_host_ms=board_ms;
+    } else if (x->command==CMD_MOTOR_SET) {
+        if (n!=6u || (int16_t)g16(d)!=x->motor_sent) goto bad;
+        x->motor_ack=x->motor_sent;
+        if (x->motor_goal!=x->motor_sent) x->motor_refresh=board_ms;
+    } else if (x->command==CMD_MOTOR_STOP) {
+        if (n!=4u) goto bad;
+        x->motor_ack=0; x->motor_stop=0u;
     } else goto bad;
+    if (x->command==CMD_INFO && x->motor_goal) x->motor_need_set=1u;
     x->pending=x->bad=0; ++x->s.response_count;
     x->next_at=board_ms+(sample_supported(x) ?
         (x->s.sensor_type==KLQ_SENSOR_IR_DUAL ? IR_SAMPLE_MS : (active?SAMPLE_ACTIVE_MS:SAMPLE_IDLE_MS)) : DISCOVER_MS);
@@ -466,11 +569,16 @@ void external_ports_poll(void)
             up_poll(); continue;
         }
         if (x->used && board_ms-x->last_byte>20u) { x->used=x->expected=0; bad_frame(x); }
+        motor_poll(x);
         if (x->pending && (int32_t)(board_ms-x->deadline)>=0) {
             ++x->s.timeout_count; x->used=x->expected=0;
-            if (x->retry<RETRIES) send(x,(uint8_t)(x->retry+1u));
+            if (x->command==CMD_MOTOR_SET || (x->motor_goal && x->command==CMD_INFO)) motor_fail(x);
+            else if (x->command==CMD_MOTOR_STOP) {
+                if (x->retry<RETRIES) motor_tx_start(x,CMD_MOTOR_STOP,(uint8_t)(x->retry+1u));
+                else { x->pending=x->motor_tx_n=x->motor_stop=0u; x->motor_fault=1u; unbind(x); x->next_at=board_ms+DISCOVER_MS; }
+            } else if (x->retry<RETRIES) send(x,(uint8_t)(x->retry+1u));
             else { x->pending=0; unbind(x); x->next_at=board_ms+DISCOVER_MS; }
-        } else if (!x->pending && (int32_t)(board_ms-x->next_at)>=0) {
+        } else if (!x->pending && !x->motor_goal && !x->motor_stop && (int32_t)(board_ms-x->next_at)>=0) {
             request(x,sample_supported(x) ? CMD_SAMPLE : CMD_INFO);
         }
     }
@@ -481,15 +589,76 @@ const klq_port_status_t *external_port_status(unsigned port)
     return port<KLQ_EXTERNAL_PORT_COUNT ? &p[port].s : 0;
 }
 
-/* Motor device class/type and command IDs are intentionally not guessed. */
-bool external_port_motor(unsigned port, int direction, bool run, unsigned power)
+bool external_ports_motor_stopped(void)
 {
-    (void)port; (void)direction; (void)run; (void)power;
-    return false;
+    unsigned i;
+    if (up.active && (up.motor_control || up.pre_stop)) return false;
+    for (i=0;i<KLQ_EXTERNAL_PORT_COUNT;i++) {
+        const Port *x=&p[i];
+        if (x->motor_fault || x->motor_goal || x->motor_stop || x->motor_tx_n || x->motor_ack ||
+            (x->pending && (x->command==CMD_MOTOR_SET || x->command==CMD_MOTOR_STOP))) return false;
+    }
+    return true;
+}
+
+bool external_port_motor_ready(unsigned port)
+{
+    return port<KLQ_EXTERNAL_PORT_COUNT && !up.active && motor_identity(&p[port]);
+}
+
+bool external_port_motor_command(unsigned port,int16_t pwm)
+{
+    Port *x;
+    if (port>=KLQ_EXTERNAL_PORT_COUNT || (up.active && port==up.port)) return false;
+    x=&p[port];
+    if (pwm<-1000 || pwm>1000) {
+        if (motor_identity(x) || x->motor_goal || x->motor_ack) motor_stop_queue(x,0u);
+        return false;
+    }
+    if (pwm && (up.active || !motor_identity(x))) return false;
+    if (!pwm) {
+        if (!motor_identity(x) && !x->motor_goal && !x->motor_ack && !x->motor_stop) return false;
+        motor_stop_queue(x,0u); return true;
+    }
+    if (x->motor_goal==pwm && !x->motor_fault) return true;
+    x->motor_goal=pwm; x->motor_fault=x->motor_need_set=0u;
+    x->motor_refresh=board_ms; x->motor_lease=board_ms+MOTOR_LEASE_MS;
+    x->motor_uart_errors=x->s.uart_error_count;
+    return true;
+}
+
+uint8_t external_port_motor_state(unsigned port)
+{
+    const Port *x;
+    if (port>=KLQ_EXTERNAL_PORT_COUNT) return KLQ_MOTOR_ERROR;
+    x=&p[port];
+    if (x->motor_fault) return KLQ_MOTOR_ERROR;
+    if (x->motor_stop) return KLQ_MOTOR_STOPPING;
+    if (x->motor_goal) return x->motor_ack==x->motor_goal?KLQ_MOTOR_ACTIVE:KLQ_MOTOR_PENDING;
+    return KLQ_MOTOR_IDLE;
+}
+
+int16_t external_port_motor_ack_pwm(unsigned port)
+{
+    return port<KLQ_EXTERNAL_PORT_COUNT?p[port].motor_ack:0;
+}
+
+bool external_port_motor(unsigned port,int direction,bool run,unsigned power)
+{
+    static const uint16_t duty[3]={333u,666u,1000u};
+    if (!run) return external_port_motor_command(port,0);
+    if ((direction!=-1 && direction!=1) || power<1u || power>3u) {
+        external_port_motor_command(port,0); return false;
+    }
+    return external_port_motor_command(port,(int16_t)(direction*(int)duty[power-1u]));
 }
 
 void external_ports_motor_stop_all(void)
 {
     unsigned i;
-    for (i=0;i<KLQ_EXTERNAL_PORT_COUNT;i++) external_port_motor(i,0,false,0);
+    for (i=0;i<KLQ_EXTERNAL_PORT_COUNT;i++) {
+        Port *x=&p[i];
+        if (!(up.active && i==up.port) && (motor_identity(x) || x->motor_goal || x->motor_ack || x->motor_stop))
+            motor_stop_queue(x,0u);
+    }
 }

@@ -1,0 +1,316 @@
+{
+  "date": "2026-10-30",
+  "status": "PAUSED_BY_USER",
+  "pause_request": "电机没转，先暂停其他测试，等会再来",
+  "branch": "codex/python-runtime",
+  "baseline": "64837d5b97eb74ebf6cbfb12cfe5bf9c3d9c0d9b",
+  "source_status": "uncommitted WIP, not pushed",
+  "main_firmware": "0.11",
+  "main_image_sha256": "9935b9f1a4ae6ee30c0bc943794995bd21a1e7b51900f86bd1b92b48ce5bccc0",
+  "CI_version": "0.2.0",
+  "confirmed_audio": "User confirmed all8 sounds audible after repeat",
+  "confirmed_idle_motion": "User confirmed forward/reverse/stop all correct",
+  "idle_summary": {
+    "result": "PASS",
+    "accepted_delta": 3,
+    "completed_delta": 2,
+    "error_delta": 0,
+    "observed_pwm": [
+      -800,
+      800
+    ],
+    "seen_semantics": [
+      "0x4B510001",
+      "0x4B510101",
+      "0x4B510102",
+      "0x4B510103"
+    ],
+    "cleanup_real_stop_ack": true
+  },
+  "running_summary": {
+    "result": "PASS",
+    "accepted_delta": 0,
+    "rejected_delta": 2,
+    "error_delta": 0,
+    "sound_in_gate_pass": true,
+    "host_gate": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=3; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=5; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=4; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+    "host_after_gate": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=3; USER_VALID=1; USER_LENGTH=55; USER_RECEIVED=55; USER_MAX=16384; UI=5; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=4; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+    "host_cleanup": "KLQ ROBOT FW 0.11; APP=0x08008000; MAX=489472; PAGE=2048; VALID=1; USER_STATE=0; USER_VALID=0; USER_LENGTH=0; USER_RECEIVED=0; USER_MAX=16384; UI=1; PY_ERROR=0; PY_LINE=0; PK_RAW=1; PK_DOWN=0; PK_SHORT=0; USB_RESETS=4; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+    "cleanup_pass": true,
+    "real_stop_ack": true,
+    "disarmed": {
+      "abi": 1,
+      "enabled": 0,
+      "version_valid": 1,
+      "awake": 1,
+      "version": "0.2.0",
+      "play_state": 2,
+      "request": 0,
+      "last_ack": 128,
+      "last_error": 0,
+      "last_cmd": 146,
+      "last_seq": 32,
+      "active": 0,
+      "port": 2,
+      "reason": 1,
+      "semantic": 1263599875,
+      "rx_frames": 99,
+      "bad_frames": 0,
+      "uart_errors": 0,
+      "rx_overflows": 0,
+      "tx_errors": 0,
+      "timeouts": 0,
+      "accepted": 3,
+      "rejected": 5,
+      "completed": 2,
+      "errors": 0,
+      "events": [
+        0,
+        3,
+        2,
+        26,
+        25
+      ],
+      "recognitions": 11,
+      "duplicates": 0,
+      "dropped": 0,
+      "play_acks": 26,
+      "play_done": 25,
+      "play_id": 5007,
+      "rx_bytes": 1229,
+      "tx_frames": 43,
+      "last_rx_ms": 2213454,
+      "cancelled": 0,
+      "score": 196,
+      "intent_seq": 67,
+      "phase": 0,
+      "pending_sound": 0,
+      "pwm": 0,
+      "pc_monotonic": 13412.203
+    }
+  },
+  "running_physical_feedback": "User confirmed motor did not rotate; did not explicitly confirm number12 persisted visually",
+  "monitor_after_cleanup": {
+    "connected": false,
+    "port": "自动识别",
+    "since": 0.0,
+    "last_update": 1793335989.5951874,
+    "error": "监测已暂停，串口已释放",
+    "firmware": {},
+    "voice": {
+      "supported": false,
+      "updated": 0.0,
+      "error": ""
+    },
+    "accelerometer": {
+      "online": false,
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "roll": 0.0,
+      "pitch": 0.0,
+      "address": "--",
+      "identity": "--",
+      "version": "--",
+      "updated": 0.0
+    },
+    "ports": [
+      {
+        "index": 1,
+        "online": false,
+        "class": 0,
+        "type": 0,
+        "uid": "--",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 0,
+        "sequence": 0,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 0,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 0,
+        "responses": 0,
+        "updated": 0.0
+      },
+      {
+        "index": 2,
+        "online": false,
+        "class": 0,
+        "type": 0,
+        "uid": "--",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 0,
+        "sequence": 0,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 0,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 0,
+        "responses": 0,
+        "updated": 0.0
+      },
+      {
+        "index": 3,
+        "online": false,
+        "class": 0,
+        "type": 0,
+        "uid": "--",
+        "distance": 0,
+        "ticks": 0,
+        "sample_status": 0,
+        "sequence": 0,
+        "left": 0,
+        "right": 0,
+        "quality_flags": 0,
+        "timeout": 0,
+        "frame_error": 0,
+        "uart_error": 0,
+        "requests": 0,
+        "responses": 0,
+        "updated": 0.0
+      }
+    ],
+    "events": [
+      {
+        "time": "12:53:09",
+        "message": "连接断开：监测已暂停，串口已释放"
+      },
+      {
+        "time": "12:53:09",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:53:08",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:53:07",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:53:06",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:53:05",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:53:04",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:53:04",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:53:03",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:53:02",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:53:01",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:53:01",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:53:00",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:59",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:52:58",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:58",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:52:57",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:56",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:52:55",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:55",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:52:54",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:53",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:52:52",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:52",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:52:51",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:50",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:52:49",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:49",
+        "message": "连接断开：Write timeout"
+      },
+      {
+        "time": "12:52:47",
+        "message": "已连接 COM123"
+      },
+      {
+        "time": "12:52:47",
+        "message": "连接断开：Write timeout"
+      }
+    ],
+    "server_time": 1793336064.7812757,
+    "paused": true,
+    "serial_released": true
+  },
+  "monitor_issue": "After graceful resume, repeated USB write timeouts with no INFO/voice snapshot; do not claim connected=true means communication healthy. HTTPpause200/releasedtrue confirmed; page/server retained, retry stopped. Root cause unknown.",
+  "not_completed": [
+    "READY validRAM actual voice acceptance",
+    "DOWNLOADING realASR rejection/audio",
+    "diagnostic exclusion realASR/audio",
+    "voiceSTOP interrupting still-running1s action (previousSTOP afterfiniteend)",
+    "activePC4/USBstop/disconnect/wakeexit physicalcancellation",
+    "newquiesce150ms shutdown/RESET physicaltiming",
+    "longstress/precisestoplatency"
+  ],
+  "no_new_tests_after_pause": true
+}

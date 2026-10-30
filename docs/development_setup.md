@@ -1,5 +1,16 @@
 # 主控0.9开发与外接升级构建环境（2026-10-29）
 
+当前主机0.12（2026-10-30）已安装，驻留引导0.3保留。以下0.9制品路径为历史；依赖/SDK恢复规则继续适用。当前构建与新增回归可用：
+
+```powershell
+python tools/build.py --demo --output-dir build/host_0_12/app
+python tools/test_usb_endpoint_register.py
+python tools/test_status_dashboard_connection.py
+```
+
+端点模型默认VC98，支持--compiler；不接硬件，含两个必须失败的负对照。语音相关native回归为tools/run_voice_wire_tests.ps1、tools/run_voice_policy_tests.ps1、sensor_boot/tests/run_motor_business.ps1；新增USB工程协议见host_voice_protocol_v0.1.md。实际验收范围先看verification_20261030_voice.md，勿将0.11/0.12和历史0.9结果混淆。
+
+
 使用 `codex/python-runtime`，先读 `handoff_current.md` 并核对分支/提交/未提交内容。共享旧main包含语音等本地工作，本分支不是其整目录覆盖副本。
 
 主控采用仓库内裁剪Geehy SDK、ARM Compiler 5.06 update6 build750，默认 `C:/Keil_v5/ARM/ARMCC/bin`，可用 `KLQ_ARMCC` 指定。Python使用3.12，USB工具依赖pyserial3.5；安装工具依赖见 `tools/requirements.txt`。本机native测试使用VC98 12.00.8168及专用stdint/stdbool mock，编译器路径可由各测试脚本 `-Compiler` 指定；这些mock不参与ARM目标构建。

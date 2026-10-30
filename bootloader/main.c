@@ -9,6 +9,8 @@
 #include "robot_ui.h"
 #include "sc7a20.h"
 #include "user_program.h"
+#include "voice_link.h"
+#include "voice_control.h"
 #include <stdio.h>
 #endif
 
@@ -32,6 +34,7 @@ int main(void)
         uint32_t sample_at;
         uint32_t error_at;
         uint32_t port_at;
+        uint32_t voice_at;
         char line[160];
         sc7a20_sample_t sample;
         bool sample_valid;
@@ -43,6 +46,8 @@ int main(void)
         power_key_init();
         peripherals_uart_init();
         external_ports_init();
+        voice_link_init();
+        voice_control_init();
         sensor_ready = sc7a20_init();
         sensor_announced = false;
         usb_serial_init();
@@ -50,10 +55,18 @@ int main(void)
         sample_at = board_ms + 100u;
         error_at = board_ms;
         port_at = board_ms + 500u;
+        voice_at = board_ms;
         sample_valid = false;
         for (;;) {
+            voice_link_poll();
             protocol_poll();
             power_key_poll();
+            voice_control_poll();
+            if ((int32_t)(board_ms-voice_at)>=0) {
+                voice_link_status_t v;
+                voice_at=board_ms+2000u; voice_link_get_status(&v);
+                if (!v.version_valid) voice_link_query_version();
+            }
             klq_runtime_poll();
             user_program_poll();
             robot_ui_poll();

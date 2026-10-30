@@ -1,5 +1,8 @@
 # KLQ V2
 
+当前主机0.12已通过USB安装，新增UART4语音与普通电机驱动，含USB完成位修复。实物验收范围及剩余工作见[本轮记录](docs/verification_20261030_voice.md)，继续开发先读[当前交接](docs/handoff_current.md)。
+
+
 
 当前主机已安装0.10，支持端口独占电机诊断；N20电机80%/1秒转动和停止已实物确认，Python电机积木尚未接通。见[电机实测](docs/verification_20261029_motor.md)。
 APM32E103RET6 编程机器人项目。项目远程仓库为 https://github.com/msl1831/KLQ_V2 ，后续源码与文档在此同步。

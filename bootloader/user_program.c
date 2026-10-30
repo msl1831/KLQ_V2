@@ -4,6 +4,8 @@
 #include "mini_python.h"
 #include "klq_runtime.h"
 #include "external_ports.h"
+#include "voice_control.h"
+#include "power_key.h"
 #include <string.h>
 
 static uint8_t program_buffer[USER_PROGRAM_CAPACITY];
@@ -23,7 +25,8 @@ void user_program_init(void)
 
 bool user_program_begin(uint32_t length, uint32_t crc)
 {
-    if (!length || length > USER_PROGRAM_CAPACITY) return false;
+    if (!length || length > USER_PROGRAM_CAPACITY || power_key_shutdown_pending() || protocol_reset_pending()) return false;
+    voice_control_cancel(); klq_runtime_stop_all();
     if (state==USER_PROGRAM_RUNNING) mini_python_stop();
     state = USER_PROGRAM_DOWNLOADING;
     expected_length = length;
@@ -61,10 +64,11 @@ bool user_program_finish_download(void)
 
 bool user_program_start(void)
 {
-    if (external_upgrade_active() || state != USER_PROGRAM_READY || robot_ui_state() != ROBOT_UI_STANDBY) return false;
+    if (power_key_shutdown_pending() || protocol_reset_pending() || external_upgrade_active() || state != USER_PROGRAM_READY || robot_ui_state() != ROBOT_UI_STANDBY) return false;
+    voice_control_cancel(); klq_runtime_stop_all();
     if (!mini_python_start()) return false;
     state = USER_PROGRAM_RUNNING;
-    robot_ui_set_running();
+    robot_ui_set_running(); voice_control_sound(5004u);
     return true;
 }
 
@@ -73,25 +77,28 @@ void user_program_poll(void)
     mini_status_t s;
     if (state!=USER_PROGRAM_RUNNING) return;
     s=mini_python_poll();
-    if (s==MINI_DONE) { state=USER_PROGRAM_READY; robot_ui_set_standby(); }
-    else if (s==MINI_ERROR) { state=USER_PROGRAM_READY; robot_ui_set_error(); }
+    if (s==MINI_DONE) { voice_control_cancel(); klq_runtime_stop_all(); state=USER_PROGRAM_READY; robot_ui_set_standby(); voice_control_sound(5006u); }
+    else if (s==MINI_ERROR) { voice_control_cancel(); klq_runtime_stop_all(); state=USER_PROGRAM_READY; robot_ui_set_error(); voice_control_sound(5003u); }
 }
 
 void user_program_stop(void)
 {
+    uint8_t was=(uint8_t)(state==USER_PROGRAM_RUNNING || state==USER_PROGRAM_DOWNLOADING || voice_control_active());
+    voice_control_cancel(); klq_runtime_stop_all();
     if (state == USER_PROGRAM_RUNNING) { mini_python_stop(); state = USER_PROGRAM_READY; }
     else if (state == USER_PROGRAM_DOWNLOADING) {
         state = USER_PROGRAM_EMPTY;
         expected_length = 0;
         received_length = 0;
     }
-    robot_ui_set_standby();
+    robot_ui_set_standby(); if (was) voice_control_sound(5005u);
 }
 
 void user_program_finish_execution(void)
 {
+    voice_control_cancel(); klq_runtime_stop_all();
     if (state == USER_PROGRAM_RUNNING) { mini_python_stop(); state = USER_PROGRAM_READY; }
-    robot_ui_set_standby();
+    robot_ui_set_standby(); voice_control_sound(5006u);
 }
 
 bool user_program_set_display(const uint8_t columns[13])

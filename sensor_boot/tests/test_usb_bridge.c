@@ -8,6 +8,23 @@
 #include "robot_ui.h"
 #include "external_ports.h"
 
+
+#include "voice_link.h"
+#include "voice_control.h"
+static unsigned voice_arm_on_calls;
+static uint8_t shutdown_test;
+void voice_control_init(void){}
+void voice_control_poll(void){}
+uint8_t voice_control_active(void){return 0u;}
+void voice_control_cancel(void){}
+void voice_control_set_enabled(uint8_t v){if(v)++voice_arm_on_calls;}
+void voice_control_sound(uint16_t id){(void)id;}
+void voice_control_get_status(voice_control_status_t *s){memset(s,0,sizeof(*s));}
+uint8_t voice_link_query_version(void){return 1u;}
+uint8_t voice_link_play(uint32_t id){(void)id;return 1u;}
+void voice_link_get_status(voice_link_status_t *s){memset(s,0,sizeof(*s));}
+uint8_t power_key_shutdown_pending(void){return shutdown_test;}
+
 #define XOPEN 0x0040U
 #define XFER 0x0041U
 #define XPOLL 0x0042U
@@ -80,6 +97,10 @@ uint32_t external_upgrade_close(uint32_t token)
 }
 void external_upgrade_cancel(void) { ++cancel_calls;owner=0U; }
 uint8_t external_upgrade_active(void) { return owner; }
+static bool motors_stopped=true;
+bool external_ports_motor_stopped(void){return motors_stopped;}
+static unsigned motor_stop_calls;
+void klq_runtime_stop_all(void){++motor_stop_calls;}
 uint8_t external_motor_control_active(void) { return (uint8_t)(owner && motor_owner); }
 
 void user_program_init(void) {}
@@ -113,7 +134,7 @@ static void setup(void)
 {
     memset(input,0,sizeof(input));memset(sent,0,sizeof(sent));memset(mock_meta,0,sizeof(mock_meta));
     in_size=in_pos=sent_size=0U;board_ms=100U;usb_reset_count=0U;
-    reset_seen=owner=result_state=result_reason=motor_owner=0U;owner_token=0U;
+    reset_seen=owner=result_state=result_reason=motor_owner=shutdown_test=0U;motors_stopped=true;voice_arm_on_calls=motor_stop_calls=0;owner_token=0U;
     inject_reset=0U;reset_queue_size=0U;
     writes=open_calls=submit_calls=result_calls=close_calls=cancel_calls=stop_calls=0U;
     begin_calls=data_calls=end_calls=run_calls=display_calls=finish_calls=reset_calls=boot_requests=0U;
@@ -232,6 +253,27 @@ static void reset_during_response(void)
     CHECK(!owner && cancel_calls==1U && !submitted_size);
     CHECK(sent_size==41U && rd32(sent+21U+16U)==ERR_STATE);
 }
+static void rejected_open_no_side_effects(void)
+{
+    uint8_t p[9]={0};setup();p[0]=3;wr32(p+1,TOKEN);wr16(p+5,1);wr16(p+7,1);in_size=in_pos=sent_size=0;append(750,XOPEN,p,9);protocol_poll();expect(750,XOPEN,ERR_RANGE,0);CHECK(!motor_stop_calls&&!stop_calls&&user_state==USER_PROGRAM_RUNNING);
+    setup();shutdown_test=1;p[0]=0;in_size=in_pos=sent_size=0;append(751,XOPEN,p,9);protocol_poll();expect(751,XOPEN,ERR_STATE,0);CHECK(!open_calls&&!motor_stop_calls&&!stop_calls);
+}
+static void reset_quiesce(void)
+{
+    setup();motors_stopped=false;in_size=in_pos=sent_size=0;append(701,CMD_RESET,0,0);{uint8_t arm=1;append(703,CMD_VOICE_ARM,&arm,1);}protocol_poll();CHECK(in_pos<in_size&&!voice_arm_on_calls);expect(701,CMD_RESET,OK,0);CHECK(protocol_reset_pending()&&!reset_calls);
+    board_ms+=149;protocol_poll();CHECK(protocol_reset_pending()&&!reset_calls);motors_stopped=true;protocol_poll();CHECK(!protocol_reset_pending()&&reset_calls==1);
+    setup();motors_stopped=false;in_size=in_pos=sent_size=0;append(702,CMD_RESET,0,0);protocol_poll();CHECK(protocol_reset_pending());board_ms+=150;protocol_poll();CHECK(!protocol_reset_pending()&&reset_calls==1);
+}
+static void voice_diagnostics(void)
+{
+    const uint8_t *out;uint8_t p[4];setup();in_size=in_pos=sent_size=0;append(600,CMD_VOICE_STATUS,0,0);protocol_poll();out=expect(600,CMD_VOICE_STATUS,OK,108);CHECK(out[0]==1);
+    in_size=in_pos=sent_size=0;append(601,CMD_VOICE_QUERY,0,0);protocol_poll();expect(601,CMD_VOICE_QUERY,OK,0);
+    wr32(p,4999);in_size=in_pos=sent_size=0;append(602,CMD_VOICE_PLAY,p,4);protocol_poll();expect(602,CMD_VOICE_PLAY,ERR_RANGE,0);
+    wr32(p,5002);in_size=in_pos=sent_size=0;append(603,CMD_VOICE_PLAY,p,4);protocol_poll();expect(603,CMD_VOICE_PLAY,OK,0);CHECK(user_state==USER_PROGRAM_RUNNING);
+    p[0]=1;in_size=in_pos=sent_size=0;append(604,CMD_VOICE_ARM,p,1);protocol_poll();expect(604,CMD_VOICE_ARM,ERR_STATE,0);
+    p[0]=2;in_size=in_pos=sent_size=0;append(605,CMD_VOICE_ARM,p,1);protocol_poll();expect(605,CMD_VOICE_ARM,ERR_RANGE,0);
+    p[0]=0;in_size=in_pos=sent_size=0;append(606,CMD_VOICE_ARM,p,1);protocol_poll();expect(606,CMD_VOICE_ARM,OK,0);
+}
 static void motor_stop_cancel(void)
 {
     uint8_t invalid=0;
@@ -243,6 +285,6 @@ static void motor_stop_cancel(void)
 }
 int main(void)
 {
-    open_and_forward();malformed_requests();ownership_and_resets();budget_and_info();reset_during_response();motor_stop_cancel();
+    open_and_forward();malformed_requests();ownership_and_resets();budget_and_info();reset_during_response();motor_stop_cancel();voice_diagnostics();reset_quiesce();rejected_open_no_side_effects();
     printf("USB bridge integration: %u assertions passed\n",checks);return 0;
 }

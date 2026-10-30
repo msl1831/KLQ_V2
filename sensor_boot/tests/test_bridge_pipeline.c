@@ -59,6 +59,22 @@ uint16_t power_key_short_count(void) { return 0U; }
 robot_ui_state_t robot_ui_state(void) { return ROBOT_UI_STANDBY; }
 
 /* Runner copies both production sources unchanged so hardware headers can be mocked. */
+
+#include "voice_link.h"
+#include "voice_control.h"
+void klq_runtime_stop_all(void){external_ports_motor_stop_all();}
+void voice_control_init(void){}
+void voice_control_poll(void){}
+uint8_t voice_control_active(void){return 0u;}
+void voice_control_cancel(void){}
+void voice_control_set_enabled(uint8_t v){(void)v;}
+void voice_control_sound(uint16_t id){(void)id;}
+void voice_control_get_status(voice_control_status_t *s){memset(s,0,sizeof(*s));}
+uint8_t voice_link_query_version(void){return 1u;}
+uint8_t voice_link_play(uint32_t id){(void)id;return 1u;}
+void voice_link_get_status(voice_link_status_t *s){memset(s,0,sizeof(*s));}
+uint8_t power_key_shutdown_pending(void){return 0u;}
+
 #include "protocol_source.c"
 #include "external_ports_source.c"
 

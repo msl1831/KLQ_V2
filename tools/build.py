@@ -18,7 +18,7 @@ def build(demo=False, baseline=False, output_dir=None):
     files = list(board.glob('*.c'))
     if not demo and not baseline:
         demo_only = {'audio_link.c', 'external_ports.c', 'peripherals.c', 'robot_ui.c', 'sc7a20.c', 'user_program.c',
-                     'klq_runtime.c', 'mini_python.c', 'power_key.c'}
+                     'klq_runtime.c', 'mini_python.c', 'power_key.c', 'voice_link.c', 'voice_control.c'}
         files = [source for source in files if source.name not in demo_only]
     drivers = ['rcm','gpio','fmc']
     if demo: drivers += ['usart']

@@ -295,7 +295,12 @@ static void motor_control_timeout_cancel(void)
     CHECK(!up.active && !up.raw_n && !external_motor_control_active());
     CHECK(external_upgrade_submit(TOKEN,req,req_n)==4U);
     CHECK(external_upgrade_open(0U,TOKEN,2U,2U)==4U);
-    poll_at(board_ms+600U); CHECK(!up.active && p[0].pending && p[0].command==1U);
+    poll_at(board_ms+50U);
+    while (p[0].motor_tx_n) poll_at(board_ms+1U);
+    CHECK(!up.active && p[0].pending && p[0].command==0x0302U);
+    p32(p[0].frame,MAGIC); p32(p[0].frame+4,p[0].sequence); p16(p[0].frame+8,0x8302U); p16(p[0].frame+10,4U); p32(p[0].frame+16,0U); valid(&p[0]);
+    CHECK(!p[0].motor_stop && external_ports_motor_stopped());
+    poll_at(p[0].next_at); CHECK(p[0].pending && p[0].command==1U);
 }
 
 int main(void)
