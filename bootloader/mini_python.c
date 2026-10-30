@@ -241,7 +241,9 @@ bool mini_python_start(void)
 mini_status_t mini_python_poll(void)
 {
     const char *p,*q; uint16_t n,ind,qn,qi; bool tab,qt; uint32_t at,next,look,candidate; int32_t count; uint8_t steps=0;
-    if (status!=MINI_RUNNING || pending()) return status;
+    if (status!=MINI_RUNNING) return status;
+    if (!klq_runtime_motors_ok()) { fail(MINI_ERR_RUNTIME,error_pc); return status; }
+    if (pending()) return status;
 again:
     if (++steps>STEP_BUDGET) return status;
     if (pc>=src_n) {
@@ -264,6 +266,7 @@ again:
     if ((!depth && ind) || (depth && ind!=(uint16_t)(loop[depth-1u].indent+4u))) {
         fail(MINI_ERR_SYNTAX,at); return status;
     }
+    error_pc=at;
     if (eq(p,n,"import klq") || eq(p,n,"from klq import *") || eq(p,n,"pass")) return status;
     if ((n>=7u && !memcmp(p,"import ",7)) || (n>=5u && !memcmp(p,"from ",5))) {
         fail(MINI_ERR_NAME,at); return status;

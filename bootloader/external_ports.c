@@ -643,6 +643,11 @@ int16_t external_port_motor_ack_pwm(unsigned port)
     return port<KLQ_EXTERNAL_PORT_COUNT?p[port].motor_ack:0;
 }
 
+int16_t external_port_motor_goal_pwm(unsigned port)
+{
+    return port<KLQ_EXTERNAL_PORT_COUNT?p[port].motor_goal:0;
+}
+
 bool external_port_motor(unsigned port,int direction,bool run,unsigned power)
 {
     static const uint16_t duty[3]={333u,666u,1000u};

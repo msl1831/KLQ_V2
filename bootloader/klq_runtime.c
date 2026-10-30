@@ -9,7 +9,7 @@
 
 static sc7a20_sample_t imu;
 static uint32_t imu_at, button_at;
-static uint8_t imu_valid, motor_power=2, move_power=2, button_raw, button_stable;
+static uint8_t imu_valid, motor_power=2, move_power=2, button_raw, button_stable, motor_owned;
 
 void klq_runtime_init(void)
 {
@@ -19,7 +19,7 @@ void klq_runtime_init(void)
     io.mode=GPIO_MODE_IN_PU;
     io.speed=GPIO_SPEED_2MHz;
     GPIO_Config(GPIOC,&io);
-    imu_valid=0;
+    imu_valid=motor_owned=0;
     button_raw=button_stable=(uint8_t)(GPIO_ReadInputBit(GPIOC,GPIO_PIN_3)==0);
     button_at=board_ms;
 }
@@ -74,7 +74,8 @@ int klq_runtime_motor(unsigned port, int direction, bool run)
 {
     if (port<1u || port>KLQ_EXTERNAL_PORT_COUNT || (direction!=-1 && direction!=1)) return KLQ_RT_RANGE;
     if (!run) { external_port_motor(port-1u,0,false,motor_power); return KLQ_RT_OK; }
-    return external_port_motor(port-1u,direction,run,motor_power) ? KLQ_RT_OK : KLQ_RT_UNSUPPORTED;
+    if (!external_port_motor(port-1u,direction,run,motor_power)) return KLQ_RT_UNSUPPORTED;
+    motor_owned|=(uint8_t)(1u<<(port-1u)); return KLQ_RT_OK;
 }
 
 int klq_runtime_move(unsigned direction, bool run)
@@ -89,11 +90,24 @@ int klq_runtime_move(unsigned direction, bool run)
     }
     if (!run) { external_port_motor(0,0,false,move_power); external_port_motor(1,0,false,move_power); return KLQ_RT_OK; }
     if (!external_port_motor(0,a,true,move_power)) return KLQ_RT_UNSUPPORTED;
+    motor_owned|=1u;
     if (!external_port_motor(1,b,true,move_power)) { external_port_motor(0,0,false,move_power); return KLQ_RT_UNSUPPORTED; }
+    motor_owned|=2u;
     return KLQ_RT_OK;
 }
 
-void klq_runtime_stop_all(void) { external_ports_motor_stop_all(); }
+bool klq_runtime_motors_ok(void)
+{
+    unsigned i;
+    /* Only this program's motors may fail its execution; retain ownership through STOP ACK. */
+    for (i=0;i<KLQ_EXTERNAL_PORT_COUNT;i++) if (motor_owned&(1u<<i)) {
+        uint8_t state=external_port_motor_state(i);
+        if (!external_port_motor_ready(i) || state==KLQ_MOTOR_ERROR) return false;
+        if (state==KLQ_MOTOR_IDLE) motor_owned&=(uint8_t)~(1u<<i);
+    }
+    return true;
+}
+void klq_runtime_stop_all(void) { motor_owned=0u; external_ports_motor_stop_all(); }
 void klq_runtime_set_motor_power(unsigned level) { if (level>=1u && level<=3u) motor_power=(uint8_t)level; }
 void klq_runtime_set_move_power(unsigned level) { if (level>=1u && level<=3u) move_power=(uint8_t)level; }
 

@@ -32,6 +32,8 @@ bool external_port_motor(unsigned p,int d,bool run,unsigned power)
     else if (supported[p]) running[p]=true;
     return !run || supported[p];
 }
+bool external_port_motor_ready(unsigned p) { return p<3 && supported[p]; }
+uint8_t external_port_motor_state(unsigned p) { return p<3 ? (running[p]?KLQ_MOTOR_ACTIVE:KLQ_MOTOR_IDLE) : KLQ_MOTOR_ERROR; }
 void external_ports_motor_stop_all(void) { ++stop_count; memset(running,0,sizeof(running)); }
 bool robot_ui_set_user_pattern(const uint8_t p[13])
 {

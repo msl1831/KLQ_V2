@@ -1,6 +1,11 @@
-# KLQ 主控当前交接（2026-10-29）
+# KLQ 主控当前交接（2026-10-30）
 
-## 最新复测结果（2026-10-30，本节优先）
+## Python电机积木已完成本轮（2026-10-30，最新）
+
+用户明确电机一直悬空，后续不再重复机械确认。当前主机0.13已USB安装，APP30952/RO30884/RAM27632 B（比0.12 Flash+248、RAM不变），SHA6637592656fdc0ebc5b681cb569433e5f1c40f9317c038ee342db9edd6d690ae。P2 N20实际motor_for正反和motor_run/motor_stop完整用户确认，另stop积木/EOF/参数错误/USBSTOP四例普通ACK停机通过，用户看到短转停止但未核对次数。异步故障→PY7只native验证。0x55只读快照和页面已启用，默认档位2恢复；当前RAM保留examples/motor_blocks_demo.py，READY/有效、未自动RUN、goal/ACK0、语音ARM0。驻留boot0.3/外设未写。详细见verification_20261030_python_motor.md/json及python_motor_worklog_20261030.md；旧60s工具窗口超时不当作电机故障，人工复测用RAM保留方式。当前提交/远端及PID收尾核对。
+
+
+## 历史：0.12语音与USB复测（2026-10-30）
 
 用户已恢复测试并确认N20仍悬空。0.11新增下载中/诊断占用真实语音拒绝、READY语音1s动作、活动中USB STOP、活动中PC4短按五项均软件证据+用户确认PASS，PC4不误启动READY程序。每项ARM0/清RAM/真实STOP ACK。
 
@@ -9,7 +14,7 @@
 详见[本轮验收](verification_20261030_voice.md)、verification_20261030_voice.json和[语音工程USB接口](host_voice_protocol_v0.1.md)。代码仍以C工作树codex/python-runtime为准，提交/远程状态结束时核对；F共享main不覆盖。剩余Python电机/移动实物、USB物理拔线、关机复位150ms实际时序及长期USB稳定性，不把模型或短测当作这些验收。以下暂停记录保留为历史。
 
 
-## 最新暂停检查点（2026-10-30，本节优先）
+## 历史：用户暂停检查点（2026-10-30）
 
 用户要求暂停其他测试。主机0.11已安装，UART4真实CI0.2.0版本、8音效听音、真实语义及EMPTY有限正反转/停止通过；RUNNING时语音正转/停止拒绝、不结束用户程序，用户确认电机未转。收尾已ARM0/active0/空RAM/精确P2 UID后的真实STOP ACK。P1 IR/P2 N20/P3 UL。监测恢复后又出现USB Write timeout，无INFO快照；现HTTP pause200/releasedtrue，保留页面但停止重试，不宣称正常在线。根因留待恢复后查。
 
@@ -20,7 +25,7 @@
 
 共享 `F:/work/KLQ_V2/Codex` 仍为旧main@63d1ea3加未提交工作。按sensor boot对话转达的用户要求，将其USB→UART升级代码真实合流到本分支，未整文件覆盖Python业务；未改写共享源码。sensor_boot及UL/IR/MOTOR第一方输入已纳入本分支，44个板端生产文件与当前来源逐字节一致。语音、环境审计工具及其它共享未提交材料仍未纳入，不能宣称克隆即可恢复整个产品。Puya SDK以sensor_boot/dependencies.json固定提交，恢复见development_setup.md，不跟踪裸gitlink。
 
-## 当前结果
+## 历史工作记录
 
 - 2026-10-30继续测试：右侧监测已恢复，主机0.10/P1 IR/P2 UL/P3 N20在线。用户确认悬空后，-800/1秒反转及单次+800不续期自动归零均通过，用户确认两次方向相反且均停止；迟到STATUS在设备uptime相隔383 ms时为0/0，不代表精确250 ms边界。之后约9.77秒三口无新增通信错误。目标固件未改/未烧录；仅修正页面电机0mm假测距显示、通用超声名称。另据共享main既往烧录/读回记录，Motor最新已知引导为1.0.2（本轮未查引导）。见verification_20261030_continue.md、continuation_20261030.json，原始文件及当前PID在build/continuation_20261030。
 
@@ -67,7 +72,7 @@ python tools/status_dashboard.py
 
 退出流程曾在 Windows CDC 重连时卡住。现已先保存功能报告，再用限时子进程发送 RESET/RUN；最终退出函数另行验证通过，主机和页面已恢复。保留功能测试与退出验证的证据边界，勿将电脑工具等待误称为固件用户循环卡死。
 
-## 后续工作
+## 历史待办（以顶部最新记录为准）
 
 1. 实物确认 PC3 按下/释放极性、SC7 安装前后左右、10 种表情与数字图案；本轮模拟和当前输入检查不替代这些验收。
 2. 按已归档电机协议落实主控驱动、周期控制/保活，再测250 ms子板失联停机、motor_for、持续动作、双端口回滚及实际停车。0.10诊断已有N20正值80%/1秒转动和停止实物证据；Python动作仍仅mock。

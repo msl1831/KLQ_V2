@@ -15,6 +15,7 @@ bool klq_runtime_tilt(unsigned direction);
 bool klq_runtime_button(bool pressed);
 int klq_runtime_motor(unsigned port, int direction, bool run);
 int klq_runtime_move(unsigned direction, bool run);
+bool klq_runtime_motors_ok(void);
 void klq_runtime_stop_all(void);
 void klq_runtime_set_motor_power(unsigned level);
 void klq_runtime_set_move_power(unsigned level);

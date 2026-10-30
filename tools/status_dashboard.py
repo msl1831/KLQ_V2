@@ -20,6 +20,7 @@ from voice_usb import STATUS as VOICE_STATUS, decode as decode_voice
 
 MAGIC = b"KLQ1"
 INFO = 1
+MOTOR_STATUS = 0x55
 VID, PIDS = 0x314B, {0x0108, 0x0109}
 PORT_ON = re.compile(
     r"P([1-3]) ON C=(\d+) T=(\d+) UID=([0-9A-F/]+) D=(\d+)mm "
@@ -38,10 +39,26 @@ def blank_voice() -> dict:
     return {"supported": False, "updated": 0.0, "error": ""}
 
 
+def blank_motors() -> dict:
+    return {"supported": False, "updated": 0.0, "error": "", "ports": []}
+
+
+def decode_motors(data: bytes) -> list[dict]:
+    if len(data) != 19 or data[0] != 1:
+        raise ValueError("电机状态ABI不匹配")
+    ports = []
+    for index in range(3):
+        state, online, goal, ack = struct.unpack_from("<BBhh", data, 1 + 6 * index)
+        if state > 4 or online > 1 or not -1000 <= goal <= 1000 or not -1000 <= ack <= 1000:
+            raise ValueError("电机状态字段越界")
+        ports.append(dict(index=index + 1, state=state, online=bool(online), goal=goal, ack_pwm=ack))
+    return ports
+
+
 def blank_state(port: str | None = None) -> dict:
     return {
         "connected": False, "port": port or "自动识别", "since": 0.0,
-        "last_update": 0.0, "error": "等待 KLQ USB CDC", "firmware": {}, "voice": blank_voice(),
+        "last_update": 0.0, "error": "等待 KLQ USB CDC", "firmware": {}, "voice": blank_voice(), "motors": blank_motors(),
         "accelerometer": {"online": False, "x": 0, "y": 0, "z": 0,
                           "roll": 0.0, "pitch": 0.0, "address": "--",
                           "identity": "--", "version": "--", "updated": 0.0},
@@ -71,6 +88,8 @@ class Monitor:
         self.control_lock = threading.Lock()
         self.voice_seq: int | None = None
         self.info_seq: int | None = None
+        self.motor_seq: int | None = None
+        self.motor_rejected = False
 
     def pause_reader(self, timeout: float = 3.0) -> dict:
         with self.control_lock:
@@ -104,7 +123,9 @@ class Monitor:
         with self.lock:
             changed = self.state["connected"] != connected or self.state["port"] != port
             if not connected or changed:
-                self.voice_seq = self.info_seq = None
+                self.voice_seq = self.info_seq = self.motor_seq = None
+                if not connected:
+                    self.motor_rejected = False
             if not connected:
                 self.state = blank_state(port)
                 self.state["events"] = list(self.events)
@@ -151,6 +172,11 @@ class Monitor:
             else:
                 self.state["voice"] = blank_voice()
                 self.voice_seq = None
+            if info.get("EXT_MOTOR_STATUS") == "1" and not self.motor_rejected:
+                self.state["motors"]["supported"] = True
+            else:
+                self.state["motors"] = blank_motors()
+                self.motor_seq = None
             if changed:
                 self.event("主机状态已更新")
             port = self.state["port"]
@@ -173,6 +199,29 @@ class Monitor:
         with self.lock:
             self.state["voice"] = voice
             self.state["last_update"] = voice["updated"]
+
+    def parse_motors(self, payload: bytes) -> None:
+        try:
+            if len(payload) < 4:
+                raise ValueError("电机状态响应过短")
+            status = struct.unpack_from("<I", payload)[0]
+            if status == 1:
+                with self.lock:
+                    self.motor_rejected = True
+                    self.state["motors"] = blank_motors()
+                    self.state["motors"]["error"] = "当前固件不支持电机快照"
+                return
+            if status:
+                raise ValueError(f"电机状态返回错误 {status}")
+            ports = decode_motors(payload[4:])
+        except ValueError as error:
+            with self.lock:
+                self.state["motors"] = blank_motors()
+                self.state["motors"].update(supported=True, error=str(error))
+            return
+        with self.lock:
+            self.state["motors"] = dict(supported=True, updated=time.time(), error="", ports=ports)
+            self.state["last_update"] = self.state["motors"]["updated"]
 
     def parse_line(self, raw: bytes) -> None:
         line = raw.decode("ascii", "ignore").strip()
@@ -269,6 +318,9 @@ class Monitor:
                     elif cmd == (VOICE_STATUS | 0x8000) and seq == self.voice_seq:
                         self.voice_seq = None
                         self.parse_voice(frame[16:])
+                    elif cmd == (MOTOR_STATUS | 0x8000) and seq == self.motor_seq:
+                        self.motor_seq = None
+                        self.parse_motors(frame[16:])
                 continue
             if newline < 0:
                 if len(data) > 2048:
@@ -308,10 +360,15 @@ class Monitor:
                         elif now >= voice_at:
                             with self.lock:
                                 supported = self.state["voice"]["supported"]
+                                motor_supported = self.state["motors"]["supported"]
                             if supported:
                                 self.seq = (self.seq + 1) & 0xFFFFFFFF
                                 self.voice_seq = self.seq
                                 device.write(self.packet(self.seq, VOICE_STATUS))
+                            if motor_supported:
+                                self.seq = (self.seq + 1) & 0xFFFFFFFF
+                                self.motor_seq = self.seq
+                                device.write(self.packet(self.seq, MOTOR_STATUS))
                             voice_at = now + 0.25
                         chunk = device.read(max(1, device.in_waiting))
                         if chunk:
@@ -356,7 +413,7 @@ function renderVoice(d){const v=d.voice||{},available=v.supported&&v.updated,pha
 $('vversion').textContent=available?(v.version_valid?`已读版本 ${v.version}`:'尚无有效版本记录'):d.connected?(v.supported?'等待语音状态快照':'当前主机尚未提供语音观测'):'等待主机连接';
 $('venabled').textContent=available?(v.enabled?'语音运动已启用':'运动禁用'):'--';$('vawake').textContent=available?(v.awake?'主机记录：已唤醒':'主机记录：休眠'):'--';const semantic=available?Number(v.semantic).toString(16).toUpperCase().padStart(8,'0'):null,words={'4B510001':'小奇小奇','4B510101':'电机正转','4B510102':'电机反转','4B510103':'停止电机'};$('vsemantic').textContent=available&&v.semantic?`0x${semantic}${words[semantic]?' · '+words[semantic]:''}`:'--';$('vscore').textContent=available&&v.recognitions?`${v.score} / ${v.intent_seq}`:'--';$('vphase').textContent=available?(phases[v.phase]??`阶段 ${v.phase}`):'--';$('vreason').textContent=available?(reasons[v.reason]??`原因 ${v.reason}`):'--';$('vactive').textContent=available?(v.active?`控制阶段中 · 端口 ${v.port}`:'无活动动作'):'--';$('vmeta').textContent=v.error?v.error:available?`主机快照 ${age(d,v.updated)} · 版本为最近已读记录，无CI在线心跳 · 接收语义与最近处理score可能分属不同帧`:'只查询状态，不发送唤醒、音效或运动指令';const e=v.events||[],counts=[['识别接收',v.recognitions],['重复',v.duplicates],['过期/丢弃',v.dropped],['接受动作',v.accepted],['拒绝动作',v.rejected],['动作完成',v.completed],['动作错误',v.errors],['动作取消',v.cancelled],['B0上电',e[0]],['B1唤醒',e[1]],['B2退出',e[2]],['B3播放接受',e[3]],['B4完成回调',e[4]],['播放ACK',v.play_acks],['播放回调',v.play_done],['UART错误',v.uart_errors],['RX溢出',v.rx_overflows],['TX错误',v.tx_errors],['请求超时',v.timeouts]];$('vcounts').innerHTML=available?counts.map(([k,n])=>`<div class="chip"><span>${k}</span>${esc(n)}</div>`).join(''):''}
 function render(d){const c=$('conn');c.classList.toggle('connected',d.connected);c.querySelector('span').textContent=d.connected?`${d.port} 已连接`:`${d.port} 未连接${d.error?' · '+d.error:''}`;
-d.ports.forEach(p=>{const i=p.index,b=$(`pb${i}`),ir=p.class===1&&p.type===2,motor=p.class===2&&p.type===2;b.classList.toggle('on',p.online);b.textContent=p.online?'在线':'离线';$(`pd${i}`).innerHTML=!p.online?'--':motor?'通信在线<small>PWM未采集</small>':ir?`左 ${esc(p.left)} / 右 ${esc(p.right)}<small>0～1000</small>`:esc(p.distance)+'<small>mm</small>';$(`pt${i}`).textContent=device(p);$(`pu${i}`).textContent=p.online?p.uid:'--';$(`pk${i}`).previousElementSibling.textContent=motor?'PWM反馈':ir?'质量标志':'回波';$(`pk${i}`).textContent=p.online?(motor?'未采集':ir?`${p.quality_flags}`:`${p.ticks} ticks`):'--';$(`ps${i}`).previousElementSibling.textContent=motor?'运行反馈':'样本';$(`ps${i}`).textContent=p.online?(motor?'未采集':`#${p.sequence} · 状态 ${p.sample_status}`):motor?'--':`REQ ${p.requests} / RESP ${p.responses}`;$(`pto${i}`).textContent=p.timeout;$(`pfe${i}`).textContent=p.frame_error;$(`pue${i}`).textContent=p.uart_error;});
+d.ports.forEach(p=>{const i=p.index,b=$(`pb${i}`),ir=p.class===1&&p.type===2,motor=p.class===2&&p.type===2,ms=d.motors||{},m=(ms.ports||[])[i-1],mv=ms.supported&&ms.updated&&d.server_time-ms.updated<2&&m&&m.online;b.classList.toggle('on',p.online);b.textContent=p.online?'在线':'离线';$(`pd${i}`).innerHTML=!p.online?'--':motor?(mv?`目标 ${esc(m.goal)}<small>最后ACK ${esc(m.ack_pwm)}</small>`:'目标 --<small>无有效电机快照</small>'):ir?`左 ${esc(p.left)} / 右 ${esc(p.right)}<small>0～1000</small>`:esc(p.distance)+'<small>mm</small>';$(`pt${i}`).textContent=device(p);$(`pu${i}`).textContent=p.online?p.uid:'--';$(`pk${i}`).previousElementSibling.textContent=motor?'最后ACK PWM':ir?'质量标志':'回波';$(`pk${i}`).textContent=p.online?(motor?(mv?`${m.ack_pwm}`:'--'):ir?`${p.quality_flags}`:`${p.ticks} ticks`):'--';$(`ps${i}`).previousElementSibling.textContent=motor?'驱动阶段':'样本';$(`ps${i}`).textContent=p.online?(motor?(mv?(['空闲','待确认','运行已ACK','停止待ACK','故障'][m.state]||`阶段 ${m.state}`):'--'):`#${p.sequence} · 状态 ${p.sample_status}`):motor?'--':`REQ ${p.requests} / RESP ${p.responses}`;$(`pto${i}`).textContent=p.timeout;$(`pfe${i}`).textContent=p.frame_error;$(`pue${i}`).textContent=p.uart_error;});
 const a=d.accelerometer;$('ax').textContent=a.online?a.x:'--';$('ay').textContent=a.online?a.y:'--';$('az').textContent=a.online?a.z:'--';$('roll').textContent=a.online?a.roll.toFixed(2):'--';$('pitch').textContent=a.online?a.pitch.toFixed(2):'--';$('plane').style.transform=`rotate(${a.roll||0}deg) translateY(${Math.max(-35,Math.min(35,a.pitch||0))}px)`;$('scmeta').textContent=a.online?`地址 ${a.address} · ID ${a.identity} · VER ${a.version} · ${age(d,a.updated)}`:'传感器离线';
 renderVoice(d);const f=d.firmware||{};$('sysname').textContent=f.name||'等待主机 INFO';const keys=['APP','VALID','UI','USER_STATE','USER_VALID','USER_LENGTH','USER_RECEIVED','USER_MAX','PY_ERROR','PY_LINE','PK_SHORT','USB_RESETS'];$('chips').innerHTML=keys.filter(k=>f[k]!==undefined).map(k=>`<div class="chip"><span>${k}</span>${esc(f[k])}</div>`).join('');$('events').innerHTML=d.events.length?d.events.map(e=>`<div class="event"><time>${esc(e.time)}</time><div>${esc(e.message)}</div></div>`).join(''):'<div class="empty">等待数据…</div>'}
 async function update(){try{const r=await fetch('/api/state',{cache:'no-store'});render(await r.json())}catch(e){$('conn').classList.remove('connected');$('conn').querySelector('span').textContent='监控服务断开'}}setInterval(update,250);update();

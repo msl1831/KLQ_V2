@@ -76,3 +76,6 @@ command(4)
 `RESET(7)` 会使系统固件复位并停留在 USB 引导；仅用于系统固件升级。引导中的 `BEGIN/DATA/END/RUN` 针对内部 Flash 系统固件，流程见 [USB 引导说明](../README_BOOTLOADER.md)。`ECHO(6)` 是通信诊断；`DISPLAY(8)` 是开发调试命令，Python 积木显示应生成 `klq.display_*()`；`FINISH(10)` 是主机通知运行结束的调试入口，通常由机器人自行判定结束。
 
 现有可运行的协议客户端是 [`tools/klq_usb.py`](../tools/klq_usb.py)。例如 `python tools/klq_usb.py program user.py` 只下载，追加 `--run` 会等待完成图标结束并启动；该工具同时给出帧封装、CRC、混合日志重同步和重试的参考实现。
+
+
+主机0.13新增可选只读0x55普通电机快照，能力EXT_MOTOR_STATUS=1，详细字节布局见[电机观测](host_motor_status_v0.1.md)。用户Python下载与运行协议不变。

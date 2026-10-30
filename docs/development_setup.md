@@ -1,9 +1,9 @@
-# 主控0.9开发与外接升级构建环境（2026-10-29）
+# 主控开发与外接升级构建环境（0.13，2026-10-30）
 
-当前主机0.12（2026-10-30）已安装，驻留引导0.3保留。以下0.9制品路径为历史；依赖/SDK恢复规则继续适用。当前构建与新增回归可用：
+当前主机0.13已安装，驻留引导0.3保留。0.13应用30952 B/RAM27632 B；以下0.9/0.12制品路径为历史，依赖/SDK恢复规则继续适用。当前构建与新增回归可用：
 
 ```powershell
-python tools/build.py --demo --output-dir build/host_0_12/app
+python tools/build.py --demo --output-dir build/host_0_13/app
 python tools/test_usb_endpoint_register.py
 python tools/test_status_dashboard_connection.py
 ```
@@ -77,3 +77,6 @@ python -m unittest discover -s sensor_boot/tests -p 'test_*.py' -v
 Flash模型运行实际驱动C，以进程虚拟内存和寄存器代理替代MMIO，只替换未执行的ARM跳转汇编。旧1.0.1源码快照随tests/flash_host入库，不依赖另一分支提交。此模型复现EOPIE契约，仍不替代硅片Flash/中断时序验收。
 
 仅引导安装需特别注意DFP1.2.6声明4096 B擦除扇区，直接给4516 B BIN做sector erase会碰到0x1800应用区。本轮经用户授权使用128 B物理页RAM写入器，并整片比较证明APP/metadata/选项未变；不要在仅引导授权下使用“擦后补回APP”。当前受限RAM helper源码/构建入口为sensor_boot/tools/boot_repair_ram.c、build_ram_repair.ps1；只供明确目标、备份和范围校验后的恢复使用，不能作为普通USB升级流程。
+
+
+0.13当前入口：python tools/test_python_motor_faults.py（188断言含负对照）、python tools/test_motor_snapshot.py（8组）、python tools/test_python_motor_live_tool.py（14组fake），实物用test_python_motor_live.py。故障/快照测试不接硬件；live会主动覆盖并清理RAM，用户人工观察优先examples/motor_blocks_demo.py正常下载保留RAM。0.13实际镜像在build/python_motor_20261030/app，验证见verification_20261030_python_motor.md。

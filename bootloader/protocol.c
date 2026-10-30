@@ -111,7 +111,7 @@ static void process(void)
     cached=false;
     if (wire_crc != calc) status=ERR_CRC;
 #ifdef KLQ_DEMO_APP
-    else if (power_key_shutdown_pending() && cmd!=CMD_INFO && cmd!=CMD_ECHO && cmd!=CMD_STOP && cmd!=CMD_VOICE_STATUS && cmd!=CMD_VOICE_CANCEL) status=ERR_STATE;
+    else if (power_key_shutdown_pending() && cmd!=CMD_INFO && cmd!=CMD_ECHO && cmd!=CMD_STOP && cmd!=CMD_VOICE_STATUS && cmd!=CMD_MOTOR_STATUS && cmd!=CMD_VOICE_CANCEL) status=ERR_STATE;
     else if (external_upgrade_active() &&
              (cmd==CMD_BEGIN || cmd==CMD_DATA || cmd==CMD_END || cmd==CMD_RUN ||
               cmd==CMD_DISPLAY || cmd==CMD_FINISH)) status=ERR_STATE;
@@ -121,9 +121,9 @@ static void process(void)
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.12; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "KLQ ROBOT FW 0.13; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
             "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; "
-            "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1",
+            "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1; EXT_MOTOR_STATUS=1",
             (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
             (unsigned)user_program_state(),(unsigned)user_program_valid(),
             (unsigned long)user_program_length(),(unsigned long)user_program_received(),
@@ -189,6 +189,19 @@ static void process(void)
         if (n!=4u) status=ERR_LENGTH;
         else status=external_upgrade_close(get32(p));
         break;
+    case CMD_MOTOR_STATUS: {
+        unsigned i; const klq_port_status_t *s;
+        if (n) { status=ERR_LENGTH; break; }
+        out[0]=1u;
+        for(i=0u;i<KLQ_EXTERNAL_PORT_COUNT;i++) {
+            s=external_port_status(i);
+            out[1u+6u*i]=external_port_motor_state(i);
+            out[2u+6u*i]=(uint8_t)(s && s->online);
+            put16(out+3u+6u*i,(uint16_t)external_port_motor_goal_pwm(i));
+            put16(out+5u+6u*i,(uint16_t)external_port_motor_ack_pwm(i));
+        }
+        size=19u; break;
+    }
     case CMD_VOICE_STATUS: {
         voice_link_status_t v; voice_control_status_t c; unsigned i;
         if (n) { status=ERR_LENGTH; break; }

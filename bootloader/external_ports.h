@@ -26,6 +26,7 @@ bool external_port_motor_ready(unsigned port);
 bool external_port_motor_command(unsigned port, int16_t pwm);
 uint8_t external_port_motor_state(unsigned port);
 int16_t external_port_motor_ack_pwm(unsigned port);
+int16_t external_port_motor_goal_pwm(unsigned port);
 bool external_port_motor(unsigned port, int direction, bool run, unsigned power);
 void external_ports_motor_stop_all(void);
 uint32_t external_upgrade_open(uint8_t port0, uint32_t token, uint16_t board, uint16_t hw);

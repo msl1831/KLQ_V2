@@ -45,6 +45,15 @@ static uint8_t selected,motor_owner;
 static uint16_t expected_board,expected_hw,submitted_size;
 static uint8_t submitted[148];
 static user_program_state_t user_state;
+static klq_port_status_t cached_ports[3];
+static uint8_t cached_motor_state[3];
+static int16_t cached_motor_goal[3],cached_motor_ack[3];
+static unsigned snapshot_reads;
+const klq_port_status_t *external_port_status(unsigned i){++snapshot_reads;return i<3u?cached_ports+i:0;}
+uint8_t external_port_motor_state(unsigned i){++snapshot_reads;return i<3u?cached_motor_state[i]:KLQ_MOTOR_ERROR;}
+int16_t external_port_motor_goal_pwm(unsigned i){++snapshot_reads;return i<3u?cached_motor_goal[i]:0;}
+int16_t external_port_motor_ack_pwm(unsigned i){++snapshot_reads;return i<3u?cached_motor_ack[i]:0;}
+
 
 int usb_serial_read(void) { return in_pos<in_size ? input[in_pos++] : -1; }
 bool usb_serial_write(const uint8_t *p,uint32_t n)
@@ -140,6 +149,8 @@ static void setup(void)
     begin_calls=data_calls=end_calls=run_calls=display_calls=finish_calls=reset_calls=boot_requests=0U;
     user_state=USER_PROGRAM_RUNNING;used=last_byte=last_seq=last_crc=response_len=0U;cached=false;last_cmd=last_len=0U;
     submitted_size=0U;
+    memset(cached_ports,0,sizeof(cached_ports));memset(cached_motor_state,0,sizeof(cached_motor_state));
+    memset(cached_motor_goal,0,sizeof(cached_motor_goal));memset(cached_motor_ack,0,sizeof(cached_motor_ack));snapshot_reads=0;
 }
 static uint32_t append(uint32_t seq,uint16_t cmd,const uint8_t *p,uint16_t n)
 {
@@ -274,6 +285,28 @@ static void voice_diagnostics(void)
     p[0]=2;in_size=in_pos=sent_size=0;append(605,CMD_VOICE_ARM,p,1);protocol_poll();expect(605,CMD_VOICE_ARM,ERR_RANGE,0);
     p[0]=0;in_size=in_pos=sent_size=0;append(606,CMD_VOICE_ARM,p,1);protocol_poll();expect(606,CMD_VOICE_ARM,OK,0);
 }
+static void motor_snapshot(void)
+{
+    const uint8_t *out; uint8_t bad=0; unsigned before;
+    setup();cached_ports[0].online=cached_ports[1].online=1;
+    cached_motor_state[1]=KLQ_MOTOR_ACTIVE;cached_motor_goal[1]=cached_motor_ack[1]=-1000;
+    cached_motor_state[2]=KLQ_MOTOR_ERROR;cached_motor_ack[2]=333;
+    out=command(900,CMD_MOTOR_STATUS,0,0,OK,19);
+    CHECK(out[0]==1 && out[1]==KLQ_MOTOR_IDLE && out[2]==1 && !rd16(out+3) && !rd16(out+5));
+    CHECK(out[7]==KLQ_MOTOR_ACTIVE && out[8]==1 && (int16_t)rd16(out+9)==-1000 && (int16_t)rd16(out+11)==-1000);
+    CHECK(out[13]==KLQ_MOTOR_ERROR && !out[14] && !rd16(out+15) && rd16(out+17)==333 && snapshot_reads==12);
+    CHECK(user_state==USER_PROGRAM_RUNNING && !stop_calls && !motor_stop_calls && !open_calls && !cancel_calls && !submit_calls);
+    before=snapshot_reads;command(901,CMD_MOTOR_STATUS,&bad,1,ERR_LENGTH,0);CHECK(snapshot_reads==before);
+    cached_motor_goal[1]=0;cached_motor_state[1]=KLQ_MOTOR_STOPPING;
+    out=command(902,CMD_MOTOR_STATUS,0,0,OK,19);
+    CHECK(out[7]==KLQ_MOTOR_STOPPING && !rd16(out+9) && (int16_t)rd16(out+11)==-1000);
+    shutdown_test=1;out=command(903,CMD_MOTOR_STATUS,0,0,OK,19);
+    CHECK(!rd16(out+9) && !stop_calls && !motor_stop_calls && !cancel_calls);
+    setup();open_session();before=stop_calls;
+    out=command(904,CMD_MOTOR_STATUS,0,0,OK,19);
+    CHECK(owner && owner_token==TOKEN && stop_calls==before && !motor_stop_calls && !submit_calls && !cancel_calls && !result_calls);
+    CHECK(user_state==USER_PROGRAM_READY && out[0]==1);
+}
 static void motor_stop_cancel(void)
 {
     uint8_t invalid=0;
@@ -285,6 +318,6 @@ static void motor_stop_cancel(void)
 }
 int main(void)
 {
-    open_and_forward();malformed_requests();ownership_and_resets();budget_and_info();reset_during_response();motor_stop_cancel();voice_diagnostics();reset_quiesce();rejected_open_no_side_effects();
+    open_and_forward();malformed_requests();ownership_and_resets();budget_and_info();reset_during_response();motor_stop_cancel();voice_diagnostics();motor_snapshot();reset_quiesce();rejected_open_no_side_effects();
     printf("USB bridge integration: %u assertions passed\n",checks);return 0;
 }

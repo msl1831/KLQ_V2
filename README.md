@@ -1,6 +1,9 @@
 # KLQ V2
 
-当前主机0.12已通过USB安装，新增UART4语音与普通电机驱动，含USB完成位修复。实物验收范围及剩余工作见[本轮记录](docs/verification_20261030_voice.md)，继续开发先读[当前交接](docs/handoff_current.md)。
+最新主机0.13：单P2 Python电机正反/定时/停止完成本轮实物验收，新增异步故障退出及只读电机ACK观测。见[电机验收](docs/verification_20261030_python_motor.md)和[当前交接](docs/handoff_current.md)。RAM保留有限示例，短按可重跑。
+
+
+此前0.12阶段已通过USB安装，新增UART4语音与普通电机驱动，含USB完成位修复。实物验收范围及剩余工作见[本轮记录](docs/verification_20261030_voice.md)，继续开发先读[当前交接](docs/handoff_current.md)。
 
 
 
