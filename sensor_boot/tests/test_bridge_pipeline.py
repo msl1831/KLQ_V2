@@ -1,4 +1,5 @@
 """Real Python USB tool -> real C USB/port bridge -> real C PY32 boot core, with mocked hardware."""
+import os
 import struct
 import subprocess
 import sys
@@ -14,7 +15,7 @@ import update
 
 class Pipeline:
     def __init__(self,kind,port):
-        self.host=subprocess.Popen([str(ROOT/'tests/build/pipeline/bridge_pipeline.exe'),str(port-1)],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+        self.host=subprocess.Popen([os.environ.get('KLQ_PIPELINE_EXE',str(ROOT/'tests/build/pipeline/bridge_pipeline.exe')),str(port-1)],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
         self.device=subprocess.Popen([str(ROOT/'tests/build'/f'sim_{kind}.exe')],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
         self.queue=bytearray()
         self.uart_commands=[]

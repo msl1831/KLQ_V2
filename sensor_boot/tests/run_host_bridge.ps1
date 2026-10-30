@@ -1,7 +1,8 @@
-param([string]$Compiler = 'C:\Program Files (x86)\Microsoft Visual Studio\VC98\bin\CL.EXE')
+param([string]$Compiler = 'C:\Program Files (x86)\Microsoft Visual Studio\VC98\bin\CL.EXE',[string]$OutDirectory='')
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $out=Join-Path $PSScriptRoot 'build\host_bridge'
+if($OutDirectory){$out=[IO.Path]::GetFullPath($OutDirectory)}
 $vc=Split-Path (Split-Path $Compiler -Parent) -Parent
 $oldLib=$env:LIB; $oldInclude=$env:INCLUDE
 New-Item -ItemType Directory -Path $out -Force | Out-Null

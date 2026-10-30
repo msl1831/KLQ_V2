@@ -31,6 +31,10 @@ uint8_t power_key_shutdown_pending(void){return shutdown_test;}
 #define XCLOSE 0x0043U
 #define TOKEN 0x12345678UL
 static unsigned checks;
+static uint8_t mock_tx_state=USB_TX_DONE, fail_writes, hold_writes;
+static const uint8_t *held_data;
+static uint32_t held_n;
+static uint8_t held_copy[1048];
 #define CHECK(x) do { ++checks; if (!(x)) { printf("USB bridge failed line %u: %s\n",__LINE__,#x); exit(1); } } while (0)
 
 volatile uint32_t board_ms,usb_reset_count;
@@ -58,6 +62,9 @@ int16_t external_port_motor_ack_pwm(unsigned i){++snapshot_reads;return i<3u?cac
 int usb_serial_read(void) { return in_pos<in_size ? input[in_pos++] : -1; }
 bool usb_serial_write(const uint8_t *p,uint32_t n)
 {
+    if (fail_writes) { --fail_writes; mock_tx_state=USB_TX_FAILED; return false; }
+    if (hold_writes) { held_data=p; held_n=n; memcpy(held_copy,p,n); mock_tx_state=USB_TX_BUSY; return true; }
+    mock_tx_state=USB_TX_DONE;
     CHECK(n<=sizeof(sent)-sent_size);memcpy(sent+sent_size,p,n);sent_size+=n;++writes;
     if(inject_reset) {
         inject_reset=0U;reset_seen=1U;
@@ -65,6 +72,11 @@ bool usb_serial_write(const uint8_t *p,uint32_t n)
     }
     return true;
 }
+uint32_t board_fault_code(void) { return 0u; }
+uint32_t board_fault_pc(void) { return 0u; }
+bool board_watchdog_enabled(void) { return false; }
+void usb_serial_poll(void) {}
+uint8_t usb_serial_tx_state(void) { return mock_tx_state; }
 bool usb_serial_reset_seen(void) { uint8_t r=reset_seen; reset_seen=0; return r; }
 void delay_ms(uint32_t ms) { board_ms+=ms; }
 void display_icon(unsigned icon) { (void)icon; }
@@ -148,7 +160,9 @@ static void setup(void)
     writes=open_calls=submit_calls=result_calls=close_calls=cancel_calls=stop_calls=0U;
     begin_calls=data_calls=end_calls=run_calls=display_calls=finish_calls=reset_calls=boot_requests=0U;
     user_state=USER_PROGRAM_RUNNING;used=last_byte=last_seq=last_crc=response_len=0U;cached=false;last_cmd=last_len=0U;
-    submitted_size=0U;
+    submitted_size=0U; mock_tx_state=USB_TX_DONE; fail_writes=hold_writes=0;
+    held_data=0; held_n=0; reply_pending=urgent_pending=false; tx_owner=action_pending=valid_cache=reset_pending=0;
+
     memset(cached_ports,0,sizeof(cached_ports));memset(cached_motor_state,0,sizeof(cached_motor_state));
     memset(cached_motor_goal,0,sizeof(cached_motor_goal));memset(cached_motor_ack,0,sizeof(cached_motor_ack));snapshot_reads=0;
 }
@@ -316,8 +330,50 @@ static void motor_stop_cancel(void)
     in_size=in_pos=sent_size=0U;append(401U,CMD_STOP,0,0U);protocol_poll();expect(401U,CMD_STOP,OK,0U);
     CHECK(!owner && cancel_calls==1U && stop_calls==2U);
 }
+static void failed_response_retry(void)
+{
+    uint8_t payload[8]; unsigned before;
+    setup(); fail_writes=1; in_size=in_pos=sent_size=0;
+    append(1000,CMD_RESET,0,0); protocol_poll();
+    CHECK(!sent_size && !reset_calls && !boot_requests && stop_calls==1 && !protocol_reset_pending());
+    command(1000,CMD_RESET,0,0,OK,0);
+    CHECK(reset_calls==1 && boot_requests==1 && stop_calls==1);
+    command(1000,CMD_RESET,0,0,OK,0);
+    CHECK(reset_calls==1 && boot_requests==1 && stop_calls==1);
+    setup(); user_state=USER_PROGRAM_DOWNLOADING; wr32(payload,0); payload[4]=1;
+    fail_writes=1;append(1001,CMD_DATA,payload,5);protocol_poll();CHECK(data_calls==1 && !sent_size);
+    command(1001,CMD_DATA,payload,5,OK,4);CHECK(data_calls==1);
+    setup(); hold_writes=1;append(1002,CMD_RESET,0,0);protocol_poll();
+    CHECK(mock_tx_state==USB_TX_BUSY && !reset_calls && !boot_requests && stop_calls==1);
+    protocol_poll();CHECK(!reset_calls && !memcmp(held_data,held_copy,held_n));
+    mock_tx_state=USB_TX_FAILED;hold_writes=0;protocol_poll();CHECK(!reset_calls && !boot_requests);
+    command(1002,CMD_RESET,0,0,OK,0);CHECK(reset_calls==1 && boot_requests==1 && stop_calls==1);
+    setup();hold_writes=1;append(1003,CMD_RESET,0,0);protocol_poll();
+    mock_tx_state=USB_TX_DONE;hold_writes=0;protocol_poll();CHECK(reset_calls==1 && boot_requests==1);
+    before=reset_calls;protocol_poll();CHECK(reset_calls==before);
+}
+static void busy_stop_and_retention(void)
+{
+    uint8_t payload[100];unsigned before;
+    setup();memset(payload,0x77,sizeof(payload));hold_writes=1;
+    append(1100,CMD_ECHO,payload,sizeof(payload));protocol_poll();
+    CHECK(reply_pending && tx_owner==1 && held_n==120 && user_state==USER_PROGRAM_RUNNING);
+    in_size=in_pos=0;append(1101,CMD_RUN,0,0);append(1102,CMD_STOP,0,0);protocol_poll();
+    CHECK(stop_calls==1 && !run_calls && urgent_pending && !memcmp(held_data,held_copy,held_n));
+    in_size=in_pos=0;append(1102,CMD_STOP,0,0);protocol_poll();CHECK(stop_calls==1);
+    memcpy(sent,held_data,held_n);sent_size=held_n;mock_tx_state=USB_TX_DONE;hold_writes=0;protocol_poll();
+    CHECK(!reply_pending && !urgent_pending && sent_size==140 && rd32(sent+124)==1102 && rd32(sent+136)==OK);
+    setup();hold_writes=1;append(1103,CMD_ECHO,payload,sizeof(payload));protocol_poll();
+    in_size=in_pos=0;before=stop_calls;append(1104,CMD_STOP,payload,1);protocol_poll();CHECK(stop_calls==before);
+    in_size=in_pos=0;append(1105,CMD_STOP,0,0);input[12]^=1;protocol_poll();CHECK(stop_calls==before);
+    reset_seen=1;mock_tx_state=USB_TX_FAILED;hold_writes=0;protocol_poll();
+    CHECK(user_state==USER_PROGRAM_RUNNING && stop_calls==before && !reply_pending && !urgent_pending);
+    setup();user_state=USER_PROGRAM_READY;reset_seen=1;protocol_poll();CHECK(user_state==USER_PROGRAM_READY && !stop_calls);
+    user_state=USER_PROGRAM_DOWNLOADING;reset_seen=1;protocol_poll();CHECK(user_state==USER_PROGRAM_READY && stop_calls==1);
+}
 int main(void)
 {
     open_and_forward();malformed_requests();ownership_and_resets();budget_and_info();reset_during_response();motor_stop_cancel();voice_diagnostics();motor_snapshot();reset_quiesce();rejected_open_no_side_effects();
+    failed_response_retry();busy_stop_and_retention();
     printf("USB bridge integration: %u assertions passed\n",checks);return 0;
 }

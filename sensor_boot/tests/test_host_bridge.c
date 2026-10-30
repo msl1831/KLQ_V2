@@ -303,9 +303,22 @@ static void motor_control_timeout_cancel(void)
     poll_at(p[0].next_at); CHECK(p[0].pending && p[0].command==1U);
 }
 
+static void queued_set_ack_expires(void)
+{
+    uint8_t b[2],f[22];unsigned i;uint32_t count;
+    setup();open_board(2U,2U,1U);p16(b,800U);submit(0x0300U,b,2U);wait_tx(0x0300U);
+    count=p[0].s.request_count;memcpy(f,up.raw,12U);p16(f+8U,0x8300U);p16(f+10U,6U);p32(f+16U,0U);p16(f+20U,800U);
+    p32(f+12U,crc32_update(crc32_update(0,f,12U),f+16U,6U));board_ms=up.deadline-1U;
+    for(i=0U;i<sizeof(f);i++){test_uart[0].DATA=f[i];test_uart[0].STS=0x20U;USART1_IRQHandler();}
+    CHECK(p[0].rt!=p[0].rh);poll_at(up.deadline+300U);
+    CHECK(up.result==2U&&up.reason==1U&&!up.waiting&&!up.retry&&up.stage==UP_IDLE);
+    CHECK(p[0].s.request_count==count&&p[0].rt==p[0].rh);
+    response_raw(f,sizeof(f));CHECK(up.result==2U&&up.reason==1U);
+}
+
 int main(void)
 {
     ownership(); identity_and_idempotence(); gate_and_transfer(); motor_enter(); errors_and_recovery(); failed_info_and_data_retry(); wrap_lease_and_close();
-    motor_control_gate(); motor_control_responses(); motor_control_timeout_cancel();
+    motor_control_gate(); motor_control_responses(); motor_control_timeout_cancel(); queued_set_ack_expires();
     printf("USB port upgrade bridge: %u assertions passed\n",checks); return 0;
 }

@@ -112,7 +112,7 @@ static void three_port_refresh(void)
 static void timeout_no_resurrection(void)
 {
     uint32_t count;setup();discover(0);CHECK(external_port_motor_command(0,800));external_ports_poll();info_reply(0,0x1000);finish_tx(0,CMD_MOTOR_SET);
-    count=p[0].s.request_count;poll_at(p[0].deadline);CHECK(!p[0].motor_goal&&p[0].motor_fault&&p[0].motor_stop&&!p[0].pending);
+    count=p[0].s.request_count;poll_at(p[0].deadline);CHECK(!p[0].motor_goal&&p[0].motor_fault&&p[0].motor_stop&&p[0].pending&&p[0].command==CMD_MOTOR_STOP);
     external_ports_poll();finish_tx(0,CMD_MOTOR_STOP);normal_reply(0,0,0,0);CHECK(p[0].s.request_count==count+1);CHECK(external_port_motor_state(0)==KLQ_MOTOR_ERROR);
     poll_at(board_ms+1000);CHECK(p[0].command==CMD_INFO&&!p[0].motor_goal);info_reply(0,0x1000);CHECK(!p[0].motor_goal&&external_port_motor_state(0)==KLQ_MOTOR_ERROR);
     CHECK(external_port_motor_command(0,0));stop_ack(0);CHECK(external_port_motor_state(0)==KLQ_MOTOR_IDLE);

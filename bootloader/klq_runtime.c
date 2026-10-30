@@ -24,6 +24,8 @@ void klq_runtime_init(void)
     button_at=board_ms;
 }
 
+void klq_runtime_start(void) { motor_power=move_power=2u; motor_owned=0u; }
+
 void klq_runtime_poll(void)
 {
     uint8_t raw=(uint8_t)(GPIO_ReadInputBit(GPIOC,GPIO_PIN_3)==0);
@@ -42,28 +44,33 @@ static bool cmp(int32_t value, int compare, int32_t limit)
     return compare<0 ? value<limit : value>limit;
 }
 
-bool klq_runtime_distance(unsigned port, int compare, int32_t cm)
+uint8_t klq_runtime_distance_state(unsigned port, int compare, int32_t cm)
 {
     const klq_port_status_t *s;
-    if (port<1u || port>KLQ_EXTERNAL_PORT_COUNT || (compare!=-1 && compare!=1) || cm<0) return false;
+    if (port<1u || port>KLQ_EXTERNAL_PORT_COUNT || (compare!=-1 && compare!=1) || cm<0) return KLQ_COND_FAULT;
     s=external_port_status(port-1u);
-    /* CS100A GET_SAMPLE status 1 is valid; 0 means no sample. */
-    return s && s->online && s->device_class==1u && s->sensor_type==1u && s->sample_status==1u &&
-           board_ms-s->sample_host_ms<=80u &&
-           cmp(s->distance_mm,compare,cm*10);
+    if (!s || !s->online || s->device_class!=1u || s->sensor_type!=1u || !s->sample_valid ||
+        board_ms-s->sample_host_ms>80u || !s->sample_status || s->sample_status>=5u) return KLQ_COND_FAULT;
+    /* Fresh too-close/out-of-range/no-echo samples do not satisfy a distance comparison. */
+    return s->sample_status==1u && cmp(s->distance_mm,compare,cm*10) ? KLQ_COND_TRUE : KLQ_COND_PENDING;
 }
 
-bool klq_runtime_tilt(unsigned direction)
+bool klq_runtime_distance(unsigned port, int compare, int32_t cm)
+{ return klq_runtime_distance_state(port,compare,cm)==KLQ_COND_TRUE; }
+
+uint8_t klq_runtime_tilt_state(unsigned direction)
 {
-    if (!imu_valid || board_ms-imu_at>100u) return false;
+    if (!imu_valid || board_ms-imu_at>100u) return KLQ_COND_FAULT;
     switch (direction) {
     case 0: return imu.pitch_cdeg<=-TILT_CDEG;
     case 1: return imu.pitch_cdeg>= TILT_CDEG;
     case 2: return imu.roll_cdeg <=-TILT_CDEG;
     case 3: return imu.roll_cdeg >= TILT_CDEG;
-    default:return false;
+    default:return KLQ_COND_FAULT;
     }
 }
+
+bool klq_runtime_tilt(unsigned direction) { return klq_runtime_tilt_state(direction)==KLQ_COND_TRUE; }
 
 bool klq_runtime_button(bool pressed)
 {

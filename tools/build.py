@@ -44,7 +44,7 @@ def build(demo=False, baseline=False, output_dir=None):
     scatter = out/(name+'.sct')
     scatter.write_text(f'''LR_CODE 0x{base:08X} 0x{size:X} {{
   ER_CODE 0x{base:08X} 0x{size:X} {{ startup.o (RESET, +First) *(InRoot$$Sections) .ANY (+RO) }}
-  RW_RAM 0x20000000 0x1FFF8 {{ .ANY (+RW +ZI) }}
+  RW_RAM 0x20000000 0x1FFE0 {{ .ANY (+RW +ZI) }}
 }}
 ''')
     axf = out/(name+'.axf')

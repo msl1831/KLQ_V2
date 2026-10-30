@@ -1,14 +1,18 @@
-# 主控开发与外接升级构建环境（0.13，2026-10-30）
+# 主控开发与外接升级构建环境（0.14，2026-10-30）
 
-当前主机0.13已安装，驻留引导0.3保留。0.13应用30952 B/RAM27632 B；以下0.9/0.12制品路径为历史，依赖/SDK恢复规则继续适用。当前构建与新增回归可用：
+当前主机0.14已安装，驻留引导0.3保留。0.14应用32980 B/RAM27888 B，另有24B顶端Fault保留区；以下0.9/0.12制品路径为历史，依赖/SDK恢复规则继续适用。当前构建与新增回归可用：
 
 ```powershell
-python tools/build.py --demo --output-dir build/host_0_13/app
+python tools/build.py --demo --output-dir build/host_0_14/app
 python tools/test_usb_endpoint_register.py
 python tools/test_status_dashboard_connection.py
+python tools/test_python_motor_faults.py
+python tools/test_tm1640_cache.py
+python tools/test_system_guard.py
+& sensor_boot/tests/run_port_freshness.ps1
 ```
 
-端点模型默认VC98，支持--compiler；不接硬件，含两个必须失败的负对照。语音相关native回归为tools/run_voice_wire_tests.ps1、tools/run_voice_policy_tests.ps1、sensor_boot/tests/run_motor_business.ps1；新增USB工程协议见host_voice_protocol_v0.1.md。实际验收范围先看verification_20261030_voice.md，勿将0.11/0.12和历史0.9结果混淆。
+端点模型默认VC98，支持--compiler；不接硬件，含两个必须失败的负对照。语音相关native回归为tools/run_voice_wire_tests.ps1、tools/run_voice_policy_tests.ps1、sensor_boot/tests/run_motor_business.ps1；新增USB工程协议见host_voice_protocol_v0.1.md。0.14优化与实板范围先看optimization_014.md；此前语音验收看verification_20261030_voice.md，勿将0.11/0.12和历史0.9结果混淆。
 
 
 使用 `codex/python-runtime`，先读 `handoff_current.md` 并核对分支/提交/未提交内容。共享旧main包含语音等本地工作，本分支不是其整目录覆盖副本。

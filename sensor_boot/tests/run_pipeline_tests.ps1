@@ -1,9 +1,10 @@
 param([string]$Compiler='C:\Program Files (x86)\Microsoft Visual Studio\VC98\Bin\CL.EXE',
-      [string]$Python=(Get-Command python -ErrorAction Stop).Source)
+      [string]$Python=(Get-Command python -ErrorAction Stop).Source,[string]$OutDirectory='')
 $ErrorActionPreference='Stop'
 $testRoot=$PSScriptRoot
 $repo=(Resolve-Path (Join-Path $testRoot '..\..')).Path
 $out=Join-Path $testRoot 'build\pipeline'
+if($OutDirectory){$out=[IO.Path]::GetFullPath($OutDirectory)}
 $vc=Split-Path (Split-Path $Compiler -Parent) -Parent
 $oldInclude=$env:INCLUDE
 $oldLib=$env:LIB
@@ -19,5 +20,9 @@ try {
     & $Compiler '/nologo' '/W3' '/O2' '/DKLQ_DEMO_APP' "/I$testRoot\usb_host" "/I$out" "/I$repo\IR\tests\mocks\host" "/I$repo\bootloader" (Join-Path $testRoot 'test_bridge_pipeline.c') "/Fe$exe"
     if($LASTEXITCODE -ne 0){throw 'Full pipeline simulator build failed'}
 } finally {Pop-Location;$env:INCLUDE=$oldInclude;$env:LIB=$oldLib}
+$oldPipeline=$env:KLQ_PIPELINE_EXE
+$env:KLQ_PIPELINE_EXE=$exe
 & $Python -m unittest discover -s $testRoot -p test_bridge_pipeline.py -v
-if($LASTEXITCODE -ne 0){throw 'Full pipeline integration tests failed'}
+$testResult=$LASTEXITCODE
+$env:KLQ_PIPELINE_EXE=$oldPipeline
+if($testResult -ne 0){throw 'Full pipeline integration tests failed'}

@@ -31,6 +31,11 @@ static void send_record(uint8_t type,const uint8_t *data,uint16_t n)
 int usb_serial_read(void) { return usb_pos<usb_size ? usb_input[usb_pos++] : -1; }
 bool usb_serial_write(const uint8_t *data,uint32_t n)
 { if(n>1048U)exit(20);send_record('B',data,(uint16_t)n);return true; }
+uint32_t board_fault_code(void) { return 0u; }
+uint32_t board_fault_pc(void) { return 0u; }
+bool board_watchdog_enabled(void) { return false; }
+void usb_serial_poll(void) {}
+uint8_t usb_serial_tx_state(void) { return USB_TX_DONE; }
 bool usb_serial_reset_seen(void) { uint8_t value=reset_seen;reset_seen=0U;return value; }
 void delay_ms(uint32_t n) { board_ms+=n; }
 void display_icon(unsigned icon) { (void)icon; }

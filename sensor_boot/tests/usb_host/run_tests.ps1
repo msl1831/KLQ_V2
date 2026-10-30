@@ -17,4 +17,15 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'USB bridge integration test build failed' }
     & $exe
     if ($LASTEXITCODE -ne 0) { throw 'USB bridge integration tests failed' }
+    $exe=Join-Path $out 'test_usb_boot_retry.exe'
+    & $Compiler '/nologo' '/W3' '/O2' "/I$PSScriptRoot" "/I$out" "/I$repo\bootloader" (Join-Path $testRoot 'test_usb_boot_retry.c') "/Fe$exe"
+    if($LASTEXITCODE -ne 0){throw 'USB boot native build failed'}
+    & $exe
+    if($LASTEXITCODE -ne 0){throw 'USB boot native tests failed'}
+    Copy-Item -LiteralPath (Join-Path $repo 'bootloader\usb_serial.c') -Destination (Join-Path $out 'usb_serial_source.c') -Force
+    $exe=Join-Path $out 'test_usb_serial_async.exe'
+    & $Compiler '/nologo' '/W3' '/O2' "/I$testRoot\usb_serial_host" "/I$PSScriptRoot" "/I$out" "/I$repo\bootloader" (Join-Path $testRoot 'test_usb_serial_async.c') "/Fe$exe"
+    if($LASTEXITCODE -ne 0){throw 'USB serial native build failed'}
+    & $exe
+    if($LASTEXITCODE -ne 0){throw 'USB serial native tests failed'}
 } finally { Pop-Location;$env:INCLUDE=$oldInclude;$env:LIB=$oldLib }

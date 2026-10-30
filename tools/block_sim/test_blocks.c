@@ -67,7 +67,7 @@ static void sample(unsigned port,unsigned status,unsigned mm,unsigned age)
 {
     klq_port_status_t *s=ports+port;
     memset(s,0,sizeof(*s)); s->online=1; s->device_class=1; s->sensor_type=1;
-    s->sample_status=(uint8_t)status; s->distance_mm=(uint16_t)mm; s->sample_host_ms=board_ms-age;
+    s->sample_valid=1; s->sample_status=(uint8_t)status; s->distance_mm=(uint16_t)mm; s->sample_host_ms=board_ms-age;
 }
 
 static void control(void)

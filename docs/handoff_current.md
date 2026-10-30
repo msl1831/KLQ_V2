@@ -1,3 +1,45 @@
+# KLQ 当前交接：主控0.14（2026-10-30）
+
+## 当前权威与设备状态
+
+主控代码在`C:/Users/Administrator/.codex/worktrees/python-runtime/Codex`的`codex/python-runtime`，本轮基于52a889b（0.13生产代码8284847）实施并安装0.14。交接时核对git HEAD/remote和交付manifest，不以旧段落的提交号当当前。共享`F:/work/KLQ_V2/Codex`仍是main@72e2ac4加其它工作，未切分支/覆盖/混入其UL/MOTOR/VOICE脏源码；F仅新增本轮outputs制品。
+
+板上已通过主机原生USB安装APP0.14，驻留BOOT0.3及所有外设固件保持。末次用户长按关机、等待至少3s不自启、再长按开机正常双眼待机；实时INFO为VALID1/USER_STATE0/USER_VALID0/UI1/PY_ERROR0/SYS_FAULT0/SYS_PC0/SYS_WDT1，电机goal/ACK0、语音ARM0。重启清空RAM是设计。监测http://127.0.0.1:8765/index.html已恢复并在线，本轮未重启服务，PID仍从build/python_motor_20261030/dashboard.pid查询；不能强杀健康CDC worker。
+
+最新串口COM123（需重新枚举不要硬编码），VID:PID314B:0108。P1 IR UID4150354C/38323609/00DB8962，APP1.0.0/BOOT1.0.2；P2 N20 Motor UID4150354C/38323609/00D86C62，APP2.0.0/最新已知BOOT1.0.2；P3 UL UID4150354C/3832360B/0064B862，板上APP1.0.2来自共享F的RCWL修复，C分支UL不等于实板最新，勿刷C旧UL；CI1303实际0.2.0。三口在线，电池供电。DAP旁路MOS，不能由PC5软件熄灭推断真实断电。
+
+## 新批准要求与实现
+
+正常用户通常不插USB，USB主要下载Python。完整16KiB RAM程序在STOP/EOF/错误/普通USB重连后保留，只有下次BEGIN覆盖，MCU复位/断电清空；外部Flash备用，用户程序不存内部Flash。无延时循环合法，协作执行可按键/USB停止。
+
+用户强调：允许不接传感器，也允许多口相同传感器或电机。只对程序实际调用的资源保护，未用空口不阻止显示/按键/其它口；当前拥有电机异步故障仍全停。wait_distance/tilt采用PENDING/TRUE/FAULT，故障连续250ms→PY7+STOP，正常新鲜无回波继续等，按钮等待无超时。保留距离80ms/IMU100ms新鲜阈值。每次RUN默认motor/move档2。电机悬空条件已长期确认，用户明确后续测试不必再问。
+
+0.14修复USB异步TX/250ms/失败动作重试/INFO缓存；binary无需DTR、日志DTR+槽就绪才格式化/逐口轮转；先端口超时后VM，驱动入口也不能把旧过期lease换向续租；新测量seq+capture改变才刷新、超时先丢积压；周期从请求起算20/40/100ms不追赶；TM1640重复帧跳过；语音去掉单seq冗余去重；CR行号统一。关机去掉额外USB300ms，保留STOP最多150ms。
+
+软件IWDT标称2s，主循环关键服务返回后每250ms喂，关机GPIO循环专门喂；未在ISR盲喂。实板首版SYS_WDT0被安装脚本捕获，修为先CCCC启动再解锁配置/等STS/AAAA，重装后SYS_WDT1。配置已启动后若同步失败，必须请求BOOT复位。未改option bytes。强Fault/NMI等安全栈入口记录24B于2001FFE0..FFF7，原BOOT请求top8不变；请求BOOT软复位恢复。持用户键启动约40ms进引导。源码BOOT0.4回归修复未安装到驻留0.3，不能混淆。
+
+## 本轮证据与制品
+
+见[优化与验证](optimization_014.md)、[机器清单](optimization_014.json)、[架构](architecture_current.md)、[Python接口](python_api_v0.1.md)、[USB](host_usb_protocol_v0.1.md)、[异步说明](usb_async_014.md)、[环境](development_setup.md)。
+
+APP BIN32980/RO32912/RAM27888B（相对0.13 +2028B/+256B，另24B保留）；SHA d6bbf4a0e12f3b67bb4b2efc6347cd4254af420f518be061e29c19ab779c067f。BOOT回归10660/10424/8968B，SHA4784da0761a9d04696840ef6c5b24fa34c3556fdc0505c4e70ad86c1777f8877，未安装。ARM仅有2B literal pool对齐A1581W提示，无错误；map确认强Fault向量和无堆。
+
+原生：USB497/BOOT15/真实usb_serial703、business342、pipeline4、ports1150/motor341/bridge315、mini-runtime666+4负对照、积木164175、voice222/1131、TM1640 APP/BOOT各6464、实际board C提取126/85+13负对照、EP寄存器39321600+2负对照、页面连接8/快照8/live工具14。
+
+实板：只APP USB下载END CRC/VALID/RUN；SYS_WDT1→RESET到原BOOT3连续稳定6s→RUN0.14；无延时显示运行和完整RAM经CDC关闭重开保留/STOP重RUN/半包取消；P2 timed正反各0.8s UART ACK与普通停止确认（本轮不伪称新逐次机械观察）；1s限时程序关闭CDC0.468s仍ACTIVE+ACK1000，重连STOP归零；IR口被明确当距离传感器调用时约282ms报7第2行、当电机调用时报6第2行，之后继续下载正常；Windows DTR0 INFO和1024B ECHO成功。用户确认物理拔USB保持12、PC4 STOP/RUN与重连正常，后长按关机/等3s/再开机正常。最终待机空RAM/ARM0/P2零。
+
+证据根`build/optimization_0_14_20261030`（含first_guard_disabled历史失败、安装、live_checks、offline_motor_and_faults、两项用户观察、final_state/build_evidence），native专项各build目录。交付复制到`F:/work/KLQ_V2/Codex/outputs/optimization_0_14_20261030`并ZIP，包含0.14APP、0.13回退、文档、证据、工具、许可证；不包含可误刷的BOOT镜像。build/outputs不进Git，换机需另传ZIP或重建。
+
+## 接续规则与剩余范围
+
+CLI前POST /api/pause且released=true，关闭CLI后resume；不并发抢CDC，不强杀串口所有者。普通USB拔插不是系统复位，不能清RAM/停止自主程序；工程会话/半包取消仍保留。不要自动开启语音ARM或恢复旧动作。
+
+未注入真实HardFault或人为停喂IWDT，强向量/实际C测试和初始化/旧BOOT兼容不是完整芯片故障证明。旧BOOT3清resetflags，不能承诺追溯WD复位原因；HSE/PLL启动故障、PC5/MOS精确电气时序、从板硬件watchdog、长期稳定性/双电机与低中档机械效果仍待。wait_ir、变量/if/异常语法、菜单/电池ADC/蓝牙下载未扩展，后续独立需求。
+
+以下为0.13及更早历史记录，状态与待办若矛盾，以本节及optimization_014为准。
+
+---
+
 # KLQ 主控当前交接（2026-10-30）
 
 ## 最新：只读架构检查（2026-10-30）

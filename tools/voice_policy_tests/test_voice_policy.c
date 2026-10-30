@@ -106,10 +106,10 @@ static void no_replay_and_cancellation(void)
 {
     unsigned before;
     setup();enable();send(0x4b510101UL,1);board_ms=249;voice_control_poll();CHECK(!status().errors);board_ms=250;voice_control_poll();CHECK(status().errors==1&&!status().active&&stop_all==1&&last_sound==5003);
-    send(0x4b510101UL,1);CHECK(sets==1&&status().last_reason==VOICE_CTL_DUPLICATE);board_ms+=500;voice_control_poll();CHECK(sets==1);
+    push(0x4b510101UL,1);incoming.received_ms=board_ms-101;voice_control_poll();CHECK(sets==1&&status().last_reason==VOICE_CTL_STALE);board_ms+=500;voice_control_poll();CHECK(sets==1);
     setup();enable();user=USER_PROGRAM_RUNNING;voice_control_poll();send(0x4b510101UL,5);CHECK(!sets&&last_sound==5007);
     push(0x4b510101UL,6);before=drop_calls;user=USER_PROGRAM_READY;voice_control_poll();CHECK(!sets&&drop_calls==before+1&&!have);
-    send(0x4b510101UL,5);CHECK(!sets&&status().last_reason==VOICE_CTL_DUPLICATE);send(0x4b510101UL,7);CHECK(sets==1);
+    send(0x4b510101UL,5);CHECK(sets==1&&status().last_reason==VOICE_CTL_OK);send(0x4b510101UL,7);CHECK(sets==1&&status().last_reason==VOICE_CTL_BUSY);
     accepted(2,800);before=stop_all;voice_control_cancel();CHECK(stop_all==before+1&&!status().active);
     voice_control_sound(5004);user=USER_PROGRAM_RUNNING;voice_control_poll();CHECK(last_sound==5004);
     before=stop_all;state[2]=KLQ_MOTOR_ACTIVE;link.awake=0;voice_control_poll();CHECK(stop_all==before);
@@ -120,6 +120,14 @@ static void no_replay_and_cancellation(void)
     setup();enable();play_ok=0;send(0x4b510101UL,1);accepted(2,800);CHECK(status().pending_sound==5002);voice_control_cancel();voice_control_sound(5004);user=USER_PROGRAM_RUNNING;play_ok=1;voice_control_poll();CHECK(last_sound==5004&&!status().pending_sound);
     setup();enable();send(0x4b510101UL,1);accepted(2,800);events=6;link.awake=1;push(0x4b510102UL,2);voice_control_poll();CHECK(stop_all==1&&!status().active&&!have&&sets==1);
     puts("PASS no stale retry/resume, busy-edge flush, owned-only cancellation and wake exit");
+}
+static void reused_sequence(void)
+{
+    unsigned n;
+    setup();enable();send(0x4b510001UL,42);events=1;voice_control_poll();send(0x4b510101UL,42);CHECK(sets==1&&status().phase==VOICE_CTL_WAIT_START);
+    setup();enable();send(0x4b510001UL,255);send(0x4b510001UL,0);send(0x4b510101UL,255);CHECK(sets==1&&status().last_reason==VOICE_CTL_OK);
+    setup();enable();send(0x4b510001UL,7);for(n=0;n<256;n++)send(0x4b510001UL,(uint8_t)n);send(0x4b510102UL,255);CHECK(sets==1&&goal[2]==-800);
+    puts("PASS transport-delivered same-seq different semantic, peer-reset reuse and global u8 wrap accepted");
 }
 static void errors_and_sounds(void)
 {
@@ -134,4 +142,4 @@ static void errors_and_sounds(void)
     setup();board_ms=0xfffffff0UL;enable();send(0x4b510101UL,1);accepted(2,800);board_ms=0x3d7UL;voice_control_poll();CHECK(!stop_commands);++board_ms;voice_control_poll();CHECK(stop_commands==1);
     puts("PASS identity/driver errors, stale input, serialized feedback while running and clock wrap");
 }
-int main(void){initial_gates();unique_identity();finite_ack_and_stop();no_replay_and_cancellation();errors_and_sounds();printf("Voice policy: %u assertions passed\n",checks);return 0;}
+int main(void){initial_gates();unique_identity();finite_ack_and_stop();no_replay_and_cancellation();reused_sequence();errors_and_sounds();printf("Voice policy: %u assertions passed\n",checks);return 0;}

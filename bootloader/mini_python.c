@@ -14,7 +14,7 @@ enum { WAIT_NONE=0, WAIT_TIME, WAIT_MOTOR, WAIT_MOVE, WAIT_DISTANCE, WAIT_TILT, 
 static const uint8_t *src;
 static uint32_t src_n, pc, error_pc, deadline;
 static int32_t wait_a, wait_b, wait_c;
-static uint8_t wait_kind, depth;
+static uint8_t wait_kind, depth, wait_fault;
 static mini_status_t status;
 static mini_error_t error;
 static Loop loop[LOOP_MAX];
@@ -170,7 +170,7 @@ static bool call(const char *p, uint16_t n, uint32_t at)
     if (eq(name,name_n,"wait_distance")) {
         if (ac!=3u || !integer(a,&x) || !integer(a+1,&y) || !integer(a+2,&z) ||
             x<1 || x>3 || (y!=-1 && y!=1) || z<0 || z>6553) goto range;
-        wait_a=x; wait_b=y; wait_c=z; wait_kind=WAIT_DISTANCE; return true;
+        wait_a=x; wait_b=y; wait_c=z; wait_kind=WAIT_DISTANCE; wait_fault=0u; return true;
     }
     if (eq(name,name_n,"wait_ir")) {
         if (ac!=3u || !integer(a,&x) || !integer(a+1,&y) || !integer(a+2,&z) ||
@@ -179,7 +179,7 @@ static bool call(const char *p, uint16_t n, uint32_t at)
     }
     if (eq(name,name_n,"wait_tilt")) {
         if (ac!=1u || !integer(a,&x) || x<0 || x>3) goto range;
-        wait_a=x; wait_kind=WAIT_TILT; return true;
+        wait_a=x; wait_kind=WAIT_TILT; wait_fault=0u; return true;
     }
     if (eq(name,name_n,"wait_button")) {
         if (ac!=1u || !integer(a,&x) || (x!=0 && x!=1)) goto range;
@@ -213,6 +213,7 @@ runerr: fail(MINI_ERR_RUNTIME,at); return false;
 
 static bool pending(void)
 {
+    uint8_t condition;
     if (!wait_kind) return false;
     if (wait_kind==WAIT_TIME || wait_kind==WAIT_MOTOR || wait_kind==WAIT_MOVE) {
         if ((int32_t)(board_ms-deadline)<0) return true;
@@ -220,21 +221,32 @@ static bool pending(void)
         else if (wait_kind==WAIT_MOVE) klq_runtime_move((unsigned)wait_a,false);
         wait_kind=WAIT_NONE; return false;
     }
-    if (wait_kind==WAIT_DISTANCE && klq_runtime_distance((unsigned)wait_a,(int)wait_b,wait_c)) wait_kind=WAIT_NONE;
-    else if (wait_kind==WAIT_TILT && klq_runtime_tilt((unsigned)wait_a)) wait_kind=WAIT_NONE;
-    else if (wait_kind==WAIT_BUTTON && klq_runtime_button(wait_a!=0)) wait_kind=WAIT_NONE;
+    if (wait_kind==WAIT_BUTTON) {
+        if (klq_runtime_button(wait_a!=0)) wait_kind=WAIT_NONE;
+        return wait_kind!=WAIT_NONE;
+    }
+    condition=wait_kind==WAIT_DISTANCE ? klq_runtime_distance_state((unsigned)wait_a,(int)wait_b,wait_c) :
+        klq_runtime_tilt_state((unsigned)wait_a);
+    if (condition==KLQ_COND_FAULT) {
+        if (!wait_fault) { wait_fault=1u; deadline=board_ms; }
+        else if (board_ms-deadline>=250u) fail(MINI_ERR_RUNTIME,error_pc);
+        return true;
+    }
+    wait_fault=0u;
+    if (condition==KLQ_COND_TRUE) wait_kind=WAIT_NONE;
     return wait_kind!=WAIT_NONE;
 }
 
 void mini_python_init(const uint8_t *source, uint32_t length)
 {
-    src=source; src_n=length; pc=error_pc=deadline=0; wait_kind=depth=0; status=MINI_IDLE; error=MINI_ERR_NONE;
+    src=source; src_n=length; pc=error_pc=deadline=0; wait_kind=depth=wait_fault=0; status=MINI_IDLE; error=MINI_ERR_NONE;
 }
 
 bool mini_python_start(void)
 {
     if (!src || !src_n) return false;
-    pc=error_pc=deadline=0; wait_kind=depth=0; error=MINI_ERR_NONE; status=MINI_RUNNING;
+    klq_runtime_start();
+    pc=error_pc=deadline=0; wait_kind=depth=wait_fault=0; error=MINI_ERR_NONE; status=MINI_RUNNING;
     return true;
 }
 
@@ -308,6 +320,9 @@ uint16_t mini_python_error_line(void)
 {
     uint32_t i; uint16_t line=1;
     if (error==MINI_ERR_NONE) return 0;
-    for (i=0;i<error_pc && i<src_n;i++) if (src[i]=='\n') ++line;
+    for (i=0;i<error_pc && i<src_n;i++) {
+        if (src[i]=='\r') { ++line; if (i+1u<error_pc && src[i+1u]=='\n') ++i; }
+        else if (src[i]=='\n') ++line;
+    }
     return line;
 }

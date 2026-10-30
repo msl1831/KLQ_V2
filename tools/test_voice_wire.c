@@ -41,6 +41,17 @@ static void recognition_and_dedup(void)
     recognition(3,0x4b510101UL,99);event(0xb2);CHECK(!state.awake&&!voice_link_take_intent(&in));pump();
     event(0xb1);CHECK(state.awake);CHECK(voice_link_take_events()&6u);CHECK(!voice_link_take_events());
 }
+static void peer_reset_and_tuple_reuse(void)
+{
+    voice_link_intent_t in;unsigned i;setup();
+    recognition(42,0x4b510001UL,90);CHECK(voice_link_take_intent(&in));pump();event(0xb0);pump();
+    recognition(42,0x4b510101UL,90);CHECK(voice_link_take_intent(&in)&&in.semantic==0x4b510101UL);pump();
+    recognition(42,0x4b510101UL,90);CHECK(!voice_link_take_intent(&in)&&state.duplicate_count==1);pump();
+    recognition(42,0x4b510102UL,90);CHECK(voice_link_take_intent(&in)&&in.semantic==0x4b510102UL);pump();
+    recognition(42,0x4b510102UL,91);CHECK(voice_link_take_intent(&in)&&in.score==91);pump();
+    for(i=0;i<256;i++){recognition((uint8_t)i,0x4b510001UL,90);CHECK(voice_link_take_intent(&in));pump();}
+    recognition(42,0x4b510102UL,91);CHECK(voice_link_take_intent(&in));pump();
+}
 static void epoch_and_audio(void)
 {
     uint8_t f[30],d[7];unsigned n,i;voice_link_intent_t in;
@@ -94,6 +105,6 @@ static void wrap_and_stall(void)
 }
 int main(void)
 {
-    golden();recognition_and_dedup();epoch_and_audio();corruption_and_recovery();playback_serialization();wrap_and_stall();nested_recovery_keeps_exit();delayed_rx_is_not_new_intent();
+    golden();recognition_and_dedup();peer_reset_and_tuple_reuse();epoch_and_audio();corruption_and_recovery();playback_serialization();wrap_and_stall();nested_recovery_keeps_exit();delayed_rx_is_not_new_intent();
     printf("VMUP UART4 transport: %u assertions passed; stateRAM=%u bytes\n",checks,(unsigned)(sizeof(rx)+sizeof(rx_epoch)+sizeof(rx_at)+sizeof(tx)+sizeof(frame)+sizeof(state)+sizeof(intent)+sizeof(dedup)));return 0;
 }

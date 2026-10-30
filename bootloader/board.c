@@ -72,7 +72,7 @@ void board_power_off(bool usb_active)
 {
     uint8_t raw, stable, released;
     uint32_t changed, pressed=0, now;
-    if (usb_active) usb_disconnect();
+    if (usb_active) usb_detach();
     display_clear();
     GPIOC->BC = GPIO_PIN_5;
     /* USB/SWD may still power the MCU. Require release before a new 1.5 s hold. */
@@ -80,6 +80,7 @@ void board_power_off(bool usb_active)
     released=(uint8_t)!stable;
     changed=board_ms;
     for (;;) {
+        board_watchdog_feed();
         now=board_ms;
         {
             uint8_t v=key_down();
@@ -152,7 +153,7 @@ void board_boot_key_poll(void)
 }
 #endif
 
-void usb_disconnect(void)
+void usb_detach(void)
 {
     GPIO_Config_T io;
     NVIC_DisableIRQ(USBD1_LP_CAN1_RX0_IRQn);
@@ -170,7 +171,12 @@ void usb_disconnect(void)
     io.mode = GPIO_MODE_OUT_PP;
     io.speed = GPIO_SPEED_2MHz;
     GPIO_Config(GPIOA, &io);
-    delay_ms(300); /* Allow Windows hubs to debounce detach from fixed D+ pull-up. */
+}
+
+void usb_disconnect(void)
+{
+    usb_detach();
+    delay_ms(300); /* Re-enumeration only; power-off must not wait for Windows. */
 }
 
 void board_request_bootloader(void)
@@ -215,3 +221,90 @@ void board_jump(uint32_t address)
     jump_stack(*(uint32_t *)address, *(uint32_t *)(address + 4));
     while (1) {}
 }
+
+
+/* Top 32 RAM bytes are reserved by the linker; the old BOOT owns the last 8. */
+#define FAULT_ADDRESS 0x2001FFE0u
+#define FAULT_MAGIC 0x4B4C5146u
+static uint8_t watchdog_enabled;
+static uint32_t watchdog_at;
+
+static uint8_t fault_valid(void)
+{
+    volatile uint32_t *f=(volatile uint32_t *)FAULT_ADDRESS;
+    return f[0]==FAULT_MAGIC && f[5]==(FAULT_MAGIC^f[1]^f[2]^f[3]^f[4]);
+}
+uint32_t board_fault_code(void) { return fault_valid() ? ((volatile uint32_t *)FAULT_ADDRESS)[1] : 0u; }
+uint32_t board_fault_pc(void) { return fault_valid() ? ((volatile uint32_t *)FAULT_ADDRESS)[2] : 0u; }
+bool board_watchdog_enabled(void) { return watchdog_enabled!=0u; }
+
+void board_watchdog_init(void)
+{
+#ifdef KLQ_DEMO_APP
+    uint32_t started=board_ms;
+    RCM->CSTS_B.LSIEN=1u;
+    while (!RCM->CSTS_B.LSIRDYFLG && board_ms-started<100u) {}
+    if (!RCM->CSTS_B.LSIRDYFLG) return;
+    IWDT->KEY=0xCCCCu; /* Enable before waiting for asynchronous register updates. */
+    IWDT->KEY=0x5555u;
+    IWDT->PSC=6u; IWDT->CNTRLD=312u; /* 256*(312+1)/40 kHz = nominal 2 s. */
+    while (IWDT->STS && board_ms-started<200u) {}
+    if (IWDT->STS) { board_request_bootloader(); NVIC_SystemReset(); }
+    DBGMCU->CFG |= 1u<<8; /* Freeze only when SWD halts the core. */
+    IWDT->KEY=0xAAAAu;
+    watchdog_enabled=1u; watchdog_at=board_ms+250u;
+#endif
+}
+void board_watchdog_feed(void)
+{
+    if (watchdog_enabled && (int32_t)(board_ms-watchdog_at)>=0) {
+        IWDT->KEY=0xAAAAu; watchdog_at=board_ms+250u;
+    }
+}
+
+void board_recovery_check(void)
+{
+#ifdef KLQ_DEMO_APP
+    GPIO_Config_T io;
+    io.pin=GPIO_PIN_3; io.mode=GPIO_MODE_IN_PU; io.speed=GPIO_SPEED_2MHz;
+    GPIO_Config(GPIOC,&io);
+    if (!(GPIOC->IDATA&GPIO_PIN_3)) {
+        delay_ms(40u);
+        if (!(GPIOC->IDATA&GPIO_PIN_3)) { board_request_bootloader(); NVIC_SystemReset(); }
+    }
+#endif
+}
+
+/* Fault path uses a fresh stack and no UART/USB/library calls. Child motor
+ * timeouts remain independent; this is recovery, not electrical instant stop. */
+void board_fault_capture(uint32_t *frame, uint32_t exception)
+{
+    volatile uint32_t *f=(volatile uint32_t *)FAULT_ADDRESS;
+    uint32_t pc=0u, lr=0u, cfsr=SCB->CFSR;
+    if ((uint32_t)frame>=0x20000000u && (uint32_t)frame<=FAULT_ADDRESS-32u && !((uint32_t)frame&3u)) {
+        lr=frame[5]; pc=frame[6];
+    }
+    f[0]=0u; f[1]=exception; f[2]=pc; f[3]=lr; f[4]=cfsr;
+    f[5]=FAULT_MAGIC^exception^pc^lr^cfsr; __DMB(); f[0]=FAULT_MAGIC;
+    board_request_bootloader(); NVIC_SystemReset();
+    for (;;) {}
+}
+
+__asm void HardFault_Handler(void)
+{
+    IMPORT __initial_sp
+    IMPORT board_fault_capture
+    CPSID i
+    TST lr,#4
+    ITE EQ
+    MRSEQ r0,MSP
+    MRSNE r0,PSP
+    MRS r1,IPSR
+    LDR r2,=__initial_sp
+    MSR MSP,r2
+    B board_fault_capture
+}
+__asm void NMI_Handler(void) { B HardFault_Handler }
+__asm void MemManage_Handler(void) { B HardFault_Handler }
+__asm void BusFault_Handler(void) { B HardFault_Handler }
+__asm void UsageFault_Handler(void) { B HardFault_Handler }

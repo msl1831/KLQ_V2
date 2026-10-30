@@ -10,7 +10,7 @@
 extern volatile uint32_t board_ms;
 static voice_control_status_t s;
 static uint32_t uid[3], end_at, ack_at;
-static uint8_t seen_seq, seq_valid, host_open, finish, stop_intent;
+static uint8_t host_open, finish, stop_intent;
 
 static uint8_t idle_host(void)
 {
@@ -64,7 +64,7 @@ void voice_control_set_enabled(uint8_t enabled)
 void voice_control_init(void)
 {
     memset(&s,0,sizeof(s)); memset(uid,0,sizeof(uid));
-    end_at=ack_at=0u; seen_seq=seq_valid=finish=stop_intent=0u;
+    end_at=ack_at=0u; finish=stop_intent=0u;
     host_open=idle_host(); voice_link_drop_intents();
 }
 uint8_t voice_control_active(void) { return s.active; }
@@ -85,8 +85,6 @@ static void intent(const voice_link_intent_t *i,const voice_link_status_t *v,uin
 {
     unsigned port=0u; uint8_t n,state; const klq_port_status_t *p;
     s.last_semantic=i->semantic; s.last_seq=i->seq; s.last_score=i->score;
-    if(seq_valid && seen_seq==i->seq) { reject(VOICE_CTL_DUPLICATE,0u); return; }
-    seen_seq=i->seq; seq_valid=1u;
     if((uint32_t)(board_ms-i->received_ms)>100u) { reject(VOICE_CTL_STALE,0u); return; }
     if(i->semantic==0x4b510001u) { s.last_reason=VOICE_CTL_OK; return; }
     if(i->semantic<0x4b510101u || i->semantic>0x4b510103u) { reject(VOICE_CTL_UNSUPPORTED,5003u); return; }

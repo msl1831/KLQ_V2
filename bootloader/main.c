@@ -38,11 +38,16 @@ int main(void)
         char line[160];
         sc7a20_sample_t sample;
         bool sample_valid;
+        uint8_t imu_active=0u, port_index=0u;
 
+        board_recovery_check();
+        if (!protocol_system_firmware_valid()) { board_request_bootloader(); NVIC_SystemReset(); }
+        board_watchdog_init();
         user_program_init();
         klq_runtime_init();
         robot_ui_init();
         robot_ui_startup_animation();
+        board_watchdog_feed();
         power_key_init();
         peripherals_uart_init();
         external_ports_init();
@@ -58,7 +63,10 @@ int main(void)
         voice_at = board_ms;
         sample_valid = false;
         for (;;) {
+            power_key_poll();
             voice_link_poll();
+            external_ports_set_active(user_program_state()==USER_PROGRAM_RUNNING);
+            external_ports_poll(); /* Expire old leases before VM/voice can set a new goal. */
             protocol_poll();
             power_key_poll();
             voice_control_poll();
@@ -67,11 +75,15 @@ int main(void)
                 voice_at=board_ms+2000u; voice_link_get_status(&v);
                 if (!v.version_valid) voice_link_query_version();
             }
+            {
+                uint8_t active=user_program_state()==USER_PROGRAM_RUNNING;
+                if (active && !imu_active) sample_at=board_ms;
+                imu_active=active;
+            }
             klq_runtime_poll();
             user_program_poll();
             robot_ui_poll();
-            external_ports_set_active(user_program_state()==USER_PROGRAM_RUNNING);
-            external_ports_poll();
+            board_watchdog_feed(); /* No ISR feed: the critical loop must return. */
             if (external_upgrade_active()) {
                 report_at=board_ms+100u; error_at=board_ms+1000u; port_at=board_ms+500u;
                 continue;
@@ -80,30 +92,19 @@ int main(void)
                 sample_at = board_ms + (user_program_state()==USER_PROGRAM_RUNNING ? 20u : 100u);
                 sample_valid=sc7a20_read(&sample);
                 klq_runtime_update_imu(&sample,sample_valid);
-                if (!sensor_announced) {
-                    int length = sprintf(line, "SC7A20 READY ADDR=0x%02X ID=0x%02X VER=0x%02X\r\n",
-                                         sc7a20_address(), sc7a20_identity(), sc7a20_version());
-                    sensor_announced = usb_serial_log((const uint8_t *)line, (uint32_t)length);
-                }
-            } else if (!sensor_ready && (int32_t)(board_ms - error_at) >= 0) {
-                static const char error[] = "SC7A20 ERROR: sensor not detected at 0x19 or 0x18\r\n";
-                error_at += 1000u;
-                usb_serial_log((const uint8_t *)error, sizeof(error) - 1u);
             }
-            if (sensor_ready && sample_valid && (int32_t)(board_ms - report_at) >= 0) {
-                    report_at = board_ms + 100u;
-                    char roll[20], pitch[20];
-                    int length;
-                    format_angle(roll, sample.roll_cdeg);
-                    format_angle(pitch, sample.pitch_cdeg);
-                    length = sprintf(line, "X=%dmg Y=%dmg Z=%dmg ROLL=%sdeg PITCH=%sdeg\r\n",
-                                     sample.x_mg, sample.y_mg, sample.z_mg, roll, pitch);
-                    usb_serial_log((const uint8_t *)line, (uint32_t)length);
-            }
-            if ((int32_t)(board_ms - port_at) >= 0) {
-                unsigned i;
-                port_at += 500u;
-                for (i=0;i<KLQ_EXTERNAL_PORT_COUNT;i++) {
+            if (!usb_serial_console_active()) { sensor_announced=false; continue; }
+            if (!usb_serial_log_ready()) continue;
+            if (sensor_ready && !sensor_announced) {
+                int length=sprintf(line,"SC7A20 READY ADDR=0x%02X ID=0x%02X VER=0x%02X\r\n",
+                                   sc7a20_address(),sc7a20_identity(),sc7a20_version());
+                sensor_announced=usb_serial_log((const uint8_t *)line,(uint32_t)length);
+            } else if (!sensor_ready && (int32_t)(board_ms-error_at)>=0) {
+                static const char error[]="SC7A20 ERROR: sensor not detected at 0x19 or 0x18\r\n";
+                if (usb_serial_log((const uint8_t *)error,sizeof(error)-1u)) error_at=board_ms+1000u;
+            } else if ((int32_t)(board_ms - port_at) >= 0) {
+                unsigned i=port_index;
+                {
                     const klq_port_status_t *s=external_port_status(i);
                     int length;
                     if (s->online && s->device_class==1u && s->sensor_type==KLQ_SENSOR_IR_DUAL)
@@ -125,8 +126,18 @@ int main(void)
                             (unsigned long)s->timeout_count,(unsigned long)s->frame_error_count,
                             (unsigned long)s->uart_error_count,(unsigned long)s->request_count,
                             (unsigned long)s->response_count);
-                    usb_serial_log((const uint8_t *)line,(uint32_t)length);
+                    if (usb_serial_log((const uint8_t *)line,(uint32_t)length)) {
+                        port_index=(uint8_t)((port_index+1u)%KLQ_EXTERNAL_PORT_COUNT);
+                        port_at=board_ms+166u;
+                    }
                 }
+            } else if (sensor_ready && sample_valid && (int32_t)(board_ms-report_at)>=0) {
+                char roll[20],pitch[20];
+                int length;
+                format_angle(roll,sample.roll_cdeg); format_angle(pitch,sample.pitch_cdeg);
+                length=sprintf(line,"X=%dmg Y=%dmg Z=%dmg ROLL=%sdeg PITCH=%sdeg\r\n",
+                               sample.x_mg,sample.y_mg,sample.z_mg,roll,pitch);
+                if (usb_serial_log((const uint8_t *)line,(uint32_t)length)) report_at=board_ms+100u;
             }
         }
     }

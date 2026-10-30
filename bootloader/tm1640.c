@@ -3,6 +3,7 @@
 /* TM1640 is a write-only, LSB-first two-wire interface (not I2C, no ACK). */
 #define CLK(v) do { if (v) GPIOB->BSC = 1u << 6; else GPIOB->BC = 1u << 6; } while (0)
 #define DAT(v) do { if (v) GPIOB->BSC = 1u << 7; else GPIOB->BC = 1u << 7; } while (0)
+static uint8_t last_frame[13], frame_valid;
 static void start(void) { DAT(1); CLK(1); delay_us(5); DAT(0); delay_us(5); CLK(0); }
 static void stop(void) { CLK(0); DAT(0); delay_us(5); CLK(1); delay_us(5); DAT(1); delay_us(5); }
 static void byte_out(uint8_t b)
@@ -18,9 +19,15 @@ static void command(uint8_t value) { start(); byte_out(value); stop(); }
 void display_columns(const uint8_t columns[13])
 {
     unsigned x;
+    if (frame_valid) {
+        for (x=0;x<13u;x++) if (last_frame[x]!=(columns[x]&0x7fu)) break;
+        if (x==13u) return;
+    }
+    for (x=0;x<13u;x++) last_frame[x]=(uint8_t)(columns[x]&0x7fu);
+    frame_valid=1u;
     command(0x40); /* Normal mode, auto-increment. */
     start(); byte_out(0xc0);
-    for (x = 0; x < 16; ++x) byte_out(x < 13 ? columns[x] & 0x7f : 0);
+    for (x = 0; x < 16; ++x) byte_out(x < 13 ? last_frame[x] : 0);
     stop();
     command(0x8a); /* Display on, moderate brightness. */
 }
@@ -64,6 +71,7 @@ void display_init(void)
     io.speed = GPIO_SPEED_2MHz;
     GPIO_Config(GPIOB, &io);
     delay_ms(5);
+    frame_valid=0u;
     command(0x80);
     display_clear();
 }

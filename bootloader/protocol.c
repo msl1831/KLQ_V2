@@ -25,7 +25,9 @@ uint8_t protocol_reset_pending(void) { return 0u; }
 typedef struct { uint32_t magic, length, crc, base, header_crc; } Image;
 static uint8_t frame[16+MAX_PAYLOAD], response[20+MAX_PAYLOAD];
 static uint32_t used, last_byte;
-static bool cached;
+static bool cached, reply_pending, urgent_pending;
+static uint8_t tx_owner, action_pending, valid_cache;
+static uint8_t urgent[20];
 #ifndef KLQ_DEMO_APP
 static uint32_t image_size, image_crc, written;
 static bool downloading;
@@ -61,10 +63,13 @@ static bool vector_valid(uint32_t n)
 static bool image_valid(void)
 {
     const Image *m = (const Image *)META_BASE;
-    return m->magic == IMAGE_MAGIC && m->base == APP_BASE &&
+    bool valid=m->magic == IMAGE_MAGIC && m->base == APP_BASE &&
            m->header_crc == crc32_update(0, &m->length, 12) && vector_valid(m->length) &&
            crc32_update(0, (const void *)APP_BASE, m->length) == m->crc;
+    valid_cache=valid?2u:1u;
+    return valid;
 }
+static bool image_status(void) { return valid_cache?valid_cache==2u:image_valid(); }
 
 bool protocol_system_firmware_valid(void) { return image_valid(); }
 
@@ -97,6 +102,69 @@ static bool program(uint32_t address, const uint8_t *p, uint32_t n, bool metadat
 }
 #endif
 
+static void commit_action(uint8_t action)
+{
+    if (action==2u) board_request_bootloader();
+#ifdef KLQ_DEMO_APP
+    reset_pending=1u; reset_deadline=board_ms+150u;
+    if (external_ports_motor_stopped()) { usb_disconnect(); NVIC_SystemReset(); reset_pending=0u; }
+#else
+    if (action==1u) board_jump(APP_BASE);
+    else { usb_disconnect(); NVIC_SystemReset(); }
+#endif
+}
+
+/* One full reply in the existing buffer; urgent STOP has one bounded ACK slot. */
+static void transmit(void)
+{
+    uint8_t state, owner, action;
+    unsigned i;
+    usb_serial_poll();
+    for (i=0;i<2u;i++) {
+        if (tx_owner) {
+            state=usb_serial_tx_state();
+            if (state==USB_TX_BUSY) return;
+            owner=tx_owner; tx_owner=0;
+            if (owner==1u) {
+                reply_pending=false;
+                if (state==USB_TX_DONE && action_pending) {
+                    action=action_pending; action_pending=0; commit_action(action);
+                    return;
+                }
+            } else urgent_pending=false;
+        }
+        if (reply_pending) {
+            if (usb_serial_write(response,response_len)) tx_owner=1u;
+            else { if (usb_serial_tx_state()!=USB_TX_BUSY) reply_pending=false; return; }
+        } else if (urgent_pending) {
+            if (usb_serial_write(urgent,sizeof(urgent))) tx_owner=2u;
+            else { if (usb_serial_tx_state()!=USB_TX_BUSY) urgent_pending=false; return; }
+        } else return;
+    }
+}
+
+#ifdef KLQ_DEMO_APP
+static void stop_request(void)
+{
+    if (external_motor_control_active()) external_upgrade_cancel();
+    user_program_stop();
+}
+static void urgent_request(uint32_t seq,uint16_t cmd,const uint8_t *p,uint16_t n)
+{
+    if (!((cmd==CMD_STOP && !n) || (cmd==CMD_VOICE_CANCEL && !n) ||
+          (cmd==CMD_VOICE_ARM && n==1u && !p[0]))) return;
+    if (urgent_pending && get32(urgent+4)==seq && get16(urgent+8)==(cmd|0x8000u)) return;
+    if (cmd==CMD_STOP) stop_request();
+    else if (cmd==CMD_VOICE_CANCEL) voice_control_cancel();
+    else voice_control_set_enabled(0u);
+    /* An ACK already handed to the controller is immutable; retry gets an ACK later. */
+    if (tx_owner==2u) return;
+    put32(urgent,FRAME_MAGIC); put32(urgent+4,seq); put16(urgent+8,cmd|0x8000u); put16(urgent+10,4u);
+    put32(urgent+16,OK); put32(urgent+12,crc32_update(crc32_update(0,urgent,12),urgent+16,4));
+    urgent_pending=true;
+}
+#endif
+
 static void process(void)
 {
     uint32_t seq=get32(frame+4), wire_crc=get32(frame+12), calc, status=OK, size=0, action=0;
@@ -105,10 +173,16 @@ static void process(void)
     uint8_t *out=response+20;
     bool bridge_command=cmd>=CMD_EXT_OPEN && cmd<=CMD_EXT_CLOSE;
     calc=crc32_update(crc32_update(0,frame,12),p,n);
-    if (!bridge_command && wire_crc == calc && cached && seq==last_seq && wire_crc==last_crc && cmd==last_cmd && n==last_len) {
-        usb_serial_write(response,response_len); return;
+    if (reply_pending || tx_owner || urgent_pending) {
+#ifdef KLQ_DEMO_APP
+        if (wire_crc==calc) urgent_request(seq,cmd,p,n);
+#endif
+        return;
     }
-    cached=false;
+    if (!bridge_command && wire_crc == calc && cached && seq==last_seq && wire_crc==last_crc && cmd==last_cmd && n==last_len) {
+        reply_pending=true; transmit(); return;
+    }
+    cached=false; action_pending=0;
     if (wire_crc != calc) status=ERR_CRC;
 #ifdef KLQ_DEMO_APP
     else if (power_key_shutdown_pending() && cmd!=CMD_INFO && cmd!=CMD_ECHO && cmd!=CMD_STOP && cmd!=CMD_VOICE_STATUS && cmd!=CMD_MOTOR_STATUS && cmd!=CMD_VOICE_CANCEL) status=ERR_STATE;
@@ -121,19 +195,20 @@ static void process(void)
         if (n) { status=ERR_LENGTH; break; }
         size = (uint32_t)sprintf((char *)out,
 #ifdef KLQ_DEMO_APP
-            "KLQ ROBOT FW 0.13; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
+            "KLQ ROBOT FW 0.14; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; "
             "USER_STATE=%u; USER_VALID=%u; USER_LENGTH=%lu; USER_RECEIVED=%lu; USER_MAX=%u; UI=%u; "
-            "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1; EXT_MOTOR_STATUS=1",
-            (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
+            "PY_ERROR=%u; PY_LINE=%u; PK_RAW=%u; PK_DOWN=%u; PK_SHORT=%u; USB_RESETS=%lu; SYS_FAULT=%lu; SYS_PC=0x%08lX; SYS_WDT=%u; EXT_UPGRADE=1; EXT_PORTS=3; EXT_MOTOR=1; EXT_VOICE=1; EXT_MOTOR_STATUS=1",
+            (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_status(),
             (unsigned)user_program_state(),(unsigned)user_program_valid(),
             (unsigned long)user_program_length(),(unsigned long)user_program_received(),
             (unsigned)USER_PROGRAM_CAPACITY,(unsigned)robot_ui_state(),
             (unsigned)user_program_error(),(unsigned)user_program_error_line(),
             (unsigned)power_key_raw_level(),(unsigned)power_key_pressed(),
-            (unsigned)power_key_short_count(),(unsigned long)usb_reset_count);
+            (unsigned)power_key_short_count(),(unsigned long)usb_reset_count,
+            (unsigned long)board_fault_code(),(unsigned long)board_fault_pc(),(unsigned)board_watchdog_enabled());
 #else
             "KLQ USB BOOT 0.4; APP=0x%08lX; MAX=%lu; PAGE=%u; VALID=%u; RECEIVED=%lu; USB_RESETS=%lu",
-            (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_valid(),
+            (unsigned long)APP_BASE,(unsigned long)APP_MAX,(unsigned)FLASH_PAGE,(unsigned)image_status(),
             (unsigned long)written,(unsigned long)usb_reset_count);
 #endif
         break;
@@ -157,7 +232,6 @@ static void process(void)
             user_program_stop();
             external_upgrade_cancel();
 #endif
-            board_request_bootloader();
             action=2;
         }
         break;
@@ -271,8 +345,7 @@ static void process(void)
     case CMD_STOP:
         if (n) status=ERR_LENGTH;
         else {
-            if (external_motor_control_active()) external_upgrade_cancel();
-            user_program_stop();
+            stop_request();
         }
         break;
     case CMD_FINISH:
@@ -286,7 +359,7 @@ static void process(void)
         if (n!=8) { status=ERR_LENGTH; break; }
         requested=get32(p);
         if (requested<8 || requested>APP_MAX) { status=ERR_RANGE; break; }
-        downloading=false;
+        downloading=false; valid_cache=1u;
         /* Invalidate FIRST. Interrupted replacement must never boot a mixed image. */
         if (!erase_page(META_BASE)) { status=ERR_FLASH; break; }
         image_size=requested; image_crc=get32(p+4); written=0;
@@ -336,21 +409,13 @@ static void process(void)
     put32(response+12,crc32_update(crc32_update(0,response,12),response+16,size+4));
     response_len=size+20;
     if (!bridge_command && wire_crc==calc) { cached=true; last_seq=seq; last_crc=wire_crc; last_cmd=cmd; last_len=n; }
-    if (usb_serial_write(response,response_len) && status==OK && action) {
-#ifdef KLQ_DEMO_APP
-        reset_pending=1u; reset_deadline=board_ms+150u;
-        if (external_ports_motor_stopped()) { delay_ms(30); usb_disconnect(); NVIC_SystemReset(); reset_pending=0u; }
-#else
-        delay_ms(30);
-        if (action==1) board_jump(APP_BASE);
-        else { usb_disconnect(); NVIC_SystemReset(); }
-#endif
-    }
+    action_pending=status==OK?(uint8_t)action:0u;
+    reply_pending=true; transmit();
 }
 
 static void reset_received(void)
 {
-    used=0; cached=false;
+    used=0; cached=reply_pending=urgent_pending=false; tx_owner=action_pending=0;
 #ifdef KLQ_DEMO_APP
     voice_control_cancel();
     external_upgrade_cancel();
@@ -364,6 +429,7 @@ void protocol_poll(void)
 {
     int b;
     uint16_t budget=256u;
+    transmit();
 #ifdef KLQ_DEMO_APP
     if (reset_pending) {
         if (external_ports_motor_stopped() || (int32_t)(board_ms-reset_deadline)>=0) { usb_disconnect(); NVIC_SystemReset(); reset_pending=0u; }
@@ -379,7 +445,7 @@ void protocol_poll(void)
         frame[used++]=(uint8_t)b; last_byte=board_ms;
         if (used==4 && get32(frame)!=FRAME_MAGIC) { memmove(frame,frame+1,3); used=3; }
         if (used==16 && get16(frame+10)>MAX_PAYLOAD) { used=0; continue; }
-        if (used>=16 && used==16u+get16(frame+10)) { process(); used=0;
+        if (used>=16 && used==16u+get16(frame+10)) { process(); used=0; transmit();
 #ifdef KLQ_DEMO_APP
             if (reset_pending) break;
 #endif

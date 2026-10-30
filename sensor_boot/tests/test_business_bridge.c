@@ -28,6 +28,11 @@ static void p32(uint8_t *p,uint32_t v){p16(p,(uint16_t)v);p16(p+2,(uint16_t)(v>>
 static uint32_t u32(const uint8_t *p){return p[0]|((uint32_t)p[1]<<8)|((uint32_t)p[2]<<16)|((uint32_t)p[3]<<24);}
 int usb_serial_read(void){return in_at<in_n?input[in_at++]:-1;}
 bool usb_serial_write(const uint8_t *p,uint32_t n){CHECK(n<=sizeof(reply));memcpy(reply,p,n);reply_n=(uint16_t)n;return true;}
+uint32_t board_fault_code(void) { return 0u; }
+uint32_t board_fault_pc(void) { return 0u; }
+bool board_watchdog_enabled(void) { return false; }
+void usb_serial_poll(void) {}
+uint8_t usb_serial_tx_state(void) { return USB_TX_DONE; }
 bool usb_serial_reset_seen(void){uint8_t n=reset_seen;reset_seen=0;return n!=0;}
 void RCM_EnableAPB2PeriphClock(unsigned v){(void)v;}
 void GPIO_Config(void *p,GPIO_Config_T *io){(void)p;CHECK(io->pin==GPIO_PIN_3||io->pin==GPIO_PIN_4);}
