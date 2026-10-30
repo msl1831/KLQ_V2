@@ -12,7 +12,7 @@
 #include "voice_link.h"
 #include "voice_control.h"
 static unsigned voice_arm_on_calls;
-static uint8_t shutdown_test;
+static uint8_t shutdown_test,finish_incomplete;
 void voice_control_init(void){}
 void voice_control_poll(void){}
 uint8_t voice_control_active(void){return 0u;}
@@ -77,7 +77,7 @@ uint32_t board_fault_pc(void) { return 0u; }
 bool board_watchdog_enabled(void) { return false; }
 void usb_serial_poll(void) {}
 uint8_t usb_serial_tx_state(void) { return mock_tx_state; }
-bool usb_serial_reset_seen(void) { uint8_t r=reset_seen; reset_seen=0; return r; }
+bool usb_serial_reset_seen(void) { uint8_t r=reset_seen; reset_seen=0; if(r&&mock_tx_state==USB_TX_BUSY)mock_tx_state=USB_TX_FAILED; return r; }
 void delay_ms(uint32_t ms) { board_ms+=ms; }
 void display_icon(unsigned icon) { (void)icon; }
 void display_columns(const uint8_t *p) { (void)p; }
@@ -127,7 +127,7 @@ uint8_t external_motor_control_active(void) { return (uint8_t)(owner && motor_ow
 void user_program_init(void) {}
 bool user_program_begin(uint32_t n,uint32_t crc) { (void)n;(void)crc;++begin_calls;return true; }
 bool user_program_write(uint32_t off,const uint8_t *p,uint32_t n) { (void)off;(void)p;(void)n;++data_calls;return true; }
-bool user_program_finish_download(void) { ++end_calls;return true; }
+bool user_program_finish_download(void) { ++end_calls;return !finish_incomplete; }
 bool user_program_start(void) { ++run_calls;return true; }
 void user_program_stop(void) { ++stop_calls;user_state=USER_PROGRAM_READY; }
 void user_program_finish_execution(void) { ++finish_calls; }
@@ -159,9 +159,10 @@ static void setup(void)
     inject_reset=0U;reset_queue_size=0U;
     writes=open_calls=submit_calls=result_calls=close_calls=cancel_calls=stop_calls=0U;
     begin_calls=data_calls=end_calls=run_calls=display_calls=finish_calls=reset_calls=boot_requests=0U;
-    user_state=USER_PROGRAM_RUNNING;used=last_byte=last_seq=last_crc=response_len=0U;cached=false;last_cmd=last_len=0U;
+    memset(links,0,sizeof(links));download_owner=finish_incomplete=0u;
+    user_state=USER_PROGRAM_RUNNING;links[0].used=links[0].last_byte=links[0].last_seq=links[0].last_crc=links[0].response_len=0U;links[0].cached=false;links[0].last_cmd=links[0].last_len=0U;
     submitted_size=0U; mock_tx_state=USB_TX_DONE; fail_writes=hold_writes=0;
-    held_data=0; held_n=0; reply_pending=urgent_pending=false; tx_owner=action_pending=valid_cache=reset_pending=0;
+    held_data=0; held_n=0; links[0].reply_pending=links[0].urgent_pending=false; links[0].tx_owner=links[0].action_pending=valid_cache=reset_pending=0;
 
     memset(cached_ports,0,sizeof(cached_ports));memset(cached_motor_state,0,sizeof(cached_motor_state));
     memset(cached_motor_goal,0,sizeof(cached_motor_goal));memset(cached_motor_ack,0,sizeof(cached_motor_ack));snapshot_reads=0;
@@ -198,7 +199,7 @@ static void open_and_forward(void)
 {
     uint8_t p[164],f[16];unsigned before;
     setup();open_session();CHECK(stop_calls==1U);
-    /* Repeated OPEN is handled by core idempotence, never a USB cached stale result. */
+    /* Repeated OPEN is handled by core idempotence, never a USB links[0].cached stale result. */
     p[0]=1U;wr32(p+1U,TOKEN);wr16(p+5U,3U);wr16(p+7U,1U);
     before=open_calls;command(10U,XOPEN,p,9U,OK,4U);CHECK(open_calls==before+1U && stop_calls==1U);
     wr32(p,TOKEN);memcpy(f,"KLQ1",4U);wr32(f+4U,1U);wr16(f+8U,1U);wr16(f+10U,0U);wr32(f+12U,crc32_update(0U,f,12U));
@@ -247,9 +248,9 @@ static void ownership_and_resets(void)
     before=stop_calls;command(36U,CMD_STOP,0,0U,OK,0U);CHECK(stop_calls==before+1U);
     command(37U,CMD_RESET,0,0U,OK,0U);CHECK(!owner && cancel_calls && reset_calls==1U && boot_requests==1U);
     setup();open_session();in_size=in_pos=sent_size=0U;append(40U,XPOLL,(const uint8_t *)"1234",4U);
-    in_size=8U;protocol_poll();CHECK(used==8U);
-    in_size=in_pos=0U;reset_seen=1U;protocol_poll();CHECK(!used && !owner && cancel_calls==1U);
-    /* Same sequence can be a new request after USB reset, never an old cached OPEN. */
+    in_size=8U;protocol_poll();CHECK(links[0].used==8U);
+    in_size=in_pos=0U;reset_seen=1U;protocol_poll();CHECK(!links[0].used && !owner && cancel_calls==1U);
+    /* Same sequence can be a new request after USB reset, never an old links[0].cached OPEN. */
     open_session();CHECK(owner && open_calls==2U);
 }
 static void budget_and_info(void)
@@ -340,7 +341,7 @@ static void failed_response_retry(void)
     CHECK(reset_calls==1 && boot_requests==1 && stop_calls==1);
     command(1000,CMD_RESET,0,0,OK,0);
     CHECK(reset_calls==1 && boot_requests==1 && stop_calls==1);
-    setup(); user_state=USER_PROGRAM_DOWNLOADING; wr32(payload,0); payload[4]=1;
+    setup(); user_state=USER_PROGRAM_DOWNLOADING;download_owner=1u; wr32(payload,0); payload[4]=1;
     fail_writes=1;append(1001,CMD_DATA,payload,5);protocol_poll();CHECK(data_calls==1 && !sent_size);
     command(1001,CMD_DATA,payload,5,OK,4);CHECK(data_calls==1);
     setup(); hold_writes=1;append(1002,CMD_RESET,0,0);protocol_poll();
@@ -357,19 +358,19 @@ static void busy_stop_and_retention(void)
     uint8_t payload[100];unsigned before;
     setup();memset(payload,0x77,sizeof(payload));hold_writes=1;
     append(1100,CMD_ECHO,payload,sizeof(payload));protocol_poll();
-    CHECK(reply_pending && tx_owner==1 && held_n==120 && user_state==USER_PROGRAM_RUNNING);
+    CHECK(links[0].reply_pending && links[0].tx_owner==1 && held_n==120 && user_state==USER_PROGRAM_RUNNING);
     in_size=in_pos=0;append(1101,CMD_RUN,0,0);append(1102,CMD_STOP,0,0);protocol_poll();
-    CHECK(stop_calls==1 && !run_calls && urgent_pending && !memcmp(held_data,held_copy,held_n));
+    CHECK(stop_calls==1 && !run_calls && links[0].urgent_pending && !memcmp(held_data,held_copy,held_n));
     in_size=in_pos=0;append(1102,CMD_STOP,0,0);protocol_poll();CHECK(stop_calls==1);
     memcpy(sent,held_data,held_n);sent_size=held_n;mock_tx_state=USB_TX_DONE;hold_writes=0;protocol_poll();
-    CHECK(!reply_pending && !urgent_pending && sent_size==140 && rd32(sent+124)==1102 && rd32(sent+136)==OK);
+    CHECK(!links[0].reply_pending && !links[0].urgent_pending && sent_size==140 && rd32(sent+124)==1102 && rd32(sent+136)==OK);
     setup();hold_writes=1;append(1103,CMD_ECHO,payload,sizeof(payload));protocol_poll();
     in_size=in_pos=0;before=stop_calls;append(1104,CMD_STOP,payload,1);protocol_poll();CHECK(stop_calls==before);
     in_size=in_pos=0;append(1105,CMD_STOP,0,0);input[12]^=1;protocol_poll();CHECK(stop_calls==before);
     reset_seen=1;mock_tx_state=USB_TX_FAILED;hold_writes=0;protocol_poll();
-    CHECK(user_state==USER_PROGRAM_RUNNING && stop_calls==before && !reply_pending && !urgent_pending);
+    CHECK(user_state==USER_PROGRAM_RUNNING && stop_calls==before && !links[0].reply_pending && !links[0].urgent_pending);
     setup();user_state=USER_PROGRAM_READY;reset_seen=1;protocol_poll();CHECK(user_state==USER_PROGRAM_READY && !stop_calls);
-    user_state=USER_PROGRAM_DOWNLOADING;reset_seen=1;protocol_poll();CHECK(user_state==USER_PROGRAM_READY && stop_calls==1);
+    user_state=USER_PROGRAM_DOWNLOADING;download_owner=1u;reset_seen=1;protocol_poll();CHECK(user_state==USER_PROGRAM_READY && stop_calls==1);
 }
 int main(void)
 {

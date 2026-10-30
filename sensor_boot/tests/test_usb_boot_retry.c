@@ -37,10 +37,10 @@ int main(void)
     CHECK(command(3,CMD_INFO,0,0)==OK && strstr((char*)sent+20,"VALID=0"));
     valid_image();CHECK(protocol_system_firmware_valid());put32(p,16);put32(p+4,0);
     CHECK(command(4,CMD_BEGIN,p,8)==ERR_FLASH && valid_cache==1);
-    valid_image();memset(mock_meta,0,sizeof(mock_meta));image_size=written=16;image_crc=crc32_update(0,mock_app,16);downloading=true;
+    valid_image();memset(mock_meta,0,sizeof(mock_meta));image_size=written=16;image_crc=crc32_update(0,mock_app,16);downloading=true;download_owner=1u;
     CHECK(command(5,CMD_END,0,0)==OK && valid_cache==2 && image_valid());
-    fail_tx=1;CHECK(command(6,CMD_RUN,0,0)==99 && !jumps && action_pending==1);
-    CHECK(command(6,CMD_RUN,0,0)==OK && jumps==1 && !action_pending);
+    fail_tx=1;CHECK(command(6,CMD_RUN,0,0)==99 && !jumps && links[0].action_pending==1);
+    CHECK(command(6,CMD_RUN,0,0)==OK && jumps==1 && !links[0].action_pending);
     CHECK(command(6,CMD_RUN,0,0)==OK && jumps==1);
     fail_tx=1;CHECK(command(7,CMD_RESET,0,0)==99 && !requests && !resets);
     CHECK(command(7,CMD_RESET,0,0)==OK && requests==1 && resets==1);

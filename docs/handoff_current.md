@@ -1,3 +1,45 @@
+# 最新：蓝牙工作已按用户要求暂停（2026-10-30）
+
+以[今日暂停交接](bluetooth_paused_20261030.md)为当前依据。手机能搜到KLQ2，PC发现/连接未完成；BOOT0.5已安装并完整验证，APP0.15只编译未安装。已恢复原APP0.14双眼待机/空RAM/错误0/电机停止/ARM0及观测服务。用户指定保存同步后关闭这台电脑。下方是执行过程旧进度，不能继续照其中“正在安装”重复烧录。
+
+---
+
+## BLE最新部署进度（优先于下方WIP旧描述）
+
+APP0.15/BOOT0.5已最终ARM构建：APP36588/RO36520/RAM31256，SHA ecdc628f5a99ce6f231901abb1598f30ddc48624335fa0f86b7cc8365d4864b7；BOOT14872/RO14580/RAM12344，SHA e32ac440683c65daa7e6f7d5ee7cf6fb080207d919b5fc6db75b7490f4b3d6ef。driver原子reset补丁已冻结，真实C18553+8负对照；protoAPP711/BOOT466+14负对照、USB718、business342/pipeline4均通过。PC客户端21、独立orphan回归通过。
+
+用户已接回并重插DAP，完整旧Flash备份成功（下方SHA/UID）。新BOOT首次以preserve-power-halt方式编程失败result1，受影响只BOOT前8页；未验证BOOT保halt，失败记录boot_install_failed_preserve_halt.json。随后未先reset时UID/option读数异常（留下FLM状态），记录boot_install_failed_identity_after_algo.json；**改为入口先SYSRESETREQ+halt/mask/PC5高**后真实UID/option恢复，受保护APP/meta与备份完全一致，标准流程重写BOOT0.5成功。
+
+当前exec_command session7862：install_boot_reset_repair.py正在写后全512KiB对比，已program_returned，BOOT整个32KiB精确验证SHA70b63d398d00133eefd58cef1ca09e87f26d83d37f3ebd3e096e1c65ffdf43c1（prefix新BIN e32ac...）；尾部post_app_meta已读到0x08028000还在继续。**不要再启动另一个DAP进程或刷旧引导**。等该session PASS，会写post_boot_full_flash.bin/boot_install.json、APP..end/options unchanged，然后自动RAM请求BOOT0.5停下载模式。BOOT代码已改变，不可再按“未Flash”段重复初装；失败修复脚本有归因与UID/保护区守卫。
+
+下一步运行build/bluetooth_20261030/read_ble_status.py（USB COM123、只读0x56，现监测pause/released）确认新BOOT0.5与ATready/configured/name KLQ2/MAC，随后tools/klq_ble.py --deps build/bluetooth_pc_20261030/deps scan/services。live脚本build/bluetooth_pc_20261030/live_ble_checks.py已准备，boot阶段只读INFO0.5/ECHO256/1024；app阶段下载显示12/重连/STOP/partial。还未真正连接BLE或蓝牙写APP。
+
+计划原生PC BLE flash APP0.15（可先partial断连再完整重下验证恢复），END CRC/RUN/INFO验证后BLE下用户程序并USB监测并发；新BOOT保留USB救援。此时板上APP仍0.14未改。native截图/目录不可当射频已验收。构建警告仅原2B literal pool和ble一条assignment条件提示，无编译错误。没有运动命令，外设固件未改。
+
+# BLE开发进行中（2026-10-30）
+
+用户新增：ECB02C按规格初始化Peripheral从机、名称KLQ2；用电脑自带蓝牙连接模拟APP，下载RAM用户程序，最好通过BLE升级主控固件。常规离线/目标口保护/无堆等0.14要求继续。新版本拟APP0.15/BOOT0.5；权威C工作树codex/python-runtime@3d4924a+本轮未提交，F共享main不覆盖。
+
+手册本地ECB02C蓝牙芯片技术手册V1.0.pdf已提取build/bluetooth_20261030/ecb02c_manual.txt；BLE而非经典SPP，UART5 PC12 TX/PD2 RX/PA8 STA高=连接，默认115200；IO没有MCU的SLEEP/AT_EN/RST映射不可虚构。Peripheral ROLE2、NAME KLQ2、MODE2 UART纯透传、SLEEP0/ECHO0/CONNOTIFY0/BTAT0、SUUIDFFF0/RUUIDFFF1/WUUIDFFF2均查询差异写，持久参数每启动最多尝试一次SET/必要RST后核验，不反复擦模块Flash。FFF1必须subscribe通知，FFF2写；最大MTU247，本版保守20B/20ms，BLE TX8s、PC RPC10s。
+
+三个agent：ble_spec拥有ble_serial.c/h及真实C driver测试；初版4627断言+5负对照，现正加reset_seen同步abort/拒pending最后补丁，必须等其最终冻结。ble_transport协议候选因首次未验证广改被自动审核拒绝，后隔离native+独立review后重新批准应用生产；现APP711/BOOT466+14负对照，协议source SHA0f70728467ff412321bfbcca694d9036f54c5edfc0f6b4b8710213caa6387294，内部poll BLE。每link独立parser/response/cache/urgent，单下载owner、非ownerreset不清另一partial、跨link pendingBOOT RUN互斥；BLE禁USB工程写命令，STOP全局。ble_pc有tools/klq_ble.py/test_klq_ble.py/requirements_ble.txt、docs/bluetooth_pc_client.md、examples/ble_display_demo.py，21fake-GATT通过；独立review发现并已回归orphan buffer reset竞态。
+
+root改main APP/BOOT初始化ble_serial（不重复poll），build非baseline加KLQ_BLE和usart驱动。root已修usb_serial reset_seen真时原子NAK/clear/FAILED释放旧借用，start拒pending reset、log_ready不格式化；真实USB718、旧协议497/BOOT15通过。ARM预检compiler_preflight BIN33428但仍旧protocol且blepoll未引用，**不能烧这个预检镜像**；最终需在协议/driver均冻结后重建APP/BOOT并查map。
+
+Windows10 19045、Intel Wireless Bluetooth8087:0032及LE枚举器正常，最初10s扫描0广告（模块可能默认ROLE浮空Central），没有连接别的设备。Bleak0.22.3/WinRT2.3.0仅隔离在build/bluetooth_pc_20261030/deps，本地锁依赖文件；D:/Python/Python312/python.exe tools/klq_ble.py --deps ... --address MAC services/info...。待板AT配置完成再扫KLQ2/查精确MAC；21单测不替代射频。
+
+用户按要求将DAPLink接回主控并又拔插一次其USB。探针LU_2022_8888、Geehy DFP1.0.3。APP0.14直接HALT长读曾受watchdog复位干扰（读回只有8个随机零）；后探针卡DAP_INFO读，关闭仅DAP辅助进程（从不杀健康监测PID25300）并用户重插后恢复。现在已通过DAP只写保留RAMBOOT请求并SYSRESET进入原BOOT0.3，**未写Flash**。原BOOT无应用WDT，稳定HALT精确APP hash=d6bbf4...，全Flash512KiB已备份成功。
+
+备份build/bluetooth_20261030/before_ble_full_flash.bin SHA5d86058efc7fe573b94ad1b11eba1c6b34a1d05d5f7bbc2ac35b9f1557808d7d；boot前32KiB before_ble_boot_0_3.bin SHA9d11e69da5d3f846037815eef31f98f0eaf6b3aba7945d545730354f1fcc9f07。dap_preflight.json PASS，UID0044003A/3531330D/4341364B、CPUID412FC231、512KiB、option a55affffffffffffffffffffffffffff。备份脚本faulthandler25s有trace但非失败，实际50s内完成PASS。当前仍原BOOT0.3下载箭头，APP0.14保留，监测已pause且released=true。别默认设备仍APP待机。
+
+DAP建议用D:/Python/Python312/python.exe，script里sys.path插F:/.venv/Lib/site-packages导入pyocd，避免venv shim多子进程在timeout后遗留。启动旧BOOT请求的dap_enter_old_boot.py已成功。稳定全备份脚本dap_backup_old_boot.py；带watchdog直接HALT的dap_preflight_safe.py不要复用（已关进程）。操作必须timeout并记录逐步进度，命令基础pyocd list（--json无效）。
+
+下一步：等ble driver最后原子reset补丁→最终APP/BOOT ARM构建map→只通过DAP安装BOOT0.5（精确UID/备份/局部BOOT扇区写/读回，不mass erase不碰option；APP0.14与meta全字节不变）。在无WDT旧BOOT状态 reset_and_halt SYSRESETREQ+PRIMASK1/SysTick0/NVIC清后跑FLM，写后放置BOOT_REQUEST top8让新BOOT停留，先用USB验证新BOOT/AT0x56与KLQ2广播。计划PC原生BLE services/INFO/ECHO后直接经BLE把APP0.15写入旧地址0x08008000，END CRC/RUN证明BLE系统升级；若BLE失败新BOOT USB与DAP救援仍在。然后BLE下载examples/ble_display_demo.py/运行/STOP/RAM/USB观测并发/断连重试边界。不要移动电机，当前无需运动。
+
+完工需要更新架构/手机协议交接/环境/原始证据/本handoff，打包F outputs/..., 提交push权威codex分支。真实BLE/BOOT安装尚未完成，不能把native作为通过。下面0.14为先前稳定版本记录。
+
+---
+
 # KLQ 当前交接：主控0.14（2026-10-30）
 
 ## 当前权威与设备状态

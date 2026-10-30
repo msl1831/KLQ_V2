@@ -157,7 +157,13 @@ int usb_serial_read(void)
 bool usb_serial_reset_seen(void)
 {
     bool value;
-    __disable_irq(); value = reset_seen; reset_seen = false; __enable_irq();
+    __disable_irq(); value = reset_seen;
+    if (value && tx_state==USB_TX_BUSY) {
+        USBD_SetEPTxStatus(USBD_EP_1,USBD_EP_STATUS_NAK);
+        USBD_ResetEPTxFlag(USBD_EP_1);
+        tx_busy=false; tx_state=USB_TX_FAILED;
+    }
+    reset_seen = false; __enable_irq();
     return value;
 }
 
@@ -184,12 +190,12 @@ void usb_serial_poll(void)
 
 uint8_t usb_serial_tx_state(void) { return tx_state; }
 bool usb_serial_console_active(void) { return configured && opened && !log_stalled; }
-bool usb_serial_log_ready(void) { return usb_serial_console_active() && tx_state!=USB_TX_BUSY; }
+bool usb_serial_log_ready(void) { return usb_serial_console_active() && !reset_seen && tx_state!=USB_TX_BUSY; }
 
 static bool start(const uint8_t *p, uint32_t n, bool log)
 {
     __disable_irq();
-    if (!configured || (log && (!opened || log_stalled)) || tx_state==USB_TX_BUSY || !n || n>1048u) { __enable_irq(); return false; }
+    if (!configured || reset_seen || (log && (!opened || log_stalled)) || tx_state==USB_TX_BUSY || !n || n>1048u) { __enable_irq(); return false; }
     tx_data=p; tx_left=n; tx_start=board_ms; tx_epoch=usb_epoch; tx_state=USB_TX_BUSY;
     __enable_irq();
     usb_serial_poll(); return true;

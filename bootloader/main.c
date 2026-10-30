@@ -1,6 +1,9 @@
 #include "board.h"
 #include "usb_serial.h"
 #include "protocol.h"
+#ifdef KLQ_BLE
+#include "ble_serial.h"
+#endif
 #ifdef KLQ_DEMO_APP
 #include "external_ports.h"
 #include "klq_runtime.h"
@@ -50,6 +53,9 @@ int main(void)
         board_watchdog_feed();
         power_key_init();
         peripherals_uart_init();
+#ifdef KLQ_BLE
+        ble_serial_init();
+#endif
         external_ports_init();
         voice_link_init();
         voice_control_init();
@@ -143,6 +149,9 @@ int main(void)
     }
 #else
     board_power_on_gate();
+#ifdef KLQ_BLE
+    ble_serial_init();
+#endif
     if (!board_consume_bootloader_request() && protocol_system_firmware_valid())
         board_jump(APP_BASE);
     display_icon(DISPLAY_ICON_DOWNLOAD);

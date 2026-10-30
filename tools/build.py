@@ -21,7 +21,7 @@ def build(demo=False, baseline=False, output_dir=None):
                      'klq_runtime.c', 'mini_python.c', 'power_key.c', 'voice_link.c', 'voice_control.c'}
         files = [source for source in files if source.name not in demo_only]
     drivers = ['rcm','gpio','fmc']
-    if demo: drivers += ['usart']
+    if not baseline: drivers += ['usart']
     files += [lib/f'APM32E10x_StdPeriphDriver/src/apm32e10x_{n}.c' for n in drivers]
     files += list((lib/'USB_Device_Lib/Core_Device/Standard/src').glob('*.c'))
     files += [lib/'USB_Device_Lib/Driver/src/drv_usb_device.c']
@@ -31,6 +31,7 @@ def build(demo=False, baseline=False, output_dir=None):
     common = ['--cpu=Cortex-M3', '--c99', '-O2', '-g', '--split_sections',
               '-D__MICROLIB', '-DAPM32E10X_HD', '-DHSE_VALUE=16000000']
     if demo: common += ['-DKLQ_DEMO_APP']
+    if not baseline: common += ['-DKLQ_BLE']
     for inc in include: common += ['-I', str(inc)]
     for src in files:
         obj = out/(src.stem+'.o')

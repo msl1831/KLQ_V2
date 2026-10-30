@@ -38,6 +38,7 @@ int main(void)
     usb_serial_init();CHECK(!usb_serial_console_active() && usb_serial_reset_seen());
     g_usbDev.curConfiguration=1;config_callback();CHECK(!usb_serial_console_active());
     before=delays;CHECK(!usb_serial_log(line,sizeof(line)) && delays==before && !packets);
+    CHECK(!usb_serial_write(data,20) && usb_serial_reset_seen());
     CHECK(usb_serial_write(data,20));drain();CHECK(usb_serial_tx_state()==USB_TX_DONE && bytes==20 && !memcmp(output,data,20));
     CHECK(!usb_serial_console_active() && !usb_serial_log_ready() && !usb_serial_log(line,sizeof(line)));
     bytes=packets=0;
@@ -60,7 +61,9 @@ int main(void)
     dtr(1);CHECK(usb_serial_write(data,100));pending_in=0;reset_callback();CHECK(usb_serial_tx_state()==USB_TX_FAILED && !usb_serial_console_active() && usb_serial_reset_seen());
     g_usbDev.curConfiguration=1;config_callback();dtr(1);usb_serial_reset_seen();
     memset(rx_packet,0x56,64);g_usbDev.outBuf[1].xferCnt=64;out_callback(1);CHECK(usb_serial_read()==0x56);for(i=1;i<64;i++)CHECK(usb_serial_read()==0x56);CHECK(usb_serial_read()==-1);
-    for(i=0;i<64;i++)out_callback(1);CHECK(usb_serial_reset_seen() && usb_serial_read()==-1);
+    CHECK(usb_serial_write(data,100) && pending_in);
+    for(i=0;i<64;i++)out_callback(1);CHECK(!usb_serial_log_ready() && !usb_serial_write(data,20));
+    CHECK(usb_serial_reset_seen() && usb_serial_read()==-1 && usb_serial_tx_state()==USB_TX_FAILED && !pending_in);
     memset(&r,0,sizeof(r));r.byte.bRequest=0x21;r.byte.wLength[0]=255;r.byte.wLength[1]=255;r.byte.bmRequestType.bit.dir=1;class_request(&r);CHECK(ctrl_n==7);
     r.byte.wIndex[0]=1;class_request(&r);CHECK(stalls==1);
     g_usbDev.curConfiguration=0;config_callback();CHECK(!usb_serial_console_active() && !usb_serial_log_ready());
